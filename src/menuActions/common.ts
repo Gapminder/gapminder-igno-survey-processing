@@ -1,5 +1,19 @@
 import { removeEmptyRowsAtTheEnd } from "../lib/cleanInputRange";
 import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
+import Blob = GoogleAppsScript.Base.Blob;
+import Folder = GoogleAppsScript.Drive.Folder;
+import File = GoogleAppsScript.Drive.File;
+
+/**
+ * @hidden
+ */
+export const xlsxMimeType =
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+/**
+ * @hidden
+ */
+export const gsheetMimeType = "application/vnd.google-apps.spreadsheet";
 
 /**
  * @hidden
@@ -81,4 +95,29 @@ export function adjustSheetRowsAndColumnsCount(
       desiredColumnCount - sheet.getMaxColumns()
     );
   }
+}
+
+/**
+ * @hidden
+ */
+export function addGsheetConvertedVersionOfExcelFileToFolder(
+  excelFile: File,
+  folder: Folder,
+  targetFileName: string
+) {
+  const blob: Blob = excelFile.getBlob();
+  const fileId = excelFile.getId();
+  // @ts-ignore
+  const folderId = Drive.Files.get(fileId).parents[0].id;
+  const resource = {
+    mimeType: gsheetMimeType,
+    parents: [{ id: folderId }],
+    title: targetFileName
+  };
+  // @ts-ignore
+  const createdFileDriveObject = Drive.Files.insert(resource, blob, {
+    convert: true
+  });
+  const createdFile = DriveApp.getFileById(createdFileDriveObject.id);
+  return createdFile;
 }

@@ -1,15 +1,21 @@
 import {
   combinedToplineSheetHeaders,
   combinedToplineSheetName,
+  gsResultsFolderName,
   surveysSheetHeaders,
   surveysSheetName
 } from "../gsheetsData/hardcodedConstants";
 import {
+  addGsheetConvertedVersionOfExcelFileToFolder,
   adjustSheetRowsAndColumnsCount,
   assertCorrectLeftmostSheetColumnHeaders,
   createSheet,
-  getSheetDataIncludingHeaderRow
+  getSheetDataIncludingHeaderRow,
+  gsheetMimeType,
+  xlsxMimeType
 } from "./common";
+import Folder = GoogleAppsScript.Drive.Folder;
+import File = GoogleAppsScript.Drive.File;
 
 /**
  * Menu item action for "Gapminder Igno Survey Process -> Refresh combined topline listing"
@@ -84,7 +90,19 @@ function refreshCombinedToplineListing() {
   }
 
   // Read files in the gs_results folder
-  // TODO
+  const folders = DriveApp.getFoldersByName(gsResultsFolderName);
+  if (!folders.hasNext()) {
+    throw Error(`No folder found called "${gsResultsFolderName}"`);
+  }
+
+  // Use the first matching folder
+  const gsResultsFolder = folders.next();
+
+  // Load files, ensuring that there is a Gsheet version of each uploaded Excel file
+  const filesByMimeType = ensureGsheetVersionsOfEachExcelFile(gsResultsFolder);
+
+  console.log(filesByMimeType);
+
   const combinedToplineSheetData = [];
 
   refreshCombinedToplineListingSheet(
@@ -115,6 +133,46 @@ function refreshCombinedToplineListing() {
     updatedCombinedToplineSheetData.length + 1,
     updatedCombinedToplineSheetDataIncludingHeaderRow[0].length
   );
+}
+
+/**
+ * @hidden
+ */
+function ensureGsheetVersionsOfEachExcelFile(gsResultsFolder: Folder) {
+  const gsResultsFolderFiles = gsResultsFolder.getFiles();
+  const filesByMimeType = {};
+  filesByMimeType[xlsxMimeType] = [];
+  filesByMimeType[gsheetMimeType] = [];
+  while (gsResultsFolderFiles.hasNext()) {
+    const file = gsResultsFolderFiles.next();
+    if (!filesByMimeType[file.getMimeType()]) {
+      filesByMimeType[file.getMimeType()] = [];
+    }
+    filesByMimeType[file.getMimeType()].push(file);
+  }
+  filesByMimeType[xlsxMimeType].map(excelFile => {
+    const targetFileName = excelFile.getName().replace(/.xlsx?/, "");
+    const existingGsheetFiles = filesByMimeType[gsheetMimeType].filter(
+      (gsheetFile: File) => gsheetFile.getName() === targetFileName
+    );
+    if (existingGsheetFiles.length === 0) {
+      /* tslint:disable:no-console */
+      console.info(
+        `Found no Gsheet version of the ${targetFileName} Excel file, creating...`
+      );
+      const gsheetFile = addGsheetConvertedVersionOfExcelFileToFolder(
+        excelFile,
+        gsResultsFolder,
+        targetFileName
+      );
+      console.info(
+        `Created Gsheet version of the ${targetFileName} Excel file`
+      );
+      /* tslint:enable:no-console */
+      filesByMimeType[gsheetMimeType].push(gsheetFile);
+    }
+  });
+  return filesByMimeType;
 }
 
 /**

@@ -17,6 +17,11 @@ export const combinedToplineSheetName = "topline_combo";
 /**
  * @hidden
  */
+export const gsResultsFolderName = "gs_results";
+
+/**
+ * @hidden
+ */
 export const surveysSheetHeaders = ["survey_name", "file_name"];
 
 /**

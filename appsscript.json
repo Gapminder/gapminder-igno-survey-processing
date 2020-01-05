@@ -1,9 +1,15 @@
 {
   "timeZone": "America/New_York",
   "dependencies": {
+    "enabledAdvancedServices": [{
+      "serviceId": "drive",
+      "userSymbol": "Drive",
+      "version": "v2"
+    }]
   },
   "oauthScopes": [
-    "https://www.googleapis.com/auth/spreadsheets"
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive"
   ],
   "exceptionLogging": "STACKDRIVER"
 }
