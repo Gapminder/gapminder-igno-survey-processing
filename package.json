@@ -1,0 +1,80 @@
+{
+  "name": "gapminder-igno-survey-process-scripts",
+  "version": "0.0.0",
+  "description": "Gapminder Igno Survey Process Scripts for specific Google Spreadsheets",
+  "main": "src/index.js",
+  "dependencies": {
+    "@types/lodash": "^4.14.120",
+    "gas-entry-generator": "github:motin/gas-entry-generator#include-params",
+    "lodash": "^4.17.11"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
+    "@babel/plugin-transform-member-expression-literals": "^7.2.0",
+    "@babel/plugin-transform-object-assign": "^7.2.0",
+    "@babel/plugin-transform-property-literals": "^7.2.0",
+    "@babel/preset-env": "^7.2.3",
+    "@google/clasp": "^2.0.0",
+    "@types/google-apps-script": "0.0.35",
+    "@types/node": "^10.12.18",
+    "ava": "^2.4.0",
+    "babel-loader": "^8.0.5",
+    "babel-plugin-add-module-exports": "^1.0.0",
+    "babel-plugin-array-includes": "^2.0.3",
+    "clean-webpack-plugin": "^1.0.0",
+    "concat-md": "^0.3.2",
+    "copy-webpack-plugin": "^5.1.1",
+    "csv-parse": "^4.3.1",
+    "es3ify-webpack-plugin": "^0.0.1",
+    "gas-lib": "^2.0.2",
+    "gas-webpack-plugin": "^1.0.1",
+    "prettier": "^1.15.3",
+    "sync-request": "^6.0.0",
+    "ts-loader": "^5.2.1",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.17.0",
+    "typedoc": "^0.15.6",
+    "typedoc-plugin-markdown": "^2.2.14",
+    "typescript": "^3.2.4",
+    "watch": "^1.0.2",
+    "webpack": "^4.28.4",
+    "webpack-cli": "^3.2.1"
+  },
+  "scripts": {
+    "build": "webpack",
+    "deploy": "npm run format && npm run build && npm run push && npm run docs && npm run lint",
+    "docs": "typedoc --theme markdown --excludeExternals --externalPattern \"**/node_modules/**\" --mode file --ignoreCompilerErrors --out docs --gitRevision v$npm_package_version --readme none --hideBreadcrumbs --name \"Gapminder Igno Survey Process Scripts\" src",
+    "format": "prettier \"src/**/*.ts\" --write",
+    "lint": "tslint -t verbose --fix --project .",
+    "push": "cp .clasp.tpl.json .clasp.json && clasp setting scriptId \"1Om9ff0iaCnshdrQ2XMNXHz-pW-2PST3TXGsNSbyLvCMFsyzH6V6TX5Y1\" && clasp push && clasp setting scriptId \"1N19ztz9YFWpqybkijCs38YHSp2vX0I11P3VXXbDk8Iad_SQI1GxQLCAA\" && clasp push",
+    "watch": "watch 'npm run build && npm run push' src/",
+    "test": "npm run format && npm run test:ava && npm run build && npm run docs && npm run lint",
+    "test:ava": "ava --verbose"
+  },
+  "ava": {
+    "failFast": true,
+    "files": [
+      "src/**/*.spec.ts"
+    ],
+    "compileEnhancements": false,
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gapminder/gsheets-gm-functions.git"
+  },
+  "author": "Gapminder Foundation",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Gapminder/gsheets-gm-functions/issues"
+  },
+  "homepage": "https://github.com/Gapminder/gsheets-gm-functions#readme"
+}
