@@ -5,17 +5,17 @@
 
 ### Functions
 
-* [menuRefreshCombinedToplineListing](README.md#menurefreshcombinedtoplinelisting)
+* [menuRefreshSurveysAndCombinedToplineListings](README.md#menurefreshsurveysandcombinedtoplinelistings)
 
 ## Functions
 
-###  menuRefreshCombinedToplineListing
+###  menuRefreshSurveysAndCombinedToplineListings
 
-▸ **menuRefreshCombinedToplineListing**(): *void*
+▸ **menuRefreshSurveysAndCombinedToplineListings**(): *void*
 
-*Defined in [menuActions/menuRefreshCombinedToplineListing.ts:27](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.0.0/src/menuActions/menuRefreshCombinedToplineListing.ts#L27)*
+*Defined in [menuActions/menuRefreshSurveysAndCombinedToplineListings.ts:37](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.0.0/src/menuActions/menuRefreshSurveysAndCombinedToplineListings.ts#L37)*
 
-Menu item action for "Gapminder Igno Survey Process -> Refresh combined topline listing"
+Menu item action for "Gapminder Igno Survey Process -> Refresh surveys and combined topline listings"
 
 Notes:
 - Creates the `surveys` and `topline_combo` worksheets if they don't exist

@@ -54,16 +54,14 @@ export function assertCorrectLeftmostSheetColumnHeaders(
   const headerRow = sheetDataWithHeaderRow.slice(0, 1);
   const firstSheetHeaders = headerRow[0].slice(0, sheetHeaders.length);
   if (JSON.stringify(firstSheetHeaders) !== JSON.stringify(sheetHeaders)) {
-    SpreadsheetApp.getUi().alert(
+    throw new Error(
       `The first column sheetHeaders in '${sheetName}' must be ${JSON.stringify(
         sheetHeaders
       )} but are currently ${JSON.stringify(
         firstSheetHeaders
       )}. Please adjust and try again`
     );
-    return false;
   }
-  return true;
 }
 
 /**
@@ -120,4 +118,50 @@ export function addGsheetConvertedVersionOfExcelFileToFolder(
   });
   const createdFile = DriveApp.getFileById(createdFileDriveObject.id);
   return createdFile;
+}
+
+/**
+ * @hidden
+ */
+export function ensuredColumnIndex(headers, header: string) {
+  const index = headers.indexOf(header);
+  if (index < 0) {
+    throw new Error(`Header not found: '${header}'`);
+  }
+  return index;
+}
+
+/**
+ * @hidden
+ */
+export function getColumnValuesRange(sheet: Sheet, headers, header) {
+  const columnIndex = ensuredColumnIndex(headers, header);
+  return sheet.getRange(2, columnIndex + 1, sheet.getMaxRows() - 1, 1);
+}
+
+/**
+ * @hidden
+ */
+export function arrayOfASingleValue(value, len): any[] {
+  const arr = [];
+  for (let i = 0; i < len; i++) {
+    arr.push(value);
+  }
+  return arr;
+}
+
+/**
+ * From https://stackoverflow.com/a/43046408/682317
+ * @hidden
+ */
+export function unique(ar) {
+  const j = {};
+
+  ar.forEach(v => {
+    j[v + "::" + typeof v] = v;
+  });
+
+  return Object.keys(j).map(v => {
+    return j[v];
+  });
 }
