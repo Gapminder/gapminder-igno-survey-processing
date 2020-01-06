@@ -18,17 +18,17 @@ import Folder = GoogleAppsScript.Drive.Folder;
 import File = GoogleAppsScript.Drive.File;
 
 /**
- * Menu item action for "Gapminder Igno Survey Process -> Refresh combined topline listing"
+ * Menu item action for "Gapminder Igno Survey Process -> Refresh surveys and combined topline listings"
  *
  * Notes:
  * - Creates the `surveys` and `topline_combo` worksheets if they don't exist
  * - Verifies that the first headers of the `surveys` and `topline_combo` worksheets are as expected
  */
-export function menuRefreshCombinedToplineListing() {
+export function menuRefreshSurveysAndCombinedToplineListings() {
   refreshCombinedToplineListing();
 
   SpreadsheetApp.getUi().alert(
-    "Refreshed the combined topline listing (based on files in the gs_results folder)."
+    "Refreshed the surveys and combined topline listings (based on files in the gs_results folder)."
   );
 
   return;
