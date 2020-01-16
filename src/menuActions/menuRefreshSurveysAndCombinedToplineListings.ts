@@ -11,7 +11,7 @@ import {
   surveysSheetName,
   surveysSheetValueRowToSurveyEntry,
   toplineEntryToCombinedToplineSheetValueRow
-} from "../gsheetsData/hardcodedConstants";
+} from "../gsheetsData/gsCombined.constants";
 import {
   addGsheetConvertedVersionOfExcelFileToFolder,
   adjustSheetRowsAndColumnsCount,

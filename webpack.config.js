@@ -11,10 +11,13 @@ const mode = 'none';
 
 module.exports = {
   devtool: false,
-  entry: './src/index.ts',
+  entry: {
+    gsCombined: './src/gsCombined.index.ts',
+    sdgQuestions: './src/sdgQuestions.index.ts',
+  },
   mode,
   output: {
-    filename: `code-${version}.js`,
+    filename: `[name]/code-${version}.js`,
     path: path.resolve(__dirname, destination),
     libraryTarget: 'this'
   },
@@ -48,8 +51,12 @@ module.exports = {
     new CleanWebpackPlugin([destination]),
     new CopyWebpackPlugin([
       {
-        from: './appsscript.json',
-        to: path.resolve(__dirname, destination)
+        from: './gsCombined.appsscript.json',
+        to: path.resolve(__dirname, destination, "gsCombined", "appsscript.json")
+      },
+      {
+        from: './sdgQuestions.appsscript.json',
+        to: path.resolve(__dirname, destination, "sdgQuestions", "appsscript.json")
       }
     ]),
     new GasPlugin(),

@@ -13,7 +13,7 @@
 
 ▸ **menuRefreshSurveysAndCombinedToplineListings**(): *void*
 
-*Defined in [menuActions/menuRefreshSurveysAndCombinedToplineListings.ts:37](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.0.0/src/menuActions/menuRefreshSurveysAndCombinedToplineListings.ts#L37)*
+*Defined in [menuActions/menuRefreshSurveysAndCombinedToplineListings.ts:37](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.1.0/src/menuActions/menuRefreshSurveysAndCombinedToplineListings.ts#L37)*
 
 Menu item action for "Gapminder Igno Survey Process -> Refresh surveys and combined topline listings"
 

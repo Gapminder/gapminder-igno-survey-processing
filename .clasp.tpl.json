@@ -1,4 +1,4 @@
 {
   "scriptId":"placeholder (script ids are dynamically inserted as part of the deploy routine)",
-  "rootDir": "dist"
+  "rootDir": "placeholder (rootDir is dynamically set as part of the deploy routine)"
 }
