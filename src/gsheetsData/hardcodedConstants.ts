@@ -28,11 +28,16 @@ export const gsResultsFolderName = "gs_results";
  * @hidden
  */
 export const surveysSheetHeaders = [
-  "survey_name",
-  "file_name",
-  "link_if_found_in_gs_results_folder",
-  "number_of_rows_in_combo_questions",
-  "number_of_rows_in_topline_combo"
+  "Survey Name",
+  "Input Sheet",
+  "Survey Batch ID (WV#/CV#)",
+  "Country",
+  "Sample Size",
+  "Survey Date",
+  "Filename",
+  "Link to results (if found in gs_results folder)",
+  "Number of rows in questions_combo",
+  "Number of rows in topline_combo"
 ];
 
 /**
@@ -40,8 +45,11 @@ export const surveysSheetHeaders = [
  */
 export const combinedQuestionsSheetHeaders = [
   "Survey ID",
+  "Survey Name",
   "Question number",
   "Question text",
+  "Igno Question ID",
+  "Igno Question",
   "Winning answer",
   "Response count"
 ];
@@ -51,9 +59,11 @@ export const combinedQuestionsSheetHeaders = [
  */
 export const combinedToplineSheetHeaders = [
   "Survey ID",
+  "Survey Name",
   "Question number",
   "Question text",
   "Answer",
+  "X marks correct answers",
   "Answer by percent",
   "Metadata",
   "Weighted by"
@@ -65,8 +75,13 @@ export const combinedToplineSheetHeaders = [
 export const surveysSheetValueRowToSurveyEntry = (surveysSheetRow: any[]) => {
   return {
     survey_name: surveysSheetRow[0],
-    file_name: surveysSheetRow[1],
-    link_if_found_in_gs_results_folder: surveysSheetRow[2]
+    input_sheet: surveysSheetRow[1],
+    survey_batch_id: surveysSheetRow[2],
+    country: surveysSheetRow[3],
+    sample_size: surveysSheetRow[4],
+    survey_date: surveysSheetRow[5],
+    file_name: surveysSheetRow[6],
+    link_if_found_in_gs_results_folder: surveysSheetRow[7]
   };
 };
 
@@ -74,9 +89,43 @@ export const surveysSheetValueRowToSurveyEntry = (surveysSheetRow: any[]) => {
  * @hidden
  */
 export const surveyEntryToSurveysSheetValueRow = updatedSurveyEntry => [
-  updatedSurveyEntry.survey_name,
+  "...", // survey_name formula
+  updatedSurveyEntry.input_sheet,
+  updatedSurveyEntry.survey_batch_id,
+  updatedSurveyEntry.country,
+  "...", // sample_size formula
+  "...", // survey_date formula
   updatedSurveyEntry.file_name,
   updatedSurveyEntry.link_if_found_in_gs_results_folder
+];
+
+/**
+ * @hidden
+ */
+export const overviewSheetValueRowToOverviewEntry = (
+  overviewSheetRow: any[]
+) => {
+  return {
+    survey_id: overviewSheetRow[0],
+    question_number: overviewSheetRow[1],
+    question_text: overviewSheetRow[2],
+    winning_answer: overviewSheetRow[3],
+    response_count: overviewSheetRow[4]
+  };
+};
+
+/**
+ * @hidden
+ */
+export const overviewEntryToCombinedQuestionSheetValueRow = overviewEntry => [
+  overviewEntry.survey_id,
+  "...", // survey_name formula
+  overviewEntry.question_number,
+  overviewEntry.question_text,
+  "",
+  "...", // igno_question formula
+  overviewEntry.winning_answer,
+  overviewEntry.response_count
 ];
 
 /**
@@ -87,10 +136,13 @@ export const combinedQuestionsSheetValueRowToQuestionEntry = (
 ) => {
   return {
     survey_id: combinedQuestionsSheetRow[0],
-    question_number: combinedQuestionsSheetRow[1],
-    question_text: combinedQuestionsSheetRow[2],
-    winning_answer: combinedQuestionsSheetRow[3],
-    respons_count: combinedQuestionsSheetRow[4]
+    survey_name: combinedQuestionsSheetRow[1],
+    question_number: combinedQuestionsSheetRow[2],
+    question_text: combinedQuestionsSheetRow[3],
+    igno_question_id: combinedQuestionsSheetRow[4],
+    igno_question: combinedQuestionsSheetRow[5],
+    winning_answer: combinedQuestionsSheetRow[6],
+    response_count: combinedQuestionsSheetRow[7]
   };
 };
 
@@ -99,10 +151,43 @@ export const combinedQuestionsSheetValueRowToQuestionEntry = (
  */
 export const questionEntryToCombinedQuestionsSheetValueRow = questionEntry => [
   questionEntry.survey_id,
+  "...", // survey_name formula
   questionEntry.question_number,
   questionEntry.question_text,
+  questionEntry.igno_question_id,
+  "...", // igno_question formula
   questionEntry.winning_answer,
-  questionEntry.respons_count
+  questionEntry.response_count
+];
+
+/**
+ * @hidden
+ */
+export const toplineSheetValueRowToToplineEntry = (toplineSheetRow: any[]) => {
+  return {
+    survey_id: toplineSheetRow[0],
+    question_number: toplineSheetRow[1],
+    question_text: toplineSheetRow[2],
+    answer: toplineSheetRow[3],
+    answer_by_percent: toplineSheetRow[4],
+    metadata: toplineSheetRow[5],
+    weighted_by: toplineSheetRow[6]
+  };
+};
+
+/**
+ * @hidden
+ */
+export const toplineEntryToCombinedToplineSheetValueRow = toplineEntry => [
+  toplineEntry.survey_id,
+  "...", // survey_name formula
+  toplineEntry.question_number,
+  toplineEntry.question_text,
+  toplineEntry.answer,
+  "",
+  toplineEntry.answer_by_percent,
+  toplineEntry.metadata,
+  toplineEntry.weighted_by
 ];
 
 /**
@@ -113,24 +198,28 @@ export const combinedToplineSheetValueRowToToplineEntry = (
 ) => {
   return {
     survey_id: combinedToplineSheetRow[0],
-    question_number: combinedToplineSheetRow[1],
-    question_text: combinedToplineSheetRow[2],
-    answer: combinedToplineSheetRow[3],
-    answer_by_percent: combinedToplineSheetRow[4],
-    metadata: combinedToplineSheetRow[5],
-    weighted_by: combinedToplineSheetRow[6]
+    survey_name: combinedToplineSheetRow[1],
+    question_number: combinedToplineSheetRow[2],
+    question_text: combinedToplineSheetRow[3],
+    answer: combinedToplineSheetRow[4],
+    x_marks_correct_answers: combinedToplineSheetRow[5],
+    answer_by_percent: combinedToplineSheetRow[6],
+    metadata: combinedToplineSheetRow[7],
+    weighted_by: combinedToplineSheetRow[8]
   };
 };
 
 /**
  * @hidden
  */
-export const toplineEntryToCombinedToplineSheetValueRow = toplineEntry => [
-  toplineEntry.survey_id,
-  toplineEntry.question_number,
-  toplineEntry.question_text,
-  toplineEntry.answer,
-  toplineEntry.answer_by_percent,
-  toplineEntry.metadata,
-  toplineEntry.weighted_by
+export const combinedToplineEntryToCombinedToplineSheetValueRow = combinedToplineEntry => [
+  combinedToplineEntry.survey_id,
+  "...", // survey_name formula
+  combinedToplineEntry.question_number,
+  combinedToplineEntry.question_text,
+  combinedToplineEntry.answer,
+  combinedToplineEntry.x_marks_correct_answers,
+  combinedToplineEntry.answer_by_percent,
+  combinedToplineEntry.metadata,
+  combinedToplineEntry.weighted_by
 ];

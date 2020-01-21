@@ -5,16 +5,20 @@ import {
   combinedQuestionsSheetHeaders,
   combinedQuestionsSheetName,
   combinedQuestionsSheetValueRowToQuestionEntry,
+  combinedToplineEntryToCombinedToplineSheetValueRow,
   combinedToplineSheetHeaders,
   combinedToplineSheetName,
   combinedToplineSheetValueRowToToplineEntry,
   gsResultsFolderName,
+  overviewEntryToCombinedQuestionSheetValueRow,
+  overviewSheetValueRowToOverviewEntry,
   questionEntryToCombinedQuestionsSheetValueRow,
   surveyEntryToSurveysSheetValueRow,
   surveysSheetHeaders,
   surveysSheetName,
   surveysSheetValueRowToSurveyEntry,
-  toplineEntryToCombinedToplineSheetValueRow
+  toplineEntryToCombinedToplineSheetValueRow,
+  toplineSheetValueRowToToplineEntry
 } from "../gsheetsData/hardcodedConstants";
 import {
   addGsheetConvertedVersionOfExcelFileToFolder,
@@ -22,6 +26,7 @@ import {
   arrayOfASingleValue,
   assertCorrectLeftmostSheetColumnHeaders,
   createSheet,
+  fillColumnWithFormula,
   getColumnValuesRange,
   getSheetDataIncludingHeaderRow,
   gsheetMimeType,
@@ -274,8 +279,13 @@ function refreshSurveysSheetListing(
   if (newGsResultsFolderGsheetFiles.length > 0) {
     newGsResultsFolderGsheetFiles.map((gsResultsFolderGsheetFile: File) => {
       updatedSurveyEntries.push({
+        country: "",
         file_name: gsResultsFolderGsheetFile.getName(),
+        input_sheet: "",
         link_if_found_in_gs_results_folder: gsResultsFolderGsheetFile.getUrl(),
+        sample_size: "",
+        survey_batch_id: "",
+        survey_date: "",
         survey_name: ""
       });
     });
@@ -302,34 +312,46 @@ function refreshSurveysSheetListing(
     surveysSheetValuesIncludingHeaderRow[0].length
   );
 
-  const surveysSheetValueRowsCount = surveysSheet.getMaxRows() - 1;
+  const surveysSheetValueRowsCount = updatedSurveysSheetValues.length;
 
-  // Fill the "number_of_rows_in_combo_questions" column with a formula
-  const questionRowCountRange = getColumnValuesRange(
+  fillColumnWithFormula(
     surveysSheet,
     surveysSheetHeaders,
-    "number_of_rows_in_combo_questions"
+    "Survey Name",
+    `=VLOOKUP(SUBSTITUTE(INDIRECT("R[0]C[6]", FALSE),"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,2,FALSE)`,
+    surveysSheetValueRowsCount
   );
-  const questionRowCountFormulas = arrayOfASingleValue(
+
+  fillColumnWithFormula(
+    surveysSheet,
+    surveysSheetHeaders,
+    "Sample Size",
+    `=VLOOKUP(SUBSTITUTE(INDIRECT("R[0]C[2]", FALSE),"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,3,FALSE)`,
+    surveysSheetValueRowsCount
+  );
+
+  fillColumnWithFormula(
+    surveysSheet,
+    surveysSheetHeaders,
+    "Survey Date",
+    `=VLOOKUP(SUBSTITUTE(INDIRECT("R[0]C[1]", FALSE),"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,4,FALSE)`,
+    surveysSheetValueRowsCount
+  );
+
+  fillColumnWithFormula(
+    surveysSheet,
+    surveysSheetHeaders,
+    "Number of rows in questions_combo",
     `=IF(INDIRECT("R[0]C[-2]", FALSE)="","",COUNTIF(${combinedQuestionsSheetName}!$A$2:$A, SUBSTITUTE(INDIRECT("R[0]C[-2]", FALSE),"survey-","")))`,
     surveysSheetValueRowsCount
   );
-  questionRowCountRange.setFormulas(
-    questionRowCountFormulas.map(formula => [formula])
-  );
 
-  // Fill the "number_of_rows_in_topline_combo" column with a formula
-  const toplineRowCountRange = getColumnValuesRange(
+  fillColumnWithFormula(
     surveysSheet,
     surveysSheetHeaders,
-    "number_of_rows_in_topline_combo"
-  );
-  const toplineRowCountFormulas = arrayOfASingleValue(
+    "Number of rows in topline_combo",
     `=IF(INDIRECT("R[0]C[-3]", FALSE)="","",COUNTIF(${combinedToplineSheetName}!$A$2:$A, SUBSTITUTE(INDIRECT("R[0]C[-3]", FALSE),"survey-","")))`,
     surveysSheetValueRowsCount
-  );
-  toplineRowCountRange.setFormulas(
-    toplineRowCountFormulas.map(formula => [formula])
   );
 
   return { updatedSurveysSheetValues };
@@ -447,16 +469,22 @@ function refreshCombinedQuestionsSheetListing(
         const sourceSheet = gsResultsFolderGsheet.getSheetByName("Overview");
         const sourceDataRange = sourceSheet.getDataRange();
         const sourceValuesIncludingHeaderRow = sourceDataRange.getValues();
+
+        // console.log({ notYetIncludedGsResultsFolderGsheetFiles });
+
         const sourceHeaderRows = sourceValuesIncludingHeaderRow.slice(0, 1);
         const sourceValues = sourceValuesIncludingHeaderRow.slice(1);
+        const targetValues = sourceValues
+          .map(overviewSheetValueRowToOverviewEntry)
+          .map(overviewEntryToCombinedQuestionSheetValueRow);
         combinedQuestionsSheet
           .getRange(
             rowsWritten + 2,
             1,
             sourceValues.length,
-            sourceHeaderRows[0].length
+            combinedQuestionsSheetHeaders.length
           )
-          .setValues(sourceValues);
+          .setValues(targetValues);
         rowsWritten += sourceValues.length;
       }
     );
@@ -480,6 +508,22 @@ function refreshCombinedQuestionsSheetListing(
     combinedQuestionsSheet,
     updatedCombinedQuestionsSheetData.length + 1,
     updatedCombinedQuestionsSheetValuesIncludingHeaderRow[0].length
+  );
+
+  fillColumnWithFormula(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Survey Name",
+    `=VLOOKUP("survey-"&INDIRECT("R[0]C[-1]", FALSE),{${surveysSheetName}!G$2:G,${surveysSheetName}!A$2:A},2,FALSE)`,
+    updatedCombinedQuestionsSheetData.length
+  );
+
+  fillColumnWithFormula(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Igno Question",
+    `=VLOOKUP(INDIRECT("R[0]C[-1]", FALSE),imported_igno_questions_info!$A$2:$C,2,FALSE)`,
+    updatedCombinedQuestionsSheetData.length
   );
 
   console.info(`End of refreshCombinedQuestionsSheetListing()`);
@@ -551,7 +595,7 @@ function refreshCombinedToplineSheetListing(
       )
       .setValues(
         toplineEntriesWithSurveyEntry.map(
-          toplineEntryToCombinedToplineSheetValueRow
+          combinedToplineEntryToCombinedToplineSheetValueRow
         )
       );
   }
@@ -593,14 +637,17 @@ function refreshCombinedToplineSheetListing(
         const sourceValuesIncludingHeaderRow = sourceDataRange.getValues();
         const sourceHeaderRows = sourceValuesIncludingHeaderRow.slice(0, 1);
         const sourceValues = sourceValuesIncludingHeaderRow.slice(1);
+        const targetValues = sourceValues
+          .map(toplineSheetValueRowToToplineEntry)
+          .map(toplineEntryToCombinedToplineSheetValueRow);
         combinedToplineSheet
           .getRange(
             rowsWritten + 2,
             1,
             sourceValues.length,
-            sourceHeaderRows[0].length
+            combinedToplineSheetHeaders.length
           )
-          .setValues(sourceValues);
+          .setValues(targetValues);
         rowsWritten += sourceValues.length;
       }
     );
@@ -624,6 +671,14 @@ function refreshCombinedToplineSheetListing(
     combinedToplineSheet,
     updatedCombinedToplineSheetData.length + 1,
     updatedCombinedToplineSheetValuesIncludingHeaderRow[0].length
+  );
+
+  fillColumnWithFormula(
+    combinedToplineSheet,
+    combinedToplineSheetHeaders,
+    "Survey Name",
+    `=VLOOKUP("survey-"&INDIRECT("R[0]C[-1]", FALSE),{${surveysSheetName}!G$2:G,${surveysSheetName}!A$2:A},2,FALSE)`,
+    updatedCombinedToplineSheetData.length
   );
 
   console.info(`End of refreshCombinedToplineSheetListing()`);

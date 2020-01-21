@@ -1,8 +1,12 @@
-import { removeEmptyRowsAtTheEnd } from "../lib/cleanInputRange";
 import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 import Blob = GoogleAppsScript.Base.Blob;
 import Folder = GoogleAppsScript.Drive.Folder;
 import File = GoogleAppsScript.Drive.File;
+import {
+  combinedQuestionsSheetName,
+  surveysSheetHeaders
+} from "../gsheetsData/hardcodedConstants";
+import { removeEmptyRowsAtTheEnd } from "../lib/cleanInputRange";
 
 /**
  * @hidden
@@ -137,6 +141,27 @@ export function ensuredColumnIndex(headers, header: string) {
 export function getColumnValuesRange(sheet: Sheet, headers, header) {
   const columnIndex = ensuredColumnIndex(headers, header);
   return sheet.getRange(2, columnIndex + 1, sheet.getMaxRows() - 1, 1);
+}
+
+/**
+ * @hidden
+ */
+export function fillColumnWithFormula(
+  sheet: Sheet,
+  headers: string[],
+  header: string,
+  formulaInA1Notation: string,
+  rowCount: number
+) {
+  const columnIndex = ensuredColumnIndex(headers, header);
+  const questionRowCountRange = sheet.getRange(2, columnIndex + 1, rowCount, 1);
+  const questionRowCountFormulas = arrayOfASingleValue(
+    formulaInA1Notation,
+    rowCount
+  );
+  questionRowCountRange.setFormulas(
+    questionRowCountFormulas.map(formula => [formula])
+  );
 }
 
 /**
