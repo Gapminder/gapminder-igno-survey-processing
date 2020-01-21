@@ -4,7 +4,7 @@
  * Note: Global functions must be exposed to the (global as any) object, or it will not be picked up by gas-webpack-plugin.
  */
 
-import { menuRefreshSurveysAndCombinedToplineListings } from "./menuActions/menuRefreshSurveysAndCombinedToplineListings";
+import { menuRefreshSurveysAndCombinedListings } from "./menuActions/menuRefreshSurveysAndCombinedListings";
 
 /* tslint:disable:only-arrow-functions */
 
@@ -14,10 +14,10 @@ import { menuRefreshSurveysAndCombinedToplineListings } from "./menuActions/menu
   const ui = SpreadsheetApp.getUi();
   const menu = ui.createMenu("Gapminder Igno Survey Process");
   menu.addItem(
-    `Refresh surveys and combined topline listings`,
-    "menuRefreshSurveysAndCombinedToplineListings"
+    `Refresh surveys and combined listings`,
+    "menuRefreshSurveysAndCombinedListings"
   );
   menu.addToUi();
 };
 
-(global as any).menuRefreshSurveysAndCombinedToplineListings = menuRefreshSurveysAndCombinedToplineListings;
+(global as any).menuRefreshSurveysAndCombinedListings = menuRefreshSurveysAndCombinedListings;

@@ -2,10 +2,14 @@ import difference from "lodash/difference";
 import intersection from "lodash/intersection";
 import union from "lodash/union";
 import {
+  combinedQuestionsSheetHeaders,
+  combinedQuestionsSheetName,
+  combinedQuestionsSheetValueRowToQuestionEntry,
   combinedToplineSheetHeaders,
   combinedToplineSheetName,
   combinedToplineSheetValueRowToToplineEntry,
   gsResultsFolderName,
+  questionEntryToCombinedQuestionsSheetValueRow,
   surveyEntryToSurveysSheetValueRow,
   surveysSheetHeaders,
   surveysSheetName,
@@ -34,11 +38,11 @@ import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
  * - Creates the `surveys` and `topline_combo` worksheets if they don't exist
  * - Verifies that the first headers of the `surveys` and `topline_combo` worksheets are as expected
  */
-export function menuRefreshSurveysAndCombinedToplineListings() {
+export function menuRefreshSurveysAndCombinedListings() {
   try {
-    refreshSurveysAndCombinedToplineListings();
+    refreshSurveysAndCombinedListings();
     SpreadsheetApp.getUi().alert(
-      "Refreshed the surveys and combined topline listing (based on files in the gs_results folder)."
+      "Refreshed the surveys and combined listings (based on files in the gs_results folder)."
     );
   } catch (e) {
     // Ignore "Timed out waiting for user response" since it just means that we let the script run and went for coffee
@@ -59,11 +63,11 @@ export function menuRefreshSurveysAndCombinedToplineListings() {
 /**
  * @hidden
  */
-function refreshSurveysAndCombinedToplineListings() {
+function refreshSurveysAndCombinedListings() {
   /* tslint:disable:no-console */
-  console.info(`Start of refreshSurveysAndCombinedToplineListings()`);
+  console.info(`Start of refreshSurveysAndCombinedListings()`);
 
-  console.info(`Fetching and verifying existing worksheet contents`);
+  console.info(`Fetching and verifying existing worksheets`);
   const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   let surveysSheet = activeSpreadsheet.getSheetByName(surveysSheetName);
   if (surveysSheet === null) {
@@ -71,6 +75,17 @@ function refreshSurveysAndCombinedToplineListings() {
       activeSpreadsheet,
       surveysSheetName,
       surveysSheetHeaders
+    );
+  }
+
+  let combinedQuestionsSheet = activeSpreadsheet.getSheetByName(
+    combinedQuestionsSheetName
+  );
+  if (combinedQuestionsSheet === null) {
+    combinedQuestionsSheet = createSheet(
+      activeSpreadsheet,
+      combinedQuestionsSheetName,
+      combinedQuestionsSheetHeaders
     );
   }
 
@@ -90,6 +105,11 @@ function refreshSurveysAndCombinedToplineListings() {
     surveysSheetHeaders
   );
 
+  const combinedQuestionsSheetValuesIncludingHeaderRow = getSheetDataIncludingHeaderRow(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders
+  );
+
   const combinedToplineSheetValuesIncludingHeaderRow = getSheetDataIncludingHeaderRow(
     combinedToplineSheet,
     combinedToplineSheetHeaders
@@ -102,12 +122,18 @@ function refreshSurveysAndCombinedToplineListings() {
     surveysSheetValuesIncludingHeaderRow
   );
   assertCorrectLeftmostSheetColumnHeaders(
+    combinedQuestionsSheetHeaders,
+    combinedQuestionsSheetName,
+    combinedQuestionsSheetValuesIncludingHeaderRow
+  );
+  assertCorrectLeftmostSheetColumnHeaders(
     combinedToplineSheetHeaders,
     combinedToplineSheetName,
     combinedToplineSheetValuesIncludingHeaderRow
   );
 
-  // Read files in the (first found) folder called "gs_results", ensuring that there is a Gsheet version of each uploaded Excel file
+  // Read files in the folder called "gs_results" (the first found, in case there are many),
+  // ensuring that there is a Gsheet version of each uploaded Excel file
   console.info(
     `Reading files in the folder called "gs_results", ensuring that there is a Gsheet version of each uploaded Excel file`
   );
@@ -126,6 +152,14 @@ function refreshSurveysAndCombinedToplineListings() {
     gsResultsFolderGsheetFiles
   );
 
+  console.info(`Refreshing combined questions listing`);
+  refreshCombinedQuestionsSheetListing(
+    updatedSurveysSheetValues,
+    combinedQuestionsSheet,
+    combinedQuestionsSheetValuesIncludingHeaderRow,
+    gsResultsFolderGsheetFiles
+  );
+
   console.info(`Refreshing combined topline listing`);
   refreshCombinedToplineSheetListing(
     updatedSurveysSheetValues,
@@ -134,7 +168,7 @@ function refreshSurveysAndCombinedToplineListings() {
     gsResultsFolderGsheetFiles
   );
 
-  console.info(`End of refreshSurveysAndCombinedToplineListings()`);
+  console.info(`End of refreshSurveysAndCombinedListings()`);
   /* tslint:disable:no-console */
 }
 
@@ -260,7 +294,7 @@ function refreshSurveysSheetListing(
     )
     .setValues(updatedSurveysSheetValues);
 
-  // Limit the amount of rows of the surveys spreadsheet to the amount of surveys + a few extras for adding new ones
+  // Limit the amount of rows of the surveys spreadsheet to the amount of surveys + a few extras for adding new ones manually
   const extraBlankRows = 3;
   adjustSheetRowsAndColumnsCount(
     surveysSheet,
@@ -268,19 +302,35 @@ function refreshSurveysSheetListing(
     surveysSheetValuesIncludingHeaderRow[0].length
   );
 
+  const surveysSheetValueRowsCount = surveysSheet.getMaxRows() - 1;
+
+  // Fill the "number_of_rows_in_combo_questions" column with a formula
+  const questionRowCountRange = getColumnValuesRange(
+    surveysSheet,
+    surveysSheetHeaders,
+    "number_of_rows_in_combo_questions"
+  );
+  const questionRowCountFormulas = arrayOfASingleValue(
+    `=IF(INDIRECT("R[0]C[-2]", FALSE)="","",COUNTIF(${combinedQuestionsSheetName}!$A$2:$A, SUBSTITUTE(INDIRECT("R[0]C[-2]", FALSE),"survey-","")))`,
+    surveysSheetValueRowsCount
+  );
+  questionRowCountRange.setFormulas(
+    questionRowCountFormulas.map(formula => [formula])
+  );
+
   // Fill the "number_of_rows_in_topline_combo" column with a formula
-  const catalogStatusRange = getColumnValuesRange(
+  const toplineRowCountRange = getColumnValuesRange(
     surveysSheet,
     surveysSheetHeaders,
     "number_of_rows_in_topline_combo"
   );
-  const sheetValueRowsCount = surveysSheet.getMaxRows() - 1;
-  const formulas = arrayOfASingleValue(
-    '=IF(INDIRECT("R[0]C[-2]", FALSE)="","",COUNTIF(topline_combo!$A$2:$A, SUBSTITUTE(INDIRECT("R[0]C[-2]", FALSE),"survey-","")))',
-    sheetValueRowsCount
+  const toplineRowCountFormulas = arrayOfASingleValue(
+    `=IF(INDIRECT("R[0]C[-3]", FALSE)="","",COUNTIF(${combinedToplineSheetName}!$A$2:$A, SUBSTITUTE(INDIRECT("R[0]C[-3]", FALSE),"survey-","")))`,
+    surveysSheetValueRowsCount
   );
-  const formulaRows = formulas.map(formula => [formula]);
-  catalogStatusRange.setFormulas(formulaRows);
+  toplineRowCountRange.setFormulas(
+    toplineRowCountFormulas.map(formula => [formula])
+  );
 
   return { updatedSurveysSheetValues };
 }
@@ -290,6 +340,150 @@ function refreshSurveysSheetListing(
  */
 function fileNameToSurveyId(fileName) {
   return fileName.replace("survey-", "");
+}
+
+/**
+ * @hidden
+ */
+function refreshCombinedQuestionsSheetListing(
+  updatedSurveysSheetValues: any[][],
+  combinedQuestionsSheet: Sheet,
+  combinedQuestionsSheetValuesIncludingHeaderRow: any[][],
+  gsResultsFolderGsheetFiles: File[]
+) {
+  /* tslint:disable:no-console */
+  console.info(`Start of refreshCombinedQuestionsSheetListing()`);
+
+  // Clear all rows except the header row
+  console.info(`Clearing all rows except the header row`);
+  combinedQuestionsSheet
+    .getRange(
+      2,
+      1,
+      combinedQuestionsSheetValuesIncludingHeaderRow.length,
+      combinedQuestionsSheetValuesIncludingHeaderRow[0].length
+    )
+    .clearContent();
+
+  // From the existing sheet contents, purge entries that does not have an entry in the surveys sheet
+  // so that the combined question listing only contains rows that are relevant for analysis
+  console.info(`Purging orphaned rows from the combined question listing`);
+  const combinedQuestionsSheetValues = combinedQuestionsSheetValuesIncludingHeaderRow.slice(
+    1
+  );
+  const existingSurveyEntries = updatedSurveysSheetValues.map(
+    surveysSheetValueRowToSurveyEntry
+  );
+  const existingQuestionEntries = combinedQuestionsSheetValues.map(
+    combinedQuestionsSheetValueRowToQuestionEntry
+  );
+  const existingSurveysSurveyIds = existingSurveyEntries.map(
+    existingSurveyEntry => fileNameToSurveyId(existingSurveyEntry.file_name)
+  );
+  const existingQuestionSurveyIds = union(
+    existingQuestionEntries.map(
+      existingQuestionEntry => existingQuestionEntry.survey_id
+    )
+  );
+
+  const surveyIdsInBothListings = intersection(
+    existingSurveysSurveyIds,
+    existingQuestionSurveyIds
+  );
+
+  const questionEntriesWithSurveyEntry = existingQuestionEntries.filter(
+    questionEntry => surveyIdsInBothListings.includes(questionEntry.survey_id)
+  );
+
+  // Write the purged/trimmed contents back to the sheet
+  console.info(`Writing the purged/trimmed contents back to the sheet`);
+  if (questionEntriesWithSurveyEntry.length > 0) {
+    combinedQuestionsSheet
+      .getRange(
+        2,
+        1,
+        questionEntriesWithSurveyEntry.length,
+        combinedQuestionsSheetValuesIncludingHeaderRow[0].length
+      )
+      .setValues(
+        questionEntriesWithSurveyEntry.map(
+          questionEntryToCombinedQuestionsSheetValueRow
+        )
+      );
+  }
+  let rowsWritten = questionEntriesWithSurveyEntry.length;
+
+  console.info(
+    `Finding which gsheet files are not-yet-included in the combined question listing`
+  );
+  const gsResultsFolderGsheetFilesSurveyIds = union(
+    gsResultsFolderGsheetFiles.map(gsResultsFolderGsheetFile =>
+      fileNameToSurveyId(gsResultsFolderGsheetFile.getName())
+    )
+  );
+  const notYetIncludedGsResultsFolderGsheetFilesSurveyIds = difference(
+    gsResultsFolderGsheetFilesSurveyIds,
+    existingQuestionSurveyIds
+  );
+  const notYetIncludedGsResultsFolderGsheetFiles = gsResultsFolderGsheetFiles.filter(
+    (gsResultsFolderGsheetFile: File) => {
+      const surveyId = fileNameToSurveyId(gsResultsFolderGsheetFile.getName());
+      return notYetIncludedGsResultsFolderGsheetFilesSurveyIds.includes(
+        surveyId
+      );
+    }
+  );
+  // Open each not-yet-included gsheet file and add rows to the end of the sheet continuously
+  if (notYetIncludedGsResultsFolderGsheetFiles.length > 0) {
+    console.info(
+      `Opening the ${notYetIncludedGsResultsFolderGsheetFiles.length} not-yet-included gsheet file(s) and adding them to the end of the sheet`
+    );
+    // console.log({ notYetIncludedGsResultsFolderGsheetFiles });
+    notYetIncludedGsResultsFolderGsheetFiles.map(
+      (gsResultsFolderGsheetFile: File) => {
+        const gsResultsFolderGsheet = SpreadsheetApp.openById(
+          gsResultsFolderGsheetFile.getId()
+        );
+        const sourceSheet = gsResultsFolderGsheet.getSheetByName("Overview");
+        const sourceDataRange = sourceSheet.getDataRange();
+        const sourceValuesIncludingHeaderRow = sourceDataRange.getValues();
+        const sourceHeaderRows = sourceValuesIncludingHeaderRow.slice(0, 1);
+        const sourceValues = sourceValuesIncludingHeaderRow.slice(1);
+        combinedQuestionsSheet
+          .getRange(
+            rowsWritten + 2,
+            1,
+            sourceValues.length,
+            sourceHeaderRows[0].length
+          )
+          .setValues(sourceValues);
+        rowsWritten += sourceValues.length;
+      }
+    );
+  }
+
+  // Read back the updated combined question sheet data
+  console.info(`Reading back the updated combined question sheet data`);
+  const updatedCombinedQuestionsSheetValuesIncludingHeaderRow = getSheetDataIncludingHeaderRow(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders
+  );
+
+  // Limit the amount of rows of the worksheet to the amount of entries
+  console.info(
+    `Limiting the amount of rows of the combined questions worksheet to the amount of entries`
+  );
+  const updatedCombinedQuestionsSheetData = updatedCombinedQuestionsSheetValuesIncludingHeaderRow.slice(
+    1
+  );
+  adjustSheetRowsAndColumnsCount(
+    combinedQuestionsSheet,
+    updatedCombinedQuestionsSheetData.length + 1,
+    updatedCombinedQuestionsSheetValuesIncludingHeaderRow[0].length
+  );
+
+  console.info(`End of refreshCombinedQuestionsSheetListing()`);
+  /* tslint:enable:no-console */
 }
 
 /**
@@ -419,9 +613,9 @@ function refreshCombinedToplineSheetListing(
     combinedToplineSheetHeaders
   );
 
-  // Limit the amount of rows of the surveys spreadsheet to the amount of entries
+  // Limit the amount of rows of the worksheet to the amount of entries
   console.info(
-    `Limiting the amount of rows of the surveys spreadsheet to the amount of entries`
+    `Limiting the amount of rows of the combined topline worksheet to the amount of entries`
   );
   const updatedCombinedToplineSheetData = updatedCombinedToplineSheetValuesIncludingHeaderRow.slice(
     1

@@ -12,6 +12,11 @@ export const surveysSheetName = "surveys";
 /**
  * @hidden
  */
+export const combinedQuestionsSheetName = "questions_combo";
+
+/**
+ * @hidden
+ */
 export const combinedToplineSheetName = "topline_combo";
 
 /**
@@ -26,7 +31,19 @@ export const surveysSheetHeaders = [
   "survey_name",
   "file_name",
   "link_if_found_in_gs_results_folder",
+  "number_of_rows_in_combo_questions",
   "number_of_rows_in_topline_combo"
+];
+
+/**
+ * @hidden
+ */
+export const combinedQuestionsSheetHeaders = [
+  "Survey ID",
+  "Question number",
+  "Question text",
+  "Winning answer",
+  "Response count"
 ];
 
 /**
@@ -60,6 +77,32 @@ export const surveyEntryToSurveysSheetValueRow = updatedSurveyEntry => [
   updatedSurveyEntry.survey_name,
   updatedSurveyEntry.file_name,
   updatedSurveyEntry.link_if_found_in_gs_results_folder
+];
+
+/**
+ * @hidden
+ */
+export const combinedQuestionsSheetValueRowToQuestionEntry = (
+  combinedQuestionsSheetRow: any[]
+) => {
+  return {
+    survey_id: combinedQuestionsSheetRow[0],
+    question_number: combinedQuestionsSheetRow[1],
+    question_text: combinedQuestionsSheetRow[2],
+    winning_answer: combinedQuestionsSheetRow[3],
+    respons_count: combinedQuestionsSheetRow[4]
+  };
+};
+
+/**
+ * @hidden
+ */
+export const questionEntryToCombinedQuestionsSheetValueRow = questionEntry => [
+  questionEntry.survey_id,
+  questionEntry.question_number,
+  questionEntry.question_text,
+  questionEntry.winning_answer,
+  questionEntry.respons_count
 ];
 
 /**
