@@ -48,10 +48,19 @@ export const combinedQuestionsSheetHeaders = [
   "Survey Name",
   "Question number",
   "Question text",
-  "Igno Question ID",
-  "Igno Question",
-  "Winning answer",
-  "Response count"
+  "Igno Index Question ID",
+  "Foreign Country Igno Question ID",
+  "Igno Index Question",
+  "Foreign Country Igno Question",
+  // "Winning answer", // Ignoring this column since it is confusing next to the others
+  "Response count",
+  "The answer options",
+  "Answers by percent",
+  "Correct answer(s)",
+  "% that answered correctly",
+  "Overall Summary",
+  "Amount of answer options",
+  "% that would have answered correctly in an abc-type question"
 ];
 
 /**
@@ -63,7 +72,7 @@ export const combinedToplineSheetHeaders = [
   "Question number",
   "Question text",
   "Answer",
-  "X marks correct answers",
+  'Correct? ("x" marks correct answers)',
   "Answer by percent",
   "Metadata",
   "Weighted by"
@@ -122,10 +131,19 @@ export const overviewEntryToCombinedQuestionSheetValueRow = overviewEntry => [
   "...", // survey_name formula
   overviewEntry.question_number,
   overviewEntry.question_text,
-  "",
-  "...", // igno_question formula
-  overviewEntry.winning_answer,
-  overviewEntry.response_count
+  "", // igno_index_question_id blank on new rows
+  "", // foreign_country_igno_question_id blank on new rows
+  "...", // igno_index_question formula
+  "...", // foreign_country_igno_question formula
+  // questionEntry.winning_answer, // Ignoring this column since it is confusing next to the others
+  overviewEntry.response_count,
+  "...", // the_answer_options formula
+  "...", // answers_by_percent formula
+  "...", // correct_answers formula
+  "...", // percent_that_answered_correctly formula
+  "...", // overall_summary formula
+  "...", // amount_of_answer_options formula
+  "..." // percent_that_would_have_answered_correctly_in_an_abc_type_question formula
 ];
 
 /**
@@ -139,10 +157,20 @@ export const combinedQuestionsSheetValueRowToQuestionEntry = (
     survey_name: combinedQuestionsSheetRow[1],
     question_number: combinedQuestionsSheetRow[2],
     question_text: combinedQuestionsSheetRow[3],
-    igno_question_id: combinedQuestionsSheetRow[4],
-    igno_question: combinedQuestionsSheetRow[5],
-    winning_answer: combinedQuestionsSheetRow[6],
-    response_count: combinedQuestionsSheetRow[7]
+    igno_index_question_id: combinedQuestionsSheetRow[4],
+    foreign_country_igno_question_id: combinedQuestionsSheetRow[5],
+    igno_index_question: combinedQuestionsSheetRow[6],
+    foreign_country_igno_question: combinedQuestionsSheetRow[7],
+    // winning_answer: combinedQuestionsSheetRow[8], // Ignoring this column since it is confusing next to the others
+    response_count: combinedQuestionsSheetRow[8],
+    the_answer_options: combinedQuestionsSheetRow[9],
+    answers_by_percent: combinedQuestionsSheetRow[10],
+    correct_answers: combinedQuestionsSheetRow[11],
+    percent_that_answered_correctly: combinedQuestionsSheetRow[12],
+    overall_summary: combinedQuestionsSheetRow[13],
+    amount_of_answer_options: combinedQuestionsSheetRow[14],
+    percent_that_would_have_answered_correctly_in_an_abc_type_question:
+      combinedQuestionsSheetRow[15]
   };
 };
 
@@ -154,10 +182,19 @@ export const questionEntryToCombinedQuestionsSheetValueRow = questionEntry => [
   "...", // survey_name formula
   questionEntry.question_number,
   questionEntry.question_text,
-  questionEntry.igno_question_id,
-  "...", // igno_question formula
-  questionEntry.winning_answer,
-  questionEntry.response_count
+  questionEntry.igno_index_question_id,
+  questionEntry.foreign_country_igno_question_id,
+  "...", // igno_index_question formula
+  "...", // foreign_country_igno_question formula
+  // questionEntry.winning_answer, // Ignoring this column since it is confusing next to the others
+  questionEntry.response_count,
+  "...", // the_answer_options formula
+  "...", // answers_by_percent formula
+  "...", // correct_answers formula
+  "...", // percent_that_answered_correctly formula
+  "...", // overall_summary formula
+  "...", // amount_of_answer_options formula
+  "..." // percent_that_would_have_answered_correctly_in_an_abc_type_question formula
 ];
 
 /**

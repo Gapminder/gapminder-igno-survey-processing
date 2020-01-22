@@ -23,11 +23,9 @@ import {
 import {
   addGsheetConvertedVersionOfExcelFileToFolder,
   adjustSheetRowsAndColumnsCount,
-  arrayOfASingleValue,
   assertCorrectLeftmostSheetColumnHeaders,
   createSheet,
   fillColumnWithFormula,
-  getColumnValuesRange,
   getSheetDataIncludingHeaderRow,
   gsheetMimeType,
   xlsxMimeType
@@ -304,8 +302,12 @@ function refreshSurveysSheetListing(
     )
     .setValues(updatedSurveysSheetValues);
 
-  // Limit the amount of rows of the surveys spreadsheet to the amount of surveys + a few extras for adding new ones manually
-  const extraBlankRows = 3;
+  // Limit the amount of rows of the surveys spreadsheet to the amount of surveys
+  /* tslint:disable:no-console */
+  console.info(
+    `Limiting the amount of rows of the surveys spreadsheet to the amount of surveys`
+  );
+  const extraBlankRows = 0;
   adjustSheetRowsAndColumnsCount(
     surveysSheet,
     updatedSurveysSheetValues.length + extraBlankRows + 1,
@@ -314,6 +316,8 @@ function refreshSurveysSheetListing(
 
   const surveysSheetValueRowsCount = updatedSurveysSheetValues.length;
 
+  console.info(`Filling formula columns`);
+  /* tslint:enable:no-console */
   fillColumnWithFormula(
     surveysSheet,
     surveysSheetHeaders,
@@ -510,6 +514,7 @@ function refreshCombinedQuestionsSheetListing(
     updatedCombinedQuestionsSheetValuesIncludingHeaderRow[0].length
   );
 
+  console.info(`Filling formula columns`);
   fillColumnWithFormula(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
@@ -521,8 +526,77 @@ function refreshCombinedQuestionsSheetListing(
   fillColumnWithFormula(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
-    "Igno Question",
-    `=VLOOKUP(INDIRECT("R[0]C[-1]", FALSE),imported_igno_questions_info!$A$2:$C,2,FALSE)`,
+    "Igno Index Question",
+    `=VLOOKUP(INDIRECT("R[0]C[-2]", FALSE),imported_igno_questions_info!$A$2:$C,2,FALSE)`,
+    updatedCombinedQuestionsSheetData.length
+  );
+
+  fillColumnWithFormula(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Foreign Country Igno Question",
+    `=VLOOKUP(INDIRECT("R[0]C[-2]", FALSE),imported_igno_questions_info!$B$2:$D,2,FALSE)`,
+    updatedCombinedQuestionsSheetData.length
+  );
+
+  fillColumnWithFormula(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "The answer options",
+    `=JOIN(" - ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW]))`,
+    // `=JOIN(" - ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = INDIRECT("R[0]C[-9]", FALSE),topline_combo!$C$2:$C = INDIRECT("R[0]C[-7]", FALSE)))`,
+    updatedCombinedQuestionsSheetData.length
+  );
+
+  fillColumnWithFormula(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Answers by percent",
+    `=JOIN(" - ",ARRAYFORMULA(TEXT(FILTER(topline_combo!$G$2:$G,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW]), "0.0%")))`,
+    updatedCombinedQuestionsSheetData.length
+  );
+
+  fillColumnWithFormula(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Correct answer(s)",
+    `=JOIN("; ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW],topline_combo!$F$2:$F = "x"))`,
+    updatedCombinedQuestionsSheetData.length
+  );
+
+  fillColumnWithFormula(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "% that answered correctly",
+    `=SUMIFS(topline_combo!$G$2:$G,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,"X")`,
+    updatedCombinedQuestionsSheetData.length
+  );
+
+  fillColumnWithFormula(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Overall Summary",
+    `=IFERROR("Response count: "&I[ROW]&"
+The answer options: "&J[ROW]&"
+Answers by percent: "&K[ROW]&"
+Correct answer(s): "&L[ROW]&"
+% that answered correctly: "&TEXT(M[ROW], "0.0%"), "Results not processed yet")`,
+    updatedCombinedQuestionsSheetData.length
+  );
+
+  fillColumnWithFormula(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Amount of answer options",
+    `=COUNTIFS(topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW])`,
+    updatedCombinedQuestionsSheetData.length
+  );
+
+  fillColumnWithFormula(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "% that would have answered correctly in an abc-type question",
+    `=M[ROW]*O[ROW]/3`,
     updatedCombinedQuestionsSheetData.length
   );
 
@@ -541,6 +615,8 @@ function refreshCombinedToplineSheetListing(
 ) {
   /* tslint:disable:no-console */
   console.info(`Start of refreshCombinedToplineSheetListing()`);
+
+  // TODO PERF: Only clear and reinsert contents if actual purging was necessary
 
   // Clear all rows except the header row
   console.info(`Clearing all rows except the header row`);
@@ -673,6 +749,7 @@ function refreshCombinedToplineSheetListing(
     updatedCombinedToplineSheetValuesIncludingHeaderRow[0].length
   );
 
+  console.info(`Filling formula columns`);
   fillColumnWithFormula(
     combinedToplineSheet,
     combinedToplineSheetHeaders,

@@ -59,11 +59,11 @@ export function assertCorrectLeftmostSheetColumnHeaders(
   const firstSheetHeaders = headerRow[0].slice(0, sheetHeaders.length);
   if (JSON.stringify(firstSheetHeaders) !== JSON.stringify(sheetHeaders)) {
     throw new Error(
-      `The first column sheetHeaders in '${sheetName}' must be ${JSON.stringify(
+      `Unexpected columns. The first column headers in '${sheetName}' must be ${JSON.stringify(
         sheetHeaders
       )} but are currently ${JSON.stringify(
         firstSheetHeaders
-      )}. Please adjust and try again`
+      )}. The scripts needs to be updated to expect the current columns or vice versa.`
     );
   }
 }
@@ -158,7 +158,7 @@ export function fillColumnWithFormula(
   const questionRowCountFormulas = arrayOfASingleValue(
     formulaInA1Notation,
     rowCount
-  );
+  ).map((formula, index) => formula.split("[ROW]").join(index + 2));
   questionRowCountRange.setFormulas(
     questionRowCountFormulas.map(formula => [formula])
   );
