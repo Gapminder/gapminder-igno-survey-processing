@@ -149,7 +149,7 @@ export const overviewEntryToCombinedQuestionSheetValueRow = overviewEntry => [
 /**
  * @hidden
  */
-export const combinedQuestionsSheetValueRowToQuestionEntry = (
+export const combinedQuestionsSheetValueRowToCombinedQuestionEntry = (
   combinedQuestionsSheetRow: any[]
 ) => {
   return {
@@ -221,7 +221,7 @@ export const toplineEntryToCombinedToplineSheetValueRow = toplineEntry => [
   toplineEntry.question_number,
   toplineEntry.question_text,
   toplineEntry.answer,
-  "",
+  "", // x_marks_correct_answers left blank
   toplineEntry.answer_by_percent,
   toplineEntry.metadata,
   toplineEntry.weighted_by
@@ -230,7 +230,7 @@ export const toplineEntryToCombinedToplineSheetValueRow = toplineEntry => [
 /**
  * @hidden
  */
-export const combinedToplineSheetValueRowToToplineEntry = (
+export const combinedToplineSheetValueRowToCombinedToplineEntry = (
   combinedToplineSheetRow: any[]
 ) => {
   return {

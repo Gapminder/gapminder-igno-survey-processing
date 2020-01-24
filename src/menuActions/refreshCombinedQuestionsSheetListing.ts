@@ -6,7 +6,7 @@ import intersection from "lodash/intersection";
 import union from "lodash/union";
 import {
   combinedQuestionsSheetHeaders,
-  combinedQuestionsSheetValueRowToQuestionEntry,
+  combinedQuestionsSheetValueRowToCombinedQuestionEntry,
   overviewEntryToCombinedQuestionSheetValueRow,
   overviewSheetValueRowToOverviewEntry,
   questionEntryToCombinedQuestionsSheetValueRow,
@@ -46,7 +46,7 @@ export function refreshCombinedQuestionsSheetListing(
     surveysSheetValueRowToSurveyEntry
   );
   const existingQuestionEntries = combinedQuestionsSheetValues.map(
-    combinedQuestionsSheetValueRowToQuestionEntry
+    combinedQuestionsSheetValueRowToCombinedQuestionEntry
   );
   const existingSurveysSurveyIds = existingSurveyEntries.map(
     existingSurveyEntry => fileNameToSurveyId(existingSurveyEntry.file_name)
@@ -138,9 +138,12 @@ export function refreshCombinedQuestionsSheetListing(
         const sourceValuesIncludingHeaderRow = sourceDataRange.getDisplayValues();
         // const sourceHeaderRows = sourceValuesIncludingHeaderRow.slice(0, 1);
         const sourceValues = sourceValuesIncludingHeaderRow.slice(1);
-        const targetValues = sourceValues
-          .map(overviewSheetValueRowToOverviewEntry)
-          .map(overviewEntryToCombinedQuestionSheetValueRow);
+        const targetEntries = sourceValues.map(
+          overviewSheetValueRowToOverviewEntry
+        );
+        const targetValues = targetEntries.map(
+          overviewEntryToCombinedQuestionSheetValueRow
+        );
         const startRow = updatedCombinedQuestionEntries.length + 2;
         console.info(
           `Adding ${
@@ -155,8 +158,14 @@ export function refreshCombinedQuestionsSheetListing(
             combinedQuestionsSheetHeaders.length
           )
           .setValues(targetValues);
+        // Add to the array that tracks the current sheet entries
         updatedCombinedQuestionEntries = updatedCombinedQuestionEntries.concat(
-          targetValues
+          targetValues.map(
+            combinedQuestionsSheetValueRowToCombinedQuestionEntry
+          )
+        );
+        console.info(
+          `Added ${targetValues.length} rows. The total amount of data rows is now ${updatedCombinedQuestionEntries.length}`
         );
       }
     );
@@ -197,8 +206,21 @@ export function refreshCombinedQuestionsSheetListing(
     updatedCombinedQuestionEntries.length
   );
 
-  const combineSurveyIdAndQuestionNumber = updatedCombinedEntry =>
-    `${updatedCombinedEntry.survey_id}-${updatedCombinedEntry.question_number}`;
+  const combineSurveyIdAndQuestionNumber = updatedCombinedEntry => {
+    if (!updatedCombinedEntry.survey_id) {
+      console.log("The entry did not have survey_id set", {
+        updatedCombinedEntry
+      });
+      throw new Error("The entry did not have survey_id set");
+    }
+    if (!updatedCombinedEntry.question_number) {
+      console.log("The entry did not have question_number set", {
+        updatedCombinedEntry
+      });
+      throw new Error("The entry did not have question_number set");
+    }
+    return `${updatedCombinedEntry.survey_id}-${updatedCombinedEntry.question_number}`;
+  };
   const updatedCombinedToplineEntriesBySurveyIdAndQuestionNumber = groupBy(
     updatedCombinedToplineEntries,
     combineSurveyIdAndQuestionNumber

@@ -6,7 +6,7 @@ import union from "lodash/union";
 import {
   combinedToplineEntryToCombinedToplineSheetValueRow,
   combinedToplineSheetHeaders,
-  combinedToplineSheetValueRowToToplineEntry,
+  combinedToplineSheetValueRowToCombinedToplineEntry,
   surveysSheetName,
   surveysSheetValueRowToSurveyEntry,
   toplineEntryToCombinedToplineSheetValueRow,
@@ -43,7 +43,7 @@ export function refreshCombinedToplineSheetListing(
     surveysSheetValueRowToSurveyEntry
   );
   const existingToplineEntries = combinedToplineSheetValues.map(
-    combinedToplineSheetValueRowToToplineEntry
+    combinedToplineSheetValueRowToCombinedToplineEntry
   );
   const existingSurveysSurveyIds = existingSurveyEntries.map(
     existingSurveyEntry => fileNameToSurveyId(existingSurveyEntry.file_name)
@@ -135,9 +135,12 @@ export function refreshCombinedToplineSheetListing(
         const sourceValuesIncludingHeaderRow = sourceDataRange.getDisplayValues();
         // const sourceHeaderRows = sourceValuesIncludingHeaderRow.slice(0, 1);
         const sourceValues = sourceValuesIncludingHeaderRow.slice(1);
-        const targetValues = sourceValues
-          .map(toplineSheetValueRowToToplineEntry)
-          .map(toplineEntryToCombinedToplineSheetValueRow);
+        const targetEntries = sourceValues.map(
+          toplineSheetValueRowToToplineEntry
+        );
+        const targetValues = targetEntries.map(
+          toplineEntryToCombinedToplineSheetValueRow
+        );
         const startRow = updatedCombinedToplineEntries.length + 2;
         console.info(
           `Adding ${
@@ -152,8 +155,12 @@ export function refreshCombinedToplineSheetListing(
             combinedToplineSheetHeaders.length
           )
           .setValues(targetValues);
+        // Add to the array that tracks the current sheet entries
         updatedCombinedToplineEntries = updatedCombinedToplineEntries.concat(
-          targetValues
+          targetValues.map(combinedToplineSheetValueRowToCombinedToplineEntry)
+        );
+        console.info(
+          `Added ${targetValues.length} rows. The total amount of data rows is now ${updatedCombinedToplineEntries.length}`
         );
       }
     );
