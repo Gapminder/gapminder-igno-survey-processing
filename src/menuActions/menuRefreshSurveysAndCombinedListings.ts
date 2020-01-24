@@ -534,7 +534,7 @@ function refreshCombinedQuestionsSheetListing(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Igno Index Question",
-    `=VLOOKUP(INDIRECT("R[0]C[-2]", FALSE),imported_igno_questions_info!$A$2:$C,2,FALSE)`,
+    `=VLOOKUP(INDIRECT("R[0]C[-2]", FALSE),imported_igno_questions_info!$A$3:$C,2,FALSE)`,
     updatedCombinedQuestionsSheetData.length
   );
 
@@ -542,7 +542,7 @@ function refreshCombinedQuestionsSheetListing(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Foreign Country Igno Question",
-    `=VLOOKUP(INDIRECT("R[0]C[-2]", FALSE),imported_igno_questions_info!$B$2:$D,2,FALSE)`,
+    `=VLOOKUP(INDIRECT("R[0]C[-2]", FALSE),imported_igno_questions_info!$D$3:$E,2,FALSE)`,
     updatedCombinedQuestionsSheetData.length
   );
 
