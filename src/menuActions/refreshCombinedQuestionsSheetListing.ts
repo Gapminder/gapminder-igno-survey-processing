@@ -223,11 +223,34 @@ export function refreshCombinedQuestionsSheetListing(
     updatedCombinedQuestionEntries.length
   );
 
-  fillColumnWithFormulas(
+  fillColumnWithValues(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Answers by percent",
-    `=JOIN(" - ",ARRAYFORMULA(TEXT(FILTER(topline_combo!$G$2:$G,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW]), "0.0%")))`,
+    // `=JOIN(" - ",ARRAYFORMULA(TEXT(FILTER(topline_combo!$G$2:$G,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW]), "0.0%")))`,
+    rowNumber => {
+      // Row number 2 corresponds to index 0 in the entries array
+      const updatedCombinedQuestionEntry =
+        updatedCombinedQuestionEntries[rowNumber - 2];
+      const matchingUpdatedCombinedToplineEntries =
+        updatedCombinedToplineEntriesBySurveyIdAndQuestionNumber[
+          combineSurveyIdAndQuestionNumber(updatedCombinedQuestionEntry)
+        ];
+      if (matchingUpdatedCombinedToplineEntries.length === 0) {
+        return "(No topline entries found)";
+      }
+      return matchingUpdatedCombinedToplineEntries
+        .map(
+          matchingUpdatedCombinedToplineEntry =>
+            parseFloat(
+              matchingUpdatedCombinedToplineEntry.answer_by_percent.replace(
+                "%",
+                ""
+              )
+            ).toFixed(1) + "%"
+        )
+        .join(" - ");
+    },
     updatedCombinedQuestionEntries.length
   );
 
@@ -259,11 +282,21 @@ Correct answer(s): "&L[ROW]&"
     updatedCombinedQuestionEntries.length
   );
 
-  fillColumnWithFormulas(
+  fillColumnWithValues(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Amount of answer options",
-    `=COUNTIFS(topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW])`,
+    // `=COUNTIFS(topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW])`,
+    rowNumber => {
+      // Row number 2 corresponds to index 0 in the entries array
+      const updatedCombinedQuestionEntry =
+        updatedCombinedQuestionEntries[rowNumber - 2];
+      const matchingUpdatedCombinedToplineEntries =
+        updatedCombinedToplineEntriesBySurveyIdAndQuestionNumber[
+          combineSurveyIdAndQuestionNumber(updatedCombinedQuestionEntry)
+        ];
+      return matchingUpdatedCombinedToplineEntries.length;
+    },
     updatedCombinedQuestionEntries.length
   );
 

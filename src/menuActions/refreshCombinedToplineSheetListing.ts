@@ -133,7 +133,7 @@ export function refreshCombinedToplineSheetListing(
         );
         const sourceSheet = gsResultsFolderGsheet.getSheetByName("Topline");
         const sourceDataRange = sourceSheet.getDataRange();
-        const sourceValuesIncludingHeaderRow = sourceDataRange.getValues();
+        const sourceValuesIncludingHeaderRow = sourceDataRange.getDisplayValues();
         // const sourceHeaderRows = sourceValuesIncludingHeaderRow.slice(0, 1);
         const sourceValues = sourceValuesIncludingHeaderRow.slice(1);
         const targetValues = sourceValues

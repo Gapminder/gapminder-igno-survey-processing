@@ -44,7 +44,9 @@ export function getSheetDataIncludingHeaderRow(sheet: Sheet, sheetHeaders) {
     sheet.getDataRange().getNumRows(),
     sheetHeaders.length
   );
-  return removeEmptyRowsAtTheEnd(sheetDataIncludingHeaderRowRange.getValues());
+  return removeEmptyRowsAtTheEnd(
+    sheetDataIncludingHeaderRowRange.getDisplayValues()
+  );
 }
 
 /**
@@ -153,6 +155,9 @@ export function fillColumnWithFormulas(
   formulaInA1Notation: string,
   rowCount: number
 ) {
+  /* tslint:disable:no-console */
+  console.info(`Filling formula column "${header}"`);
+  /* tslint:enable:no-console */
   const columnIndex = ensuredColumnIndex(headers, header);
   const questionRowCountRange = sheet.getRange(2, columnIndex + 1, rowCount, 1);
   const questionRowCountFormulas = arrayOfASingleValue(
@@ -174,6 +179,9 @@ export function fillColumnWithValues(
   valueCalculationCallback: (rowNumber: number) => any,
   rowCount: number
 ) {
+  /* tslint:disable:no-console */
+  console.info(`Filling value column "${header}"`);
+  /* tslint:enable:no-console */
   const columnIndex = ensuredColumnIndex(headers, header);
   const questionRowCountRange = sheet.getRange(2, columnIndex + 1, rowCount, 1);
   const questionRowCountValues = arrayOfASingleValue(null, rowCount).map(
