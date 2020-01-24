@@ -167,6 +167,27 @@ export function fillColumnWithFormulas(
 /**
  * @hidden
  */
+export function fillColumnWithValues(
+  sheet: Sheet,
+  headers: string[],
+  header: string,
+  valueCalculationCallback: (rowNumber: number) => any,
+  rowCount: number
+) {
+  const columnIndex = ensuredColumnIndex(headers, header);
+  const questionRowCountRange = sheet.getRange(2, columnIndex + 1, rowCount, 1);
+  const questionRowCountValues = arrayOfASingleValue(null, rowCount).map(
+    (value, index) => {
+      const rowNumber = index + 2;
+      return valueCalculationCallback(rowNumber);
+    }
+  );
+  questionRowCountRange.setValues(questionRowCountValues.map(value => [value]));
+}
+
+/**
+ * @hidden
+ */
 export function arrayOfASingleValue(value, len): any[] {
   const arr = [];
   for (let i = 0; i < len; i++) {

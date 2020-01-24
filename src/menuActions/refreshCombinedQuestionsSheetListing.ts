@@ -1,4 +1,7 @@
 import difference from "lodash/difference";
+import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
+import File = GoogleAppsScript.Drive.File;
+import groupBy from "lodash/groupBy";
 import intersection from "lodash/intersection";
 import union from "lodash/union";
 import {
@@ -14,16 +17,16 @@ import {
   adjustSheetRowsAndColumnsCount,
   fileNameToSurveyId,
   fillColumnWithFormulas,
+  fillColumnWithValues,
   getSheetDataIncludingHeaderRow
 } from "./common";
-import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
-import File = GoogleAppsScript.Drive.File;
 
 /**
  * @hidden
  */
 export function refreshCombinedQuestionsSheetListing(
   updatedSurveysSheetValues: any[][],
+  updatedCombinedToplineEntries,
   combinedQuestionsSheet: Sheet,
   combinedQuestionsSheetValuesIncludingHeaderRow: any[][],
   gsResultsFolderGsheetFiles: File[]
@@ -194,11 +197,39 @@ export function refreshCombinedQuestionsSheetListing(
     updatedCombinedQuestionsSheetData.length
   );
 
-  fillColumnWithFormulas(
+  const updatedCombinedQuestionEntries = updatedCombinedQuestionsSheetData.map(
+    combinedQuestionsSheetValueRowToQuestionEntry
+  );
+  const combineSurveyIdAndQuestionNumber = updatedCombinedEntry =>
+    `${updatedCombinedEntry.survey_id}-${updatedCombinedEntry.question_number}`;
+  const updatedCombinedToplineEntriesBySurveyIdAndQuestionNumber = groupBy(
+    updatedCombinedToplineEntries,
+    combineSurveyIdAndQuestionNumber
+  );
+
+  fillColumnWithValues(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "The answer options",
-    `=JOIN(" - ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW]))`,
+    // `=JOIN(" - ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW]))`,
+    rowNumber => {
+      // Row number 2 corresponds to index 0 in the entries array
+      const updatedCombinedQuestionEntry =
+        updatedCombinedQuestionEntries[rowNumber - 2];
+      const matchingUpdatedCombinedToplineEntries =
+        updatedCombinedToplineEntriesBySurveyIdAndQuestionNumber[
+          combineSurveyIdAndQuestionNumber(updatedCombinedQuestionEntry)
+        ];
+      if (matchingUpdatedCombinedToplineEntries.length === 0) {
+        return "(No topline entries found)";
+      }
+      return matchingUpdatedCombinedToplineEntries
+        .map(
+          matchingUpdatedCombinedToplineEntry =>
+            matchingUpdatedCombinedToplineEntry.answer
+        )
+        .join(" - ");
+    },
     updatedCombinedQuestionsSheetData.length
   );
 

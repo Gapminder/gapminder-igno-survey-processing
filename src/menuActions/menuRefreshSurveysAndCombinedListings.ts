@@ -142,19 +142,20 @@ function refreshSurveysAndCombinedListings() {
     gsResultsFolderGsheetFiles
   );
 
-  console.info(`Refreshing combined questions listing`);
-  refreshCombinedQuestionsSheetListing(
-    updatedSurveysSheetValues,
-    combinedQuestionsSheet,
-    combinedQuestionsSheetValuesIncludingHeaderRow,
-    gsResultsFolderGsheetFiles
-  );
-
   console.info(`Refreshing combined topline listing`);
-  refreshCombinedToplineSheetListing(
+  const { updatedCombinedToplineEntries } = refreshCombinedToplineSheetListing(
     updatedSurveysSheetValues,
     combinedToplineSheet,
     combinedToplineSheetValuesIncludingHeaderRow,
+    gsResultsFolderGsheetFiles
+  );
+
+  console.info(`Refreshing combined questions listing`);
+  refreshCombinedQuestionsSheetListing(
+    updatedSurveysSheetValues,
+    updatedCombinedToplineEntries,
+    combinedQuestionsSheet,
+    combinedQuestionsSheetValuesIncludingHeaderRow,
     gsResultsFolderGsheetFiles
   );
 
