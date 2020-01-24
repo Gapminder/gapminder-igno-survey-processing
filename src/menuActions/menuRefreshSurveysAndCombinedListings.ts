@@ -322,7 +322,7 @@ function refreshSurveysSheetListing(
     surveysSheet,
     surveysSheetHeaders,
     "Survey Name",
-    `=VLOOKUP(SUBSTITUTE(INDIRECT("R[0]C[6]", FALSE),"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,2,FALSE)`,
+    `=VLOOKUP(SUBSTITUTE(G[ROW],"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,2,FALSE)`,
     surveysSheetValueRowsCount
   );
 
@@ -330,7 +330,7 @@ function refreshSurveysSheetListing(
     surveysSheet,
     surveysSheetHeaders,
     "Sample Size",
-    `=SUBSTITUTE(SUBSTITUTE(VLOOKUP(SUBSTITUTE(INDIRECT("R[0]C[2]", FALSE),"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,3,FALSE),"Complete","")," responses","")`,
+    `=SUBSTITUTE(SUBSTITUTE(VLOOKUP(SUBSTITUTE(G[ROW], FALSE),"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,3,FALSE),"Complete","")," responses","")`,
     surveysSheetValueRowsCount
   );
 
@@ -338,7 +338,7 @@ function refreshSurveysSheetListing(
     surveysSheet,
     surveysSheetHeaders,
     "Survey Date",
-    `=VLOOKUP(SUBSTITUTE(INDIRECT("R[0]C[1]", FALSE),"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,4,FALSE)`,
+    `=VLOOKUP(SUBSTITUTE(G[ROW],"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,4,FALSE)`,
     surveysSheetValueRowsCount
   );
 
@@ -346,7 +346,7 @@ function refreshSurveysSheetListing(
     surveysSheet,
     surveysSheetHeaders,
     "Number of rows in questions_combo",
-    `=IF(INDIRECT("R[0]C[-2]", FALSE)="","",COUNTIF(${combinedQuestionsSheetName}!$A$2:$A, SUBSTITUTE(INDIRECT("R[0]C[-2]", FALSE),"survey-","")))`,
+    `=IF(G[ROW]="","",COUNTIF(${combinedQuestionsSheetName}!$A$2:$A, SUBSTITUTE(G[ROW],"survey-","")))`,
     surveysSheetValueRowsCount
   );
 
@@ -354,7 +354,7 @@ function refreshSurveysSheetListing(
     surveysSheet,
     surveysSheetHeaders,
     "Number of rows in topline_combo",
-    `=IF(INDIRECT("R[0]C[-3]", FALSE)="","",COUNTIF(${combinedToplineSheetName}!$A$2:$A, SUBSTITUTE(INDIRECT("R[0]C[-3]", FALSE),"survey-","")))`,
+    `=IF(G[ROW]="","",COUNTIF(${combinedToplineSheetName}!$A$2:$A, SUBSTITUTE(G[ROW],"survey-","")))`,
     surveysSheetValueRowsCount
   );
 
@@ -523,7 +523,7 @@ function refreshCombinedQuestionsSheetListing(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Survey Name",
-    `=VLOOKUP("survey-"&INDIRECT("R[0]C[-1]", FALSE),{${surveysSheetName}!G$2:G,${surveysSheetName}!A$2:A},2,FALSE)`,
+    `=VLOOKUP("survey-"&A[ROW],{${surveysSheetName}!G$2:G,${surveysSheetName}!A$2:A},2,FALSE)`,
     updatedCombinedQuestionsSheetData.length
   );
 
@@ -531,7 +531,7 @@ function refreshCombinedQuestionsSheetListing(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Igno Index Question",
-    `=VLOOKUP(INDIRECT("R[0]C[-2]", FALSE),imported_igno_questions_info!$A$3:$C,2,FALSE)`,
+    `=VLOOKUP(E[ROW],imported_igno_questions_info!$A$3:$C,2,FALSE)`,
     updatedCombinedQuestionsSheetData.length
   );
 
@@ -539,7 +539,7 @@ function refreshCombinedQuestionsSheetListing(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Foreign Country Igno Question",
-    `=VLOOKUP(INDIRECT("R[0]C[-2]", FALSE),imported_igno_questions_info!$D$3:$E,2,FALSE)`,
+    `=VLOOKUP(F[ROW],imported_igno_questions_info!$D$3:$E,2,FALSE)`,
     updatedCombinedQuestionsSheetData.length
   );
 
@@ -548,7 +548,6 @@ function refreshCombinedQuestionsSheetListing(
     combinedQuestionsSheetHeaders,
     "The answer options",
     `=JOIN(" - ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW]))`,
-    // `=JOIN(" - ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = INDIRECT("R[0]C[-9]", FALSE),topline_combo!$C$2:$C = INDIRECT("R[0]C[-7]", FALSE)))`,
     updatedCombinedQuestionsSheetData.length
   );
 
@@ -761,7 +760,7 @@ function refreshCombinedToplineSheetListing(
     combinedToplineSheet,
     combinedToplineSheetHeaders,
     "Survey Name",
-    `=VLOOKUP("survey-"&INDIRECT("R[0]C[-1]", FALSE),{${surveysSheetName}!G$2:G,${surveysSheetName}!A$2:A},2,FALSE)`,
+    `=VLOOKUP("survey-"&A[ROW],{${surveysSheetName}!G$2:G,${surveysSheetName}!A$2:A},2,FALSE)`,
     updatedCombinedToplineSheetData.length
   );
 
