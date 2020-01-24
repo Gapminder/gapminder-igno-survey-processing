@@ -190,3 +190,10 @@ export function unique(ar) {
     return j[v];
   });
 }
+
+/**
+ * @hidden
+ */
+export function fileNameToSurveyId(fileName) {
+  return fileName.replace("survey-", "");
+}
