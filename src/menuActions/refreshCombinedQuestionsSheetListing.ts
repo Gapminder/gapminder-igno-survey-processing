@@ -34,9 +34,11 @@ export function refreshCombinedQuestionsSheetListing(
   /* tslint:disable:no-console */
   console.info(`Start of refreshCombinedQuestionsSheetListing()`);
 
+  let updatedCombinedQuestionEntries;
+
   // From the existing sheet contents, purge entries that does not have an entry in the surveys sheet
   // so that the combined question listing only contains rows that are relevant for analysis
-  console.info(`Purging orphaned rows from the combined question listing`);
+  console.info(`Checking for orphaned rows in the combined question listing`);
   const combinedQuestionsSheetValues = combinedQuestionsSheetValuesIncludingHeaderRow.slice(
     1
   );
@@ -64,41 +66,41 @@ export function refreshCombinedQuestionsSheetListing(
     questionEntry => surveyIdsInBothListings.includes(questionEntry.survey_id)
   );
 
-  // Write the purged/trimmed contents back to the sheet
-  console.info(`Writing the purged/trimmed contents back to the sheet`);
-  if (questionEntriesWithSurveyEntry.length > 0) {
+  // Remove orphaned rows in the combined question listing if necessary
+  if (
+    questionEntriesWithSurveyEntry.length < combinedQuestionsSheetValues.length
+  ) {
+    console.info(`Removing orphaned rows in the combined question listing`);
     // If we ended up with less rows than what already exists, clear all rows except the header row
     // so that we do not keep old rows hanging around
-    if (
-      questionEntriesWithSurveyEntry.length <
-      combinedQuestionsSheetValues.length
-    ) {
-      // Clear all rows except the header row
-      console.info(`Clearing all rows except the header row`);
-      combinedQuestionsSheet
-        .getRange(
-          2,
-          1,
-          combinedQuestionsSheetValuesIncludingHeaderRow.length,
-          combinedQuestionsSheetValuesIncludingHeaderRow[0].length
-        )
-        .clearContent();
-    }
-
+    console.info(`Clearing all rows except the header row`);
     combinedQuestionsSheet
       .getRange(
         2,
         1,
-        questionEntriesWithSurveyEntry.length,
+        combinedQuestionsSheetValuesIncludingHeaderRow.length,
         combinedQuestionsSheetValuesIncludingHeaderRow[0].length
       )
-      .setValues(
-        questionEntriesWithSurveyEntry.map(
-          questionEntryToCombinedQuestionsSheetValueRow
+      .clearContent();
+    if (questionEntriesWithSurveyEntry.length > 0) {
+      console.info(`Writing back the non-orphaned rows`);
+      combinedQuestionsSheet
+        .getRange(
+          2,
+          1,
+          questionEntriesWithSurveyEntry.length,
+          combinedQuestionsSheetValuesIncludingHeaderRow[0].length
         )
-      );
+        .setValues(
+          questionEntriesWithSurveyEntry.map(
+            questionEntryToCombinedQuestionsSheetValueRow
+          )
+        );
+    }
+    updatedCombinedQuestionEntries = questionEntriesWithSurveyEntry;
+  } else {
+    updatedCombinedQuestionEntries = existingQuestionEntries;
   }
-  let rowsWritten = questionEntriesWithSurveyEntry.length;
 
   console.info(
     `Finding which gsheet files are not-yet-included in the combined question listing`
@@ -141,35 +143,25 @@ export function refreshCombinedQuestionsSheetListing(
           .map(overviewEntryToCombinedQuestionSheetValueRow);
         combinedQuestionsSheet
           .getRange(
-            rowsWritten + 2,
+            updatedCombinedToplineEntries.length + 2,
             1,
             sourceValues.length,
             combinedQuestionsSheetHeaders.length
           )
           .setValues(targetValues);
-        rowsWritten += sourceValues.length;
+        targetValues.map(updatedCombinedQuestionEntries.push);
       }
     );
   }
-
-  // Read back the updated combined question sheet data
-  console.info(`Reading back the updated combined question sheet data`);
-  const updatedCombinedQuestionsSheetValuesIncludingHeaderRow = getSheetDataIncludingHeaderRow(
-    combinedQuestionsSheet,
-    combinedQuestionsSheetHeaders
-  );
 
   // Limit the amount of rows of the worksheet to the amount of entries
   console.info(
     `Limiting the amount of rows of the combined questions worksheet to the amount of entries`
   );
-  const updatedCombinedQuestionsSheetData = updatedCombinedQuestionsSheetValuesIncludingHeaderRow.slice(
-    1
-  );
   adjustSheetRowsAndColumnsCount(
     combinedQuestionsSheet,
-    updatedCombinedQuestionsSheetData.length + 1,
-    updatedCombinedQuestionsSheetValuesIncludingHeaderRow[0].length
+    updatedCombinedQuestionEntries.length + 1,
+    combinedQuestionsSheetValuesIncludingHeaderRow[0].length
   );
 
   console.info(`Filling formula columns`);
@@ -178,7 +170,7 @@ export function refreshCombinedQuestionsSheetListing(
     combinedQuestionsSheetHeaders,
     "Survey Name",
     `=VLOOKUP("survey-"&A[ROW],{${surveysSheetName}!G$2:G,${surveysSheetName}!A$2:A},2,FALSE)`,
-    updatedCombinedQuestionsSheetData.length
+    updatedCombinedQuestionEntries.length
   );
 
   fillColumnWithFormulas(
@@ -186,7 +178,7 @@ export function refreshCombinedQuestionsSheetListing(
     combinedQuestionsSheetHeaders,
     "Igno Index Question",
     `=VLOOKUP(E[ROW],imported_igno_questions_info!$A$3:$C,2,FALSE)`,
-    updatedCombinedQuestionsSheetData.length
+    updatedCombinedQuestionEntries.length
   );
 
   fillColumnWithFormulas(
@@ -194,12 +186,9 @@ export function refreshCombinedQuestionsSheetListing(
     combinedQuestionsSheetHeaders,
     "Foreign Country Igno Question",
     `=VLOOKUP(F[ROW],imported_igno_questions_info!$D$3:$E,2,FALSE)`,
-    updatedCombinedQuestionsSheetData.length
+    updatedCombinedQuestionEntries.length
   );
 
-  const updatedCombinedQuestionEntries = updatedCombinedQuestionsSheetData.map(
-    combinedQuestionsSheetValueRowToQuestionEntry
-  );
   const combineSurveyIdAndQuestionNumber = updatedCombinedEntry =>
     `${updatedCombinedEntry.survey_id}-${updatedCombinedEntry.question_number}`;
   const updatedCombinedToplineEntriesBySurveyIdAndQuestionNumber = groupBy(
@@ -230,7 +219,7 @@ export function refreshCombinedQuestionsSheetListing(
         )
         .join(" - ");
     },
-    updatedCombinedQuestionsSheetData.length
+    updatedCombinedQuestionEntries.length
   );
 
   fillColumnWithFormulas(
@@ -238,7 +227,7 @@ export function refreshCombinedQuestionsSheetListing(
     combinedQuestionsSheetHeaders,
     "Answers by percent",
     `=JOIN(" - ",ARRAYFORMULA(TEXT(FILTER(topline_combo!$G$2:$G,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW]), "0.0%")))`,
-    updatedCombinedQuestionsSheetData.length
+    updatedCombinedQuestionEntries.length
   );
 
   fillColumnWithFormulas(
@@ -246,7 +235,7 @@ export function refreshCombinedQuestionsSheetListing(
     combinedQuestionsSheetHeaders,
     "Correct answer(s)",
     `=JOIN("; ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW],topline_combo!$F$2:$F = "x"))`,
-    updatedCombinedQuestionsSheetData.length
+    updatedCombinedQuestionEntries.length
   );
 
   fillColumnWithFormulas(
@@ -254,7 +243,7 @@ export function refreshCombinedQuestionsSheetListing(
     combinedQuestionsSheetHeaders,
     "% that answered correctly",
     `=SUMIFS(topline_combo!$G$2:$G,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,"X")`,
-    updatedCombinedQuestionsSheetData.length
+    updatedCombinedQuestionEntries.length
   );
 
   fillColumnWithFormulas(
@@ -266,7 +255,7 @@ The answer options: "&J[ROW]&"
 Answers by percent: "&K[ROW]&"
 Correct answer(s): "&L[ROW]&"
 % that answered correctly: "&TEXT(M[ROW], "0.0%"), "Results not processed yet")`,
-    updatedCombinedQuestionsSheetData.length
+    updatedCombinedQuestionEntries.length
   );
 
   fillColumnWithFormulas(
@@ -274,7 +263,7 @@ Correct answer(s): "&L[ROW]&"
     combinedQuestionsSheetHeaders,
     "Amount of answer options",
     `=COUNTIFS(topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW])`,
-    updatedCombinedQuestionsSheetData.length
+    updatedCombinedQuestionEntries.length
   );
 
   fillColumnWithFormulas(
@@ -282,7 +271,7 @@ Correct answer(s): "&L[ROW]&"
     combinedQuestionsSheetHeaders,
     "% that would have answered correctly in an abc-type question",
     `=M[ROW]*O[ROW]/3`,
-    updatedCombinedQuestionsSheetData.length
+    updatedCombinedQuestionEntries.length
   );
 
   console.info(`End of refreshCombinedQuestionsSheetListing()`);
