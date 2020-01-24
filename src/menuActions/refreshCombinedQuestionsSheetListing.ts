@@ -141,15 +141,23 @@ export function refreshCombinedQuestionsSheetListing(
         const targetValues = sourceValues
           .map(overviewSheetValueRowToOverviewEntry)
           .map(overviewEntryToCombinedQuestionSheetValueRow);
+        const startRow = updatedCombinedQuestionEntries.length + 2;
+        console.info(
+          `Adding ${
+            targetValues.length
+          } rows from spreadsheet with id ${gsResultsFolderGsheetFile.getId()} to the end of the sheet (row ${startRow})`
+        );
         combinedQuestionsSheet
           .getRange(
-            updatedCombinedToplineEntries.length + 2,
+            startRow,
             1,
-            sourceValues.length,
+            targetValues.length,
             combinedQuestionsSheetHeaders.length
           )
           .setValues(targetValues);
-        targetValues.map(updatedCombinedQuestionEntries.push);
+        updatedCombinedQuestionEntries = updatedCombinedQuestionEntries.concat(
+          targetValues
+        );
       }
     );
   }
@@ -209,7 +217,10 @@ export function refreshCombinedQuestionsSheetListing(
         updatedCombinedToplineEntriesBySurveyIdAndQuestionNumber[
           combineSurveyIdAndQuestionNumber(updatedCombinedQuestionEntry)
         ];
-      if (matchingUpdatedCombinedToplineEntries.length === 0) {
+      if (
+        !matchingUpdatedCombinedToplineEntries ||
+        matchingUpdatedCombinedToplineEntries.length === 0
+      ) {
         return "(No topline entries found)";
       }
       return matchingUpdatedCombinedToplineEntries
@@ -221,6 +232,9 @@ export function refreshCombinedQuestionsSheetListing(
     },
     updatedCombinedQuestionEntries.length
   );
+
+  const percentStringRoundedToOneDecimal = (percentString: string) =>
+    parseFloat(percentString.replace("%", "")).toFixed(1) + "%";
 
   fillColumnWithValues(
     combinedQuestionsSheet,
@@ -235,18 +249,19 @@ export function refreshCombinedQuestionsSheetListing(
         updatedCombinedToplineEntriesBySurveyIdAndQuestionNumber[
           combineSurveyIdAndQuestionNumber(updatedCombinedQuestionEntry)
         ];
-      if (matchingUpdatedCombinedToplineEntries.length === 0) {
+      if (
+        !matchingUpdatedCombinedToplineEntries ||
+        matchingUpdatedCombinedToplineEntries.length === 0
+      ) {
         return "(No topline entries found)";
       }
       return matchingUpdatedCombinedToplineEntries
-        .map(
-          matchingUpdatedCombinedToplineEntry =>
-            parseFloat(
-              matchingUpdatedCombinedToplineEntry.answer_by_percent.replace(
-                "%",
-                ""
+        .map(matchingUpdatedCombinedToplineEntry =>
+          matchingUpdatedCombinedToplineEntry.answer_by_percent
+            ? percentStringRoundedToOneDecimal(
+                matchingUpdatedCombinedToplineEntry.answer_by_percent
               )
-            ).toFixed(1) + "%"
+            : matchingUpdatedCombinedToplineEntry.answer_by_percent
         )
         .join(" - ");
     },

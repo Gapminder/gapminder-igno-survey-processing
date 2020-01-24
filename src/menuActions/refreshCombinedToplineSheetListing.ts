@@ -138,15 +138,23 @@ export function refreshCombinedToplineSheetListing(
         const targetValues = sourceValues
           .map(toplineSheetValueRowToToplineEntry)
           .map(toplineEntryToCombinedToplineSheetValueRow);
+        const startRow = updatedCombinedToplineEntries.length + 2;
+        console.info(
+          `Adding ${
+            targetValues.length
+          } rows from spreadsheet with id ${gsResultsFolderGsheetFile.getId()} to the end of the sheet (row ${startRow})`
+        );
         combinedToplineSheet
           .getRange(
-            updatedCombinedToplineEntries.length + 2,
+            startRow,
             1,
-            sourceValues.length,
+            targetValues.length,
             combinedToplineSheetHeaders.length
           )
           .setValues(targetValues);
-        targetValues.map(updatedCombinedToplineEntries.push);
+        updatedCombinedToplineEntries = updatedCombinedToplineEntries.concat(
+          targetValues
+        );
       }
     );
   }
