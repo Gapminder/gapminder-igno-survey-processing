@@ -14,7 +14,8 @@ import {
   adjustSheetRowsAndColumnsCount,
   fileNameToSurveyId,
   fillColumnWithFormulas,
-  getSheetDataIncludingHeaderRow
+  getSheetDataIncludingHeaderRow,
+  openSpreadsheetByIdAtMostOncePerScriptRun
 } from "./common";
 import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 import File = GoogleAppsScript.Drive.File;
@@ -122,12 +123,12 @@ export function refreshCombinedToplineSheetListing(
   // Open each not-yet-included gsheet file and add rows to the end of the sheet continuously
   if (notYetIncludedGsResultsFolderGsheetFiles.length > 0) {
     console.info(
-      `Opening the ${notYetIncludedGsResultsFolderGsheetFiles.length} not-yet-included gsheet file(s) and adding them to the end of the sheet`
+      `Adding the contents of the ${notYetIncludedGsResultsFolderGsheetFiles.length} not-yet-included gsheet file(s) to the end of the sheet`
     );
     // console.log({ notYetIncludedGsResultsFolderGsheetFiles });
     notYetIncludedGsResultsFolderGsheetFiles.map(
       (gsResultsFolderGsheetFile: File) => {
-        const gsResultsFolderGsheet = SpreadsheetApp.openById(
+        const gsResultsFolderGsheet = openSpreadsheetByIdAtMostOncePerScriptRun(
           gsResultsFolderGsheetFile.getId()
         );
         const sourceSheet = gsResultsFolderGsheet.getSheetByName("Topline");

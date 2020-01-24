@@ -218,3 +218,22 @@ export function unique(ar) {
 export function fileNameToSurveyId(fileName) {
   return fileName.replace("survey-", "");
 }
+
+/**
+ * @hidden
+ */
+const openedSpreadsheetsByIdMemoryCache = {};
+
+/**
+ * @hidden
+ */
+export function openSpreadsheetByIdAtMostOncePerScriptRun(id: string) {
+  if (openedSpreadsheetsByIdMemoryCache[id]) {
+    return openedSpreadsheetsByIdMemoryCache[id];
+  }
+  /* tslint:disable:no-console */
+  console.info(`Opening Spreadsheet with id ${id}`);
+  /* tslint:enable:no-console */
+  openedSpreadsheetsByIdMemoryCache[id] = SpreadsheetApp.openById(id);
+  return openedSpreadsheetsByIdMemoryCache[id];
+}
