@@ -124,7 +124,7 @@ export function refreshSurveysSheetListing(
     surveysSheet,
     surveysSheetHeaders,
     "Sample Size",
-    `=SUBSTITUTE(SUBSTITUTE(VLOOKUP(SUBSTITUTE(G[ROW], FALSE),"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,3,FALSE),"Complete","")," responses","")`,
+    `=SUBSTITUTE(SUBSTITUTE(VLOOKUP(SUBSTITUTE(G[ROW],"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,3,FALSE),"Complete","")," responses","")`,
     surveysSheetValueRowsCount
   );
 
