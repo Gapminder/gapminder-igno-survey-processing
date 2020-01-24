@@ -380,17 +380,6 @@ function refreshCombinedQuestionsSheetListing(
   /* tslint:disable:no-console */
   console.info(`Start of refreshCombinedQuestionsSheetListing()`);
 
-  // Clear all rows except the header row
-  console.info(`Clearing all rows except the header row`);
-  combinedQuestionsSheet
-    .getRange(
-      2,
-      1,
-      combinedQuestionsSheetValuesIncludingHeaderRow.length,
-      combinedQuestionsSheetValuesIncludingHeaderRow[0].length
-    )
-    .clearContent();
-
   // From the existing sheet contents, purge entries that does not have an entry in the surveys sheet
   // so that the combined question listing only contains rows that are relevant for analysis
   console.info(`Purging orphaned rows from the combined question listing`);
@@ -424,6 +413,24 @@ function refreshCombinedQuestionsSheetListing(
   // Write the purged/trimmed contents back to the sheet
   console.info(`Writing the purged/trimmed contents back to the sheet`);
   if (questionEntriesWithSurveyEntry.length > 0) {
+    // If we ended up with less rows than what already exists, clear all rows except the header row
+    // so that we do not keep old rows hanging around
+    if (
+      questionEntriesWithSurveyEntry.length <
+      combinedQuestionsSheetValues.length
+    ) {
+      // Clear all rows except the header row
+      console.info(`Clearing all rows except the header row`);
+      combinedQuestionsSheet
+        .getRange(
+          2,
+          1,
+          combinedQuestionsSheetValuesIncludingHeaderRow.length,
+          combinedQuestionsSheetValuesIncludingHeaderRow[0].length
+        )
+        .clearContent();
+    }
+
     combinedQuestionsSheet
       .getRange(
         2,
@@ -616,19 +623,6 @@ function refreshCombinedToplineSheetListing(
   /* tslint:disable:no-console */
   console.info(`Start of refreshCombinedToplineSheetListing()`);
 
-  // TODO PERF: Only clear and reinsert contents if actual purging was necessary
-
-  // Clear all rows except the header row
-  console.info(`Clearing all rows except the header row`);
-  combinedToplineSheet
-    .getRange(
-      2,
-      1,
-      combinedToplineSheetValuesIncludingHeaderRow.length,
-      combinedToplineSheetValuesIncludingHeaderRow[0].length
-    )
-    .clearContent();
-
   // From the existing sheet contents, purge entries that does not have an entry in the surveys sheet
   // so that the combined topline listing only contains rows that are relevant for analysis
   console.info(`Purging orphaned rows from the combined topline listing`);
@@ -662,6 +656,22 @@ function refreshCombinedToplineSheetListing(
   // Write the purged/trimmed contents back to the sheet
   console.info(`Writing the purged/trimmed contents back to the sheet`);
   if (toplineEntriesWithSurveyEntry.length > 0) {
+    // If we ended up with less rows than what already exists, clear all rows except the header row
+    // so that we do not keep old rows hanging around
+    if (
+      toplineEntriesWithSurveyEntry.length < combinedToplineSheetValues.length
+    ) {
+      console.info(`Clearing all rows except the header row`);
+      combinedToplineSheet
+        .getRange(
+          2,
+          1,
+          combinedToplineSheetValuesIncludingHeaderRow.length,
+          combinedToplineSheetValuesIncludingHeaderRow[0].length
+        )
+        .clearContent();
+    }
+
     combinedToplineSheet
       .getRange(
         2,
