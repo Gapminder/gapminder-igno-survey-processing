@@ -330,7 +330,7 @@ function refreshSurveysSheetListing(
     surveysSheet,
     surveysSheetHeaders,
     "Sample Size",
-    `=VLOOKUP(SUBSTITUTE(INDIRECT("R[0]C[2]", FALSE),"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,3,FALSE)`,
+    `=SUBSTITUTE(SUBSTITUTE(VLOOKUP(SUBSTITUTE(INDIRECT("R[0]C[2]", FALSE),"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,3,FALSE),"Complete","")," responses","")`,
     surveysSheetValueRowsCount
   );
 
