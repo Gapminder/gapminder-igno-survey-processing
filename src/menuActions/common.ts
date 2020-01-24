@@ -146,7 +146,7 @@ export function getColumnValuesRange(sheet: Sheet, headers, header) {
 /**
  * @hidden
  */
-export function fillColumnWithFormula(
+export function fillColumnWithFormulas(
   sheet: Sheet,
   headers: string[],
   header: string,

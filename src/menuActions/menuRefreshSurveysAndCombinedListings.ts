@@ -25,7 +25,7 @@ import {
   adjustSheetRowsAndColumnsCount,
   assertCorrectLeftmostSheetColumnHeaders,
   createSheet,
-  fillColumnWithFormula,
+  fillColumnWithFormulas,
   getSheetDataIncludingHeaderRow,
   gsheetMimeType,
   xlsxMimeType
@@ -318,7 +318,7 @@ function refreshSurveysSheetListing(
 
   console.info(`Filling formula columns`);
   /* tslint:enable:no-console */
-  fillColumnWithFormula(
+  fillColumnWithFormulas(
     surveysSheet,
     surveysSheetHeaders,
     "Survey Name",
@@ -326,7 +326,7 @@ function refreshSurveysSheetListing(
     surveysSheetValueRowsCount
   );
 
-  fillColumnWithFormula(
+  fillColumnWithFormulas(
     surveysSheet,
     surveysSheetHeaders,
     "Sample Size",
@@ -334,7 +334,7 @@ function refreshSurveysSheetListing(
     surveysSheetValueRowsCount
   );
 
-  fillColumnWithFormula(
+  fillColumnWithFormulas(
     surveysSheet,
     surveysSheetHeaders,
     "Survey Date",
@@ -342,7 +342,7 @@ function refreshSurveysSheetListing(
     surveysSheetValueRowsCount
   );
 
-  fillColumnWithFormula(
+  fillColumnWithFormulas(
     surveysSheet,
     surveysSheetHeaders,
     "Number of rows in questions_combo",
@@ -350,7 +350,7 @@ function refreshSurveysSheetListing(
     surveysSheetValueRowsCount
   );
 
-  fillColumnWithFormula(
+  fillColumnWithFormulas(
     surveysSheet,
     surveysSheetHeaders,
     "Number of rows in topline_combo",
@@ -519,7 +519,7 @@ function refreshCombinedQuestionsSheetListing(
   );
 
   console.info(`Filling formula columns`);
-  fillColumnWithFormula(
+  fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Survey Name",
@@ -527,7 +527,7 @@ function refreshCombinedQuestionsSheetListing(
     updatedCombinedQuestionsSheetData.length
   );
 
-  fillColumnWithFormula(
+  fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Igno Index Question",
@@ -535,7 +535,7 @@ function refreshCombinedQuestionsSheetListing(
     updatedCombinedQuestionsSheetData.length
   );
 
-  fillColumnWithFormula(
+  fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Foreign Country Igno Question",
@@ -543,7 +543,7 @@ function refreshCombinedQuestionsSheetListing(
     updatedCombinedQuestionsSheetData.length
   );
 
-  fillColumnWithFormula(
+  fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "The answer options",
@@ -551,7 +551,7 @@ function refreshCombinedQuestionsSheetListing(
     updatedCombinedQuestionsSheetData.length
   );
 
-  fillColumnWithFormula(
+  fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Answers by percent",
@@ -559,7 +559,7 @@ function refreshCombinedQuestionsSheetListing(
     updatedCombinedQuestionsSheetData.length
   );
 
-  fillColumnWithFormula(
+  fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Correct answer(s)",
@@ -567,7 +567,7 @@ function refreshCombinedQuestionsSheetListing(
     updatedCombinedQuestionsSheetData.length
   );
 
-  fillColumnWithFormula(
+  fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "% that answered correctly",
@@ -575,7 +575,7 @@ function refreshCombinedQuestionsSheetListing(
     updatedCombinedQuestionsSheetData.length
   );
 
-  fillColumnWithFormula(
+  fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Overall Summary",
@@ -587,7 +587,7 @@ Correct answer(s): "&L[ROW]&"
     updatedCombinedQuestionsSheetData.length
   );
 
-  fillColumnWithFormula(
+  fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Amount of answer options",
@@ -595,7 +595,7 @@ Correct answer(s): "&L[ROW]&"
     updatedCombinedQuestionsSheetData.length
   );
 
-  fillColumnWithFormula(
+  fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "% that would have answered correctly in an abc-type question",
@@ -756,7 +756,7 @@ function refreshCombinedToplineSheetListing(
   );
 
   console.info(`Filling formula columns`);
-  fillColumnWithFormula(
+  fillColumnWithFormulas(
     combinedToplineSheet,
     combinedToplineSheetHeaders,
     "Survey Name",
