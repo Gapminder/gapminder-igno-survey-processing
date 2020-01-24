@@ -160,7 +160,7 @@ function refreshSurveysAndCombinedListings() {
   );
 
   console.info(`End of refreshSurveysAndCombinedListings()`);
-  /* tslint:disable:no-console */
+  /* tslint:enable:no-console */
 }
 
 /**

@@ -1,4 +1,6 @@
 import difference from "lodash/difference";
+import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
+import File = GoogleAppsScript.Drive.File;
 import intersection from "lodash/intersection";
 import union from "lodash/union";
 import {
@@ -14,11 +16,8 @@ import {
   adjustSheetRowsAndColumnsCount,
   fileNameToSurveyId,
   fillColumnWithFormulas,
-  getSheetDataIncludingHeaderRow,
   openSpreadsheetByIdAtMostOncePerScriptRun
 } from "./common";
-import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
-import File = GoogleAppsScript.Drive.File;
 
 /**
  * @hidden
