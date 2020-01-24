@@ -480,10 +480,7 @@ function refreshCombinedQuestionsSheetListing(
         const sourceSheet = gsResultsFolderGsheet.getSheetByName("Overview");
         const sourceDataRange = sourceSheet.getDataRange();
         const sourceValuesIncludingHeaderRow = sourceDataRange.getValues();
-
-        // console.log({ notYetIncludedGsResultsFolderGsheetFiles });
-
-        const sourceHeaderRows = sourceValuesIncludingHeaderRow.slice(0, 1);
+        // const sourceHeaderRows = sourceValuesIncludingHeaderRow.slice(0, 1);
         const sourceValues = sourceValuesIncludingHeaderRow.slice(1);
         const targetValues = sourceValues
           .map(overviewSheetValueRowToOverviewEntry)
@@ -721,7 +718,7 @@ function refreshCombinedToplineSheetListing(
         const sourceSheet = gsResultsFolderGsheet.getSheetByName("Topline");
         const sourceDataRange = sourceSheet.getDataRange();
         const sourceValuesIncludingHeaderRow = sourceDataRange.getValues();
-        const sourceHeaderRows = sourceValuesIncludingHeaderRow.slice(0, 1);
+        // const sourceHeaderRows = sourceValuesIncludingHeaderRow.slice(0, 1);
         const sourceValues = sourceValuesIncludingHeaderRow.slice(1);
         const targetValues = sourceValues
           .map(toplineSheetValueRowToToplineEntry)
