@@ -22,6 +22,12 @@ export const combinedToplineSheetName = "topline_combo";
 /**
  * @hidden
  */
+export const gsDashboardSurveyListingsSheetName =
+  "gs_dashboard_surveys_listing";
+
+/**
+ * @hidden
+ */
 export const gsResultsFolderName = "gs_results";
 
 /**
@@ -76,6 +82,19 @@ export const combinedToplineSheetHeaders = [
   "Answer by percent",
   "Metadata",
   "Weighted by"
+];
+
+/**
+ * @hidden
+ */
+export const gsDashboardSurveyListingsSheetHeaders = [
+  "Survey ID",
+  "Survey Name & Link",
+  "Status",
+  "Created",
+  "Last run",
+  "Next run",
+  "URL"
 ];
 
 /**

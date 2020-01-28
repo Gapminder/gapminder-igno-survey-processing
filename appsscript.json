@@ -5,6 +5,10 @@
       "serviceId": "drive",
       "userSymbol": "Drive",
       "version": "v2"
+    },{
+      "serviceId": "sheets",
+      "userSymbol": "Sheets",
+      "version": "v4"
     }]
   },
   "oauthScopes": [
