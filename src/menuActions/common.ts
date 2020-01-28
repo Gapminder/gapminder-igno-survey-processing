@@ -159,14 +159,12 @@ export function fillColumnWithFormulas(
   console.info(`Filling formula column "${header}"`);
   /* tslint:enable:no-console */
   const columnIndex = ensuredColumnIndex(headers, header);
-  const questionRowCountRange = sheet.getRange(2, columnIndex + 1, rowCount, 1);
-  const questionRowCountFormulas = arrayOfASingleValue(
+  const range = sheet.getRange(2, columnIndex + 1, rowCount, 1);
+  const formulas = arrayOfASingleValue(
     formulaInA1Notation,
     rowCount
   ).map((formula, index) => formula.split("[ROW]").join(index + 2));
-  questionRowCountRange.setFormulas(
-    questionRowCountFormulas.map(formula => [formula])
-  );
+  range.setFormulas(formulas.map(formula => [formula]));
 }
 
 /**
@@ -183,14 +181,12 @@ export function fillColumnWithValues(
   console.info(`Filling value column "${header}"`);
   /* tslint:enable:no-console */
   const columnIndex = ensuredColumnIndex(headers, header);
-  const questionRowCountRange = sheet.getRange(2, columnIndex + 1, rowCount, 1);
-  const questionRowCountValues = arrayOfASingleValue(null, rowCount).map(
-    (value, index) => {
-      const rowNumber = index + 2;
-      return valueCalculationCallback(rowNumber);
-    }
-  );
-  questionRowCountRange.setValues(questionRowCountValues.map(value => [value]));
+  const range = sheet.getRange(2, columnIndex + 1, rowCount, 1);
+  const values = arrayOfASingleValue(null, rowCount).map((value, index) => {
+    const rowNumber = index + 2;
+    return valueCalculationCallback(rowNumber);
+  });
+  range.setValues(values.map(value => [value]));
 }
 
 /**
