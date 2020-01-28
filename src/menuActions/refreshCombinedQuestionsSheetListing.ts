@@ -331,7 +331,9 @@ Correct answer(s): "&L[ROW]&"
         updatedCombinedToplineEntriesBySurveyIdAndQuestionNumber[
           combineSurveyIdAndQuestionNumber(updatedCombinedQuestionEntry)
         ];
-      return matchingUpdatedCombinedToplineEntries.length;
+      return !matchingUpdatedCombinedToplineEntries
+        ? "(No topline entries found)"
+        : matchingUpdatedCombinedToplineEntries.length;
     },
     updatedCombinedQuestionEntries.length
   );
