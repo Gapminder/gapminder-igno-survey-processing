@@ -203,6 +203,32 @@ function ensureGsheetVersionsOfEachExcelFile(gsResultsFolder: Folder) {
       /* tslint:enable:no-console */
       filesByMimeType[gsheetMimeType].push(gsheetFile);
     }
+    // Remove/move duplicate gsheet files if they are encountered
+    if (existingGsheetFiles.length > 1) {
+      console.info(
+        `Found ${existingGsheetFiles.length} Gsheet versions of the ${targetFileName} Excel file, removing all but one...`
+      );
+      existingGsheetFiles.slice(1).map((existingGsheetFileDuplicate: File) => {
+        try {
+          existingGsheetFileDuplicate.setTrashed(true);
+        } catch (e) {
+          console.log(
+            `Error while trying to remove file with id ${existingGsheetFileDuplicate.getId()}`,
+            e
+          );
+          // Move file instead
+          console.log(`Moving file to the "Moved Duplicates" folder instead`);
+          const movedDuplicatesFolder = gsResultsFolder
+            .getFoldersByName("Moved Duplicates")
+            .next();
+          movedDuplicatesFolder.addFile(existingGsheetFileDuplicate);
+          existingGsheetFileDuplicate
+            .getParents()
+            .next()
+            .removeFile(existingGsheetFileDuplicate);
+        }
+      });
+    }
   });
   return filesByMimeType;
 }
