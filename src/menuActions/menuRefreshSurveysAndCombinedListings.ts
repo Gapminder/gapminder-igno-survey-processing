@@ -29,12 +29,39 @@ import { refreshSurveysSheetListing } from "./refreshSurveysSheetListing";
  * - Verifies that the first headers of the `surveys` and `topline_combo` worksheets are as expected
  */
 export function menuRefreshSurveysAndCombinedListings() {
+
+  // Gets a cache that is specific to the current document containing the script
+  const cache = CacheService.getDocumentCache();
+
+  const cached = cache.get("script-is-running");
+  console.log({ cached });
+  if (cached !== null) {
+    console.log("Script is already running");
+    SpreadsheetApp.getUi().alert(
+      `Script is already running. Please wait for it to finish (max 10 minutes) and try again`
+    );
+    return;
+  }
+  cache.put("script-is-running", "true", 60 * 10); // cache for 10 minutes
+
+  // Long running script
   try {
     refreshSurveysAndCombinedListings();
+
+    // Removes any cache entries for 'script-is-running'
+    cache.remove("script-is-running");
+    console.log("Removed cache entry. The script can run again now");
+
     SpreadsheetApp.getUi().alert(
       "Refreshed the surveys and combined listings (based on files in the gs_results folder)."
     );
+
   } catch (e) {
+
+    // Removes any cache entries for 'script-is-running'
+    cache.remove("script-is-running");
+    console.log("Removed cache entry. The script can run again now");
+
     // Ignore "Timed out waiting for user response" since it just means that we let the script run and went for coffee
     if (e.message === "Timed out waiting for user response") {
       return;
