@@ -29,6 +29,7 @@ import { refreshSurveysSheetListing } from "./refreshSurveysSheetListing";
  * - Verifies that the first headers of the `surveys` and `topline_combo` worksheets are as expected
  */
 export function menuRefreshSurveysAndCombinedListings() {
+  /* tslint:disable:no-console */
   // Gets a cache that is specific to the current document containing the script
   const cache = CacheService.getDocumentCache();
 
@@ -87,6 +88,7 @@ export function menuRefreshSurveysAndCombinedListings() {
   }
 
   return;
+  /* tslint:enable:no-console */
 }
 
 /**
