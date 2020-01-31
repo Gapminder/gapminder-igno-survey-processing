@@ -302,7 +302,7 @@ export function refreshCombinedQuestionsSheetListing(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "% that answered correctly",
-    `=SUMIFS(topline_combo!$G$2:$G,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,"X")`,
+    `=SUMIFS(topline_combo!$G$2:$G,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,"x")`,
     updatedCombinedQuestionEntries.length
   );
 
