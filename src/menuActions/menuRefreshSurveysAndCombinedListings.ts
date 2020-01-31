@@ -62,6 +62,18 @@ export function menuRefreshSurveysAndCombinedListings() {
     cache.remove("script-is-running");
     console.log("Removed cache entry. The script can run again now");
 
+    // Inform about appropriate user action on timeout
+    if (
+      e.message.indexOf(
+        "Service Spreadsheets timed out while accessing document"
+      )
+    ) {
+      SpreadsheetApp.getUi().alert(
+        "The script did not have time to finish all the imports before it timed out. Please re-run the script."
+      );
+      return;
+    }
+
     // Ignore "Timed out waiting for user response" since it just means that we let the script run and went for coffee
     if (e.message === "Timed out waiting for user response") {
       return;
