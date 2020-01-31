@@ -55,6 +55,8 @@ export function menuRefreshSurveysAndCombinedListings() {
       "Refreshed the surveys and combined listings (based on files in the gs_results folder)."
     );
   } catch (e) {
+    // Make sure that the error ends up in the logs, regardless of if the user sees the error or not
+    console.error(e);
 
     // Removes any cache entries for 'script-is-running'
     cache.remove("script-is-running");
@@ -68,7 +70,7 @@ export function menuRefreshSurveysAndCombinedListings() {
     SpreadsheetApp.getUi().alert(
       "Encountered an issue: \n\n" + e.message + "\n\n" + e.stack
     );
-    // Also throw the error so that it turns up in the error log
+    // Also throw the error so that it is clear that there was an error
     throw e;
   }
 

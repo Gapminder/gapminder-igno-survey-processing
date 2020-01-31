@@ -21,6 +21,8 @@ export function menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames() {
       `Extracted Survey IDs from copy-pasted linked survey names (in the "${gsDashboardSurveyListingsSheetName}" worksheet)`
     );
   } catch (e) {
+    // Make sure that the error ends up in the logs, regardless of if the user sees the error or not
+    console.error(e);
     // Ignore "Timed out waiting for user response" since it just means that we let the script run and went for coffee
     if (e.message === "Timed out waiting for user response") {
       return;
@@ -29,7 +31,7 @@ export function menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames() {
     SpreadsheetApp.getUi().alert(
       "Encountered an issue: \n\n" + e.message + "\n\n" + e.stack
     );
-    // Also throw the error so that it turns up in the error log
+    // Also throw the error so that it is clear that there was an error
     throw e;
   }
 
