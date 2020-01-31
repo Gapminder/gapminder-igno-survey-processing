@@ -29,7 +29,6 @@ import { refreshSurveysSheetListing } from "./refreshSurveysSheetListing";
  * - Verifies that the first headers of the `surveys` and `topline_combo` worksheets are as expected
  */
 export function menuRefreshSurveysAndCombinedListings() {
-
   // Gets a cache that is specific to the current document containing the script
   const cache = CacheService.getDocumentCache();
 
@@ -55,7 +54,6 @@ export function menuRefreshSurveysAndCombinedListings() {
     SpreadsheetApp.getUi().alert(
       "Refreshed the surveys and combined listings (based on files in the gs_results folder)."
     );
-
   } catch (e) {
 
     // Removes any cache entries for 'script-is-running'
