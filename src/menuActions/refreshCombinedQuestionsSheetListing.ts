@@ -206,8 +206,24 @@ export function refreshCombinedQuestionsSheetListing(
   fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
+    "Answer to Igno Index Question",
+    `=VLOOKUP(E[ROW],imported_igno_questions_info!$A$3:$C,3,FALSE)`,
+    updatedCombinedQuestionEntries.length
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
     "Foreign Country Igno Question",
     `=VLOOKUP(F[ROW],imported_igno_questions_info!$D$3:$E,2,FALSE)`,
+    updatedCombinedQuestionEntries.length
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Answer to Foreign Country Igno Question",
+    `=VLOOKUP(F[ROW],imported_igno_questions_info!$D$3:$E,3,FALSE)`,
     updatedCombinedQuestionEntries.length
   );
 

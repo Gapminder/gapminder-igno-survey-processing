@@ -55,9 +55,13 @@ export const combinedQuestionsSheetHeaders = [
   "Question number",
   "Question text",
   "Igno Index Question ID",
+  "Auto-mapped Igno Index Question ID",
   "Foreign Country Igno Question ID",
+  "Auto-mapped Foreign Country Igno Question ID",
   "Igno Index Question",
+  "Answer to Igno Index Question",
   "Foreign Country Igno Question",
+  "Answer to Foreign Country Igno Question",
   // "Winning answer", // Ignoring this column since it is confusing next to the others
   "Response count",
   "The answer options",
@@ -79,6 +83,7 @@ export const combinedToplineSheetHeaders = [
   "Question text",
   "Answer",
   'Correct? ("x" marks correct answers)',
+  "Auto-marked correct answers",
   "Answer by percent",
   "Metadata",
   "Weighted by"
@@ -177,19 +182,23 @@ export const combinedQuestionsSheetValueRowToCombinedQuestionEntry = (
     question_number: combinedQuestionsSheetRow[2],
     question_text: combinedQuestionsSheetRow[3],
     igno_index_question_id: combinedQuestionsSheetRow[4],
-    foreign_country_igno_question_id: combinedQuestionsSheetRow[5],
-    igno_index_question: combinedQuestionsSheetRow[6],
-    foreign_country_igno_question: combinedQuestionsSheetRow[7],
-    // winning_answer: combinedQuestionsSheetRow[8], // Ignoring this column since it is confusing next to the others
-    response_count: combinedQuestionsSheetRow[8],
-    the_answer_options: combinedQuestionsSheetRow[9],
-    answers_by_percent: combinedQuestionsSheetRow[10],
-    correct_answers: combinedQuestionsSheetRow[11],
-    percent_that_answered_correctly: combinedQuestionsSheetRow[12],
-    overall_summary: combinedQuestionsSheetRow[13],
-    amount_of_answer_options: combinedQuestionsSheetRow[14],
+    auto_mapped_igno_index_question_id: combinedQuestionsSheetRow[5],
+    foreign_country_igno_question_id: combinedQuestionsSheetRow[6],
+    auto_mapped_foreign_country_igno_question_id: combinedQuestionsSheetRow[7],
+    igno_index_question: combinedQuestionsSheetRow[8],
+    answer_to_igno_index_question: combinedQuestionsSheetRow[9],
+    foreign_country_igno_question: combinedQuestionsSheetRow[10],
+    answer_to_foreign_country_igno_question: combinedQuestionsSheetRow[11],
+    // winning_answer: combinedQuestionsSheetRow[12], // Ignoring this column since it is confusing next to the others
+    response_count: combinedQuestionsSheetRow[12],
+    the_answer_options: combinedQuestionsSheetRow[13],
+    answers_by_percent: combinedQuestionsSheetRow[14],
+    correct_answers: combinedQuestionsSheetRow[15],
+    percent_that_answered_correctly: combinedQuestionsSheetRow[16],
+    overall_summary: combinedQuestionsSheetRow[17],
+    amount_of_answer_options: combinedQuestionsSheetRow[18],
     percent_that_would_have_answered_correctly_in_an_abc_type_question:
-      combinedQuestionsSheetRow[15]
+      combinedQuestionsSheetRow[19]
   };
 };
 
@@ -202,9 +211,13 @@ export const questionEntryToCombinedQuestionsSheetValueRow = questionEntry => [
   questionEntry.question_number,
   questionEntry.question_text,
   questionEntry.igno_index_question_id,
+  questionEntry.auto_mapped_igno_index_question_id,
   questionEntry.foreign_country_igno_question_id,
+  questionEntry.auto_mapped_foreign_country_igno_question_id,
   "...", // igno_index_question formula
+  "...", // answer_to_igno_index_question formula
   "...", // foreign_country_igno_question formula
+  "...", // answer_to_foreign_country_igno_question formula
   // questionEntry.winning_answer, // Ignoring this column since it is confusing next to the others
   questionEntry.response_count,
   "...", // the_answer_options formula
@@ -241,6 +254,7 @@ export const toplineEntryToCombinedToplineSheetValueRow = toplineEntry => [
   toplineEntry.question_text,
   toplineEntry.answer,
   "", // x_marks_correct_answers left blank
+  "", // auto_marked_correct_answers left blank
   toplineEntry.answer_by_percent,
   toplineEntry.metadata,
   toplineEntry.weighted_by
@@ -259,9 +273,10 @@ export const combinedToplineSheetValueRowToCombinedToplineEntry = (
     question_text: combinedToplineSheetRow[3],
     answer: combinedToplineSheetRow[4],
     x_marks_correct_answers: combinedToplineSheetRow[5],
-    answer_by_percent: combinedToplineSheetRow[6],
-    metadata: combinedToplineSheetRow[7],
-    weighted_by: combinedToplineSheetRow[8]
+    auto_marked_correct_answers: combinedToplineSheetRow[6],
+    answer_by_percent: combinedToplineSheetRow[7],
+    metadata: combinedToplineSheetRow[8],
+    weighted_by: combinedToplineSheetRow[9]
   };
 };
 
