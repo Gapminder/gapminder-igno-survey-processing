@@ -59,7 +59,7 @@ export function menuRefreshSurveysAndCombinedListings() {
     if (
       e.message.indexOf(
         "Service Spreadsheets timed out while accessing document"
-      )
+      ) > -1
     ) {
       SpreadsheetApp.getUi().alert(
         "The script did not have time to finish all the imports before it timed out. Please re-run the script."
