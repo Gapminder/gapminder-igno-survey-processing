@@ -2,6 +2,8 @@ import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 import Blob = GoogleAppsScript.Base.Blob;
 import Folder = GoogleAppsScript.Drive.Folder;
 import File = GoogleAppsScript.Drive.File;
+import Spreadsheet = GoogleAppsScript.Spreadsheet.Spreadsheet;
+import groupBy from "lodash/groupBy";
 import {
   combinedQuestionsSheetHeaders,
   combinedQuestionsSheetName,
@@ -11,7 +13,6 @@ import {
   surveysSheetName
 } from "../gsheetsData/hardcodedConstants";
 import { removeEmptyRowsAtTheEnd } from "../lib/cleanInputRange";
-import Spreadsheet = GoogleAppsScript.Spreadsheet.Spreadsheet;
 
 /**
  * @hidden
@@ -158,17 +159,20 @@ export function fillColumnWithFormulas(
   headers: string[],
   header: string,
   formulaInA1Notation: string,
-  rowCount: number
+  startRow: number,
+  numRows: number
 ) {
   /* tslint:disable:no-console */
   console.info(`Filling formula column "${header}"`);
   /* tslint:enable:no-console */
   const columnIndex = ensuredColumnIndex(headers, header);
-  const range = sheet.getRange(2, columnIndex + 1, rowCount, 1);
+  const range = sheet.getRange(startRow, columnIndex + 1, numRows, 1);
   const formulas = arrayOfASingleValue(
     formulaInA1Notation,
-    rowCount
-  ).map((formula, index) => formula.split("[ROW]").join(index + 2));
+    numRows
+  ).map((formula, index) =>
+    formula.split("[ROW]").join(String(index + startRow))
+  );
   range.setFormulas(formulas.map(formula => [formula]));
 }
 
@@ -180,15 +184,16 @@ export function fillColumnWithValues(
   headers: string[],
   header: string,
   valueCalculationCallback: (rowNumber: number) => any,
-  rowCount: number
+  startRow: number,
+  numRows: number
 ) {
   /* tslint:disable:no-console */
   console.info(`Filling value column "${header}"`);
   /* tslint:enable:no-console */
   const columnIndex = ensuredColumnIndex(headers, header);
-  const range = sheet.getRange(2, columnIndex + 1, rowCount, 1);
-  const values = arrayOfASingleValue(null, rowCount).map((value, index) => {
-    const rowNumber = index + 2;
+  const range = sheet.getRange(startRow, columnIndex + 1, numRows, 1);
+  const values = arrayOfASingleValue(null, numRows).map((value, index) => {
+    const rowNumber = index + startRow;
     return valueCalculationCallback(rowNumber);
   });
   range.setValues(values.map(value => [value]));
@@ -329,4 +334,246 @@ export function fetchAndVerifyCombinedToplineSheet(
     combinedToplineSheetValuesIncludingHeaderRow
   );
   return { combinedToplineSheet, combinedToplineSheetValuesIncludingHeaderRow };
+}
+
+/**
+ * @hidden
+ */
+export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
+  combinedQuestionsSheet,
+  combinedQuestionEntries,
+  combinedToplineEntries,
+  startRow: number,
+  numRows: number
+) {
+  /* tslint:disable:no-console */
+  console.info(
+    `Start of updateCombinedQuestionSheetFormulasAndCalculatedColumns()`
+  );
+
+  console.info(`Filling formula columns`);
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Survey Name",
+    `=VLOOKUP("survey-"&A[ROW],{${surveysSheetName}!G$2:G,${surveysSheetName}!A$2:A},2,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Igno Index Question",
+    `=VLOOKUP(E[ROW],imported_igno_questions_info!$A$3:$C,2,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Answer to Igno Index Question",
+    `=VLOOKUP(E[ROW],imported_igno_questions_info!$A$3:$C,3,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Foreign Country Igno Question",
+    `=VLOOKUP(G[ROW],imported_igno_questions_info!$D$3:$F,2,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Answer to Foreign Country Igno Question",
+    `=VLOOKUP(G[ROW],imported_igno_questions_info!$D$3:$Fs,3,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  const combineSurveyIdAndQuestionNumber = combinedEntry => {
+    if (!combinedEntry.survey_id) {
+      console.log("The entry did not have survey_id set", {
+        combinedEntry
+      });
+      throw new Error("The entry did not have survey_id set");
+    }
+    if (!combinedEntry.question_number) {
+      console.log("The entry did not have question_number set", {
+        combinedEntry
+      });
+      throw new Error("The entry did not have question_number set");
+    }
+    return `${combinedEntry.survey_id}-${combinedEntry.question_number}`;
+  };
+  const combinedToplineEntriesBySurveyIdAndQuestionNumber = groupBy(
+    combinedToplineEntries,
+    combineSurveyIdAndQuestionNumber
+  );
+
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "The answer options",
+    // `=JOIN(" - ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW]))`,
+    rowNumber => {
+      // Row number startRow corresponds to index 0 in the entries array
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      const matchingCombinedToplineEntries =
+        combinedToplineEntriesBySurveyIdAndQuestionNumber[
+          combineSurveyIdAndQuestionNumber(combinedQuestionEntry)
+        ];
+      if (
+        !matchingCombinedToplineEntries ||
+        matchingCombinedToplineEntries.length === 0
+      ) {
+        return "(No topline entries found)";
+      }
+      return matchingCombinedToplineEntries
+        .map(
+          matchingCombinedToplineEntry => matchingCombinedToplineEntry.answer
+        )
+        .join(" - ");
+    },
+    startRow,
+    numRows
+  );
+
+  const percentStringRoundedToOneDecimal = (percentString: string) =>
+    parseFloat(percentString.replace("%", "")).toFixed(1) + "%";
+
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Answers by percent",
+    // `=JOIN(" - ",ARRAYFORMULA(TEXT(FILTER(topline_combo!$G$2:$G,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW]), "0.0%")))`,
+    rowNumber => {
+      // Row number startRow corresponds to index 0 in the entries array
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      const matchingCombinedToplineEntries =
+        combinedToplineEntriesBySurveyIdAndQuestionNumber[
+          combineSurveyIdAndQuestionNumber(combinedQuestionEntry)
+        ];
+      if (
+        !matchingCombinedToplineEntries ||
+        matchingCombinedToplineEntries.length === 0
+      ) {
+        return "(No topline entries found)";
+      }
+      return matchingCombinedToplineEntries
+        .map(matchingCombinedToplineEntry =>
+          matchingCombinedToplineEntry.answer_by_percent
+            ? percentStringRoundedToOneDecimal(
+                matchingCombinedToplineEntry.answer_by_percent
+              )
+            : matchingCombinedToplineEntry.answer_by_percent
+        )
+        .join(" - ");
+    },
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Correct answer(s)",
+    `=JOIN("; ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW],topline_combo!$F$2:$F = "x"))`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "% that answered correctly",
+    `=SUMIFS(topline_combo!$H$2:$H,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,"x")`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Overall Summary",
+    `=IFERROR("Response count: "&M[ROW]&"
+The answer options: "&N[ROW]&"
+Answers by percent: "&O[ROW]&"
+Correct answer(s): "&P[ROW]&"
+% that answered correctly: "&TEXT(Q[ROW], "0.0%"), "Results not processed yet")`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Amount of answer options",
+    // `=COUNTIFS(topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW])`,
+    rowNumber => {
+      // Row number startRow corresponds to index 0 in the entries array
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      const matchingCombinedToplineEntries =
+        combinedToplineEntriesBySurveyIdAndQuestionNumber[
+          combineSurveyIdAndQuestionNumber(combinedQuestionEntry)
+        ];
+      return !matchingCombinedToplineEntries
+        ? "(No topline entries found)"
+        : matchingCombinedToplineEntries.length;
+    },
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "% that would have answered correctly in an abc-type question",
+    `=Q[ROW]*S[ROW]/3`,
+    startRow,
+    numRows
+  );
+
+  console.info(
+    `End of updateCombinedQuestionSheetFormulasAndCalculatedColumns()`
+  );
+  /* tslint:enable:no-console */
+}
+
+/**
+ * @hidden
+ */
+export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
+  combinedToplineSheet,
+  startRow: number,
+  numRows: number
+) {
+  /* tslint:disable:no-console */
+  console.info(
+    `Start of updateCombinedToplineSheetFormulasAndCalculatedColumns()`
+  );
+
+  console.info(`Filling formula columns`);
+  fillColumnWithFormulas(
+    combinedToplineSheet,
+    combinedToplineSheetHeaders,
+    "Survey Name",
+    `=VLOOKUP("survey-"&A[ROW],{${surveysSheetName}!G$2:G,${surveysSheetName}!A$2:A},2,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  console.info(
+    `End of updateCombinedToplineSheetFormulasAndCalculatedColumns()`
+  );
+  /* tslint:enable:no-console */
 }

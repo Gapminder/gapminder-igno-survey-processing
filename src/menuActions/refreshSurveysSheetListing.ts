@@ -117,6 +117,7 @@ export function refreshSurveysSheetListing(
     surveysSheetHeaders,
     "Survey Name",
     `=VLOOKUP(SUBSTITUTE(G[ROW],"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,2,FALSE)`,
+    2,
     surveysSheetValueRowsCount
   );
 
@@ -125,6 +126,7 @@ export function refreshSurveysSheetListing(
     surveysSheetHeaders,
     "Sample Size",
     `=SUBSTITUTE(SUBSTITUTE(VLOOKUP(SUBSTITUTE(G[ROW],"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,3,FALSE),"Complete","")," responses","")`,
+    2,
     surveysSheetValueRowsCount
   );
 
@@ -133,6 +135,7 @@ export function refreshSurveysSheetListing(
     surveysSheetHeaders,
     "Survey Date",
     `=VLOOKUP(SUBSTITUTE(G[ROW],"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,4,FALSE)`,
+    2,
     surveysSheetValueRowsCount
   );
 
@@ -141,6 +144,7 @@ export function refreshSurveysSheetListing(
     surveysSheetHeaders,
     "Number of rows in questions_combo",
     `=IF(G[ROW]="","",COUNTIF(${combinedQuestionsSheetName}!$A$2:$A, SUBSTITUTE(G[ROW],"survey-","")))`,
+    2,
     surveysSheetValueRowsCount
   );
 
@@ -149,6 +153,7 @@ export function refreshSurveysSheetListing(
     surveysSheetHeaders,
     "Number of rows in topline_combo",
     `=IF(G[ROW]="","",COUNTIF(${combinedToplineSheetName}!$A$2:$A, SUBSTITUTE(G[ROW],"survey-","")))`,
+    2,
     surveysSheetValueRowsCount
   );
 

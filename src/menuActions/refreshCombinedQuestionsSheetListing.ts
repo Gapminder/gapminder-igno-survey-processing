@@ -14,7 +14,9 @@ import {
 import {
   adjustSheetRowsAndColumnsCount,
   fileNameToSurveyId,
-  openSpreadsheetByIdAtMostOncePerScriptRun
+  openSpreadsheetByIdAtMostOncePerScriptRun,
+  updateCombinedQuestionSheetFormulasAndCalculatedColumns,
+  updateCombinedToplineSheetFormulasAndCalculatedColumns
 } from "./common";
 
 /**
@@ -169,6 +171,14 @@ export function refreshCombinedQuestionsSheetListing(
     );
     console.info(
       `Added ${rowsToAdd.length} rows. The total amount of data rows is now ${updatedCombinedQuestionEntries.length}`
+    );
+    console.info(`Updating formulas and calculated columns for the new rows`);
+    updateCombinedQuestionSheetFormulasAndCalculatedColumns(
+      combinedQuestionsSheet,
+      rowsToAdd,
+      updatedCombinedToplineEntries,
+      2,
+      rowsToAdd.length
     );
   }
 

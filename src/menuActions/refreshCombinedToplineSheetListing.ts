@@ -14,7 +14,8 @@ import {
 import {
   adjustSheetRowsAndColumnsCount,
   fileNameToSurveyId,
-  openSpreadsheetByIdAtMostOncePerScriptRun
+  openSpreadsheetByIdAtMostOncePerScriptRun,
+  updateCombinedToplineSheetFormulasAndCalculatedColumns
 } from "./common";
 
 /**
@@ -168,6 +169,12 @@ export function refreshCombinedToplineSheetListing(
     );
     console.info(
       `Added ${rowsToAdd.length} rows. The total amount of data rows is now ${updatedCombinedToplineEntries.length}`
+    );
+    console.info(`Updating formulas and calculated columns for the new rows`);
+    updateCombinedToplineSheetFormulasAndCalculatedColumns(
+      combinedToplineSheet,
+      2,
+      entriesToAdd.length
     );
   }
 
