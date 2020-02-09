@@ -156,10 +156,14 @@ export const overviewEntryToCombinedQuestionSheetValueRow = overviewEntry => [
   overviewEntry.question_number,
   overviewEntry.question_text,
   "", // igno_index_question_id blank on new rows
+  "", // auto_mapped_igno_index_question_id blank on new rows
   "", // foreign_country_igno_question_id blank on new rows
+  "", // answer_to_foreign_country_igno_question blank on new rows
   "...", // igno_index_question formula
+  "...", // answer_to_igno_index_question formula
   "...", // foreign_country_igno_question formula
-  // questionEntry.winning_answer, // Ignoring this column since it is confusing next to the others
+  "...", // answer_to_foreign_country_igno_question formula
+  // overviewEntry.winning_answer, // Ignoring this column since it is confusing next to the others
   overviewEntry.response_count,
   "...", // the_answer_options formula
   "...", // answers_by_percent formula
