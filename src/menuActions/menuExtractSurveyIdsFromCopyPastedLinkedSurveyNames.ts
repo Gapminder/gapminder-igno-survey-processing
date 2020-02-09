@@ -22,7 +22,9 @@ export function menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames() {
     );
   } catch (e) {
     // Make sure that the error ends up in the logs, regardless of if the user sees the error or not
+    /* tslint:disable:no-console */
     console.error(e);
+    /* tslint:enable:no-console */
     // Ignore "Timed out waiting for user response" since it just means that we let the script run and went for coffee
     if (e.message === "Timed out waiting for user response") {
       return;

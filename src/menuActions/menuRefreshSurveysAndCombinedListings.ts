@@ -188,6 +188,7 @@ function ensureGsheetVersionsOfEachExcelFile(gsResultsFolder: Folder) {
     }
     // Remove/move duplicate gsheet files if they are encountered
     if (existingGsheetFiles.length > 1) {
+      /* tslint:disable:no-console */
       console.info(
         `Found ${existingGsheetFiles.length} Gsheet versions of the ${targetFileName} Excel file, removing all but one...`
       );
@@ -211,6 +212,7 @@ function ensureGsheetVersionsOfEachExcelFile(gsResultsFolder: Folder) {
             .removeFile(existingGsheetFileDuplicate);
         }
       });
+      /* tslint:enable:no-console */
     }
   });
   return filesByMimeType;
