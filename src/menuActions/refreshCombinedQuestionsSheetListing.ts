@@ -122,13 +122,13 @@ export function refreshCombinedQuestionsSheetListing(
       );
     }
   );
-  // Open each not-yet-included gsheet file and add rows to the end of the sheet continuously
+  // Open each not-yet-included gsheet file and add rows to the end of the sheet
   if (notYetIncludedGsResultsFolderGsheetFiles.length > 0) {
     console.info(
       `Adding the contents of the ${notYetIncludedGsResultsFolderGsheetFiles.length} not-yet-included gsheet file(s) to the end of the sheet`
     );
     // console.log({ notYetIncludedGsResultsFolderGsheetFiles });
-    notYetIncludedGsResultsFolderGsheetFiles.map(
+    const arraysOfEntriesToAdd = notYetIncludedGsResultsFolderGsheetFiles.map(
       (gsResultsFolderGsheetFile: File) => {
         const gsResultsFolderGsheet = openSpreadsheetByIdAtMostOncePerScriptRun(
           gsResultsFolderGsheetFile.getId()
@@ -141,33 +141,38 @@ export function refreshCombinedQuestionsSheetListing(
         const targetEntries = sourceValues.map(
           overviewSheetValueRowToOverviewEntry
         );
-        const targetValues = targetEntries.map(
-          overviewEntryToCombinedQuestionSheetValueRow
-        );
-        const startRow = updatedCombinedQuestionEntries.length + 2;
         console.info(
-          `Adding ${
-            targetValues.length
-          } rows from spreadsheet with id ${gsResultsFolderGsheetFile.getId()} to the end of the sheet (row ${startRow})`
+          `Read ${
+            targetEntries.length
+          } rows from spreadsheet with id ${gsResultsFolderGsheetFile.getId()}`
         );
-        combinedQuestionsSheet
-          .getRange(
-            startRow,
-            1,
-            targetValues.length,
-            combinedQuestionsSheetHeaders.length
-          )
-          .setValues(targetValues);
-        // Add to the array that tracks the current sheet entries
-        updatedCombinedQuestionEntries = updatedCombinedQuestionEntries.concat(
-          targetValues.map(
-            combinedQuestionsSheetValueRowToCombinedQuestionEntry
-          )
-        );
-        console.info(
-          `Added ${targetValues.length} rows. The total amount of data rows is now ${updatedCombinedQuestionEntries.length}`
-        );
+        return targetEntries;
       }
+    );
+    // flatten
+    const entriesToAdd = [].concat.apply([], arraysOfEntriesToAdd);
+    // actually add rows
+    const rowsToAdd = entriesToAdd.map(
+      overviewEntryToCombinedQuestionSheetValueRow
+    );
+    const startRow = updatedCombinedQuestionEntries.length + 2;
+    console.info(
+      `Adding ${rowsToAdd.length} rows to the end of the sheet (row ${startRow})`
+    );
+    combinedQuestionsSheet
+      .getRange(
+        startRow,
+        1,
+        rowsToAdd.length,
+        combinedQuestionsSheetHeaders.length
+      )
+      .setValues(rowsToAdd);
+    // Add to the array that tracks the current sheet entries
+    updatedCombinedQuestionEntries = updatedCombinedQuestionEntries.concat(
+      rowsToAdd.map(combinedQuestionsSheetValueRowToCombinedQuestionEntry)
+    );
+    console.info(
+      `Added ${rowsToAdd.length} rows. The total amount of data rows is now ${updatedCombinedQuestionEntries.length}`
     );
   }
 

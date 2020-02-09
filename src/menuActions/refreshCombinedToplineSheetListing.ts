@@ -119,13 +119,13 @@ export function refreshCombinedToplineSheetListing(
       );
     }
   );
-  // Open each not-yet-included gsheet file and add rows to the end of the sheet continuously
+  // Open each not-yet-included gsheet file and add rows to the end of the sheet
   if (notYetIncludedGsResultsFolderGsheetFiles.length > 0) {
     console.info(
       `Adding the contents of the ${notYetIncludedGsResultsFolderGsheetFiles.length} not-yet-included gsheet file(s) to the end of the sheet`
     );
     // console.log({ notYetIncludedGsResultsFolderGsheetFiles });
-    notYetIncludedGsResultsFolderGsheetFiles.map(
+    const arraysOfEntriesToAdd = notYetIncludedGsResultsFolderGsheetFiles.map(
       (gsResultsFolderGsheetFile: File) => {
         const gsResultsFolderGsheet = openSpreadsheetByIdAtMostOncePerScriptRun(
           gsResultsFolderGsheetFile.getId()
@@ -138,31 +138,38 @@ export function refreshCombinedToplineSheetListing(
         const targetEntries = sourceValues.map(
           toplineSheetValueRowToToplineEntry
         );
-        const targetValues = targetEntries.map(
-          toplineEntryToCombinedToplineSheetValueRow
-        );
-        const startRow = updatedCombinedToplineEntries.length + 2;
         console.info(
-          `Adding ${
-            targetValues.length
-          } rows from spreadsheet with id ${gsResultsFolderGsheetFile.getId()} to the end of the sheet (row ${startRow})`
+          `Read ${
+            targetEntries.length
+          } rows from spreadsheet with id ${gsResultsFolderGsheetFile.getId()}`
         );
-        combinedToplineSheet
-          .getRange(
-            startRow,
-            1,
-            targetValues.length,
-            combinedToplineSheetHeaders.length
-          )
-          .setValues(targetValues);
-        // Add to the array that tracks the current sheet entries
-        updatedCombinedToplineEntries = updatedCombinedToplineEntries.concat(
-          targetValues.map(combinedToplineSheetValueRowToCombinedToplineEntry)
-        );
-        console.info(
-          `Added ${targetValues.length} rows. The total amount of data rows is now ${updatedCombinedToplineEntries.length}`
-        );
+        return targetEntries;
       }
+    );
+    // flatten
+    const entriesToAdd = [].concat.apply([], arraysOfEntriesToAdd);
+    // actually add rows
+    const rowsToAdd = entriesToAdd.map(
+      toplineEntryToCombinedToplineSheetValueRow
+    );
+    const startRow = updatedCombinedToplineEntries.length + 2;
+    console.info(
+      `Adding ${rowsToAdd.length} rows to the end of the sheet (row ${startRow})`
+    );
+    combinedToplineSheet
+      .getRange(
+        startRow,
+        1,
+        rowsToAdd.length,
+        combinedToplineSheetHeaders.length
+      )
+      .setValues(rowsToAdd);
+    // Add to the array that tracks the current sheet entries
+    updatedCombinedToplineEntries = updatedCombinedToplineEntries.concat(
+      rowsToAdd.map(combinedToplineSheetValueRowToCombinedToplineEntry)
+    );
+    console.info(
+      `Added ${rowsToAdd.length} rows. The total amount of data rows is now ${updatedCombinedToplineEntries.length}`
     );
   }
 
