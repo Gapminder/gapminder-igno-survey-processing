@@ -129,7 +129,7 @@ function devUpdateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Foreign Country Igno Question",
-    `=VLOOKUP(F[ROW],imported_igno_questions_info!$D$3:$E,2,FALSE)`,
+    `=VLOOKUP(G[ROW],imported_igno_questions_info!$D$3:$F,2,FALSE)`,
     combinedQuestionEntries.length
   );
 
@@ -137,7 +137,7 @@ function devUpdateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Answer to Foreign Country Igno Question",
-    `=VLOOKUP(F[ROW],imported_igno_questions_info!$D$3:$E,3,FALSE)`,
+    `=VLOOKUP(G[ROW],imported_igno_questions_info!$D$3:$Fs,3,FALSE)`,
     combinedQuestionEntries.length
   );
 
@@ -234,7 +234,7 @@ function devUpdateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "% that answered correctly",
-    `=SUMIFS(topline_combo!$G$2:$G,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,"x")`,
+    `=SUMIFS(topline_combo!$H$2:$H,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,"x")`,
     combinedQuestionEntries.length
   );
 
@@ -242,11 +242,11 @@ function devUpdateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Overall Summary",
-    `=IFERROR("Response count: "&I[ROW]&"
-The answer options: "&J[ROW]&"
-Answers by percent: "&K[ROW]&"
-Correct answer(s): "&L[ROW]&"
-% that answered correctly: "&TEXT(M[ROW], "0.0%"), "Results not processed yet")`,
+    `=IFERROR("Response count: "&M[ROW]&"
+The answer options: "&N[ROW]&"
+Answers by percent: "&O[ROW]&"
+Correct answer(s): "&P[ROW]&"
+% that answered correctly: "&TEXT(Q[ROW], "0.0%"), "Results not processed yet")`,
     combinedQuestionEntries.length
   );
 
@@ -273,7 +273,7 @@ Correct answer(s): "&L[ROW]&"
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "% that would have answered correctly in an abc-type question",
-    `=M[ROW]*O[ROW]/3`,
+    `=Q[ROW]*S[ROW]/3`,
     combinedQuestionEntries.length
   );
 
