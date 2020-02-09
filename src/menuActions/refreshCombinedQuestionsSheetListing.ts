@@ -194,4 +194,6 @@ export function refreshCombinedQuestionsSheetListing(
 
   console.info(`End of refreshCombinedQuestionsSheetListing()`);
   /* tslint:enable:no-console */
+
+  return { updatedCombinedQuestionEntries };
 }

@@ -1,9 +1,12 @@
+import intersection from "lodash/intersection";
+import union from "lodash/union";
 import { gsResultsFolderName } from "../gsheetsData/hardcodedConstants";
 import {
   addGsheetConvertedVersionOfExcelFileToFolder,
   fetchAndVerifyCombinedQuestionsSheet,
   fetchAndVerifyCombinedToplineSheet,
   fetchAndVerifySurveysSheet,
+  fileNameToSurveyId,
   gsheetMimeType,
   xlsxMimeType
 } from "./common";
@@ -134,13 +137,47 @@ function refreshSurveysAndCombinedListings() {
   );
 
   console.info(`Refreshing combined questions listing`);
-  refreshCombinedQuestionsSheetListing(
+  const {
+    updatedCombinedQuestionEntries
+  } = refreshCombinedQuestionsSheetListing(
     updatedSurveysSheetValues,
     updatedCombinedToplineEntries,
     combinedQuestionsSheet,
     combinedQuestionsSheetValuesIncludingHeaderRow,
     gsResultsFolderGsheetFiles
   );
+
+  console.info(
+    `Moving processed results files to a subfolder, so that they are not checked/processed again`
+  );
+  const existingCombinedQuestionSurveyIds = union(
+    updatedCombinedQuestionEntries.map(
+      existingQuestionEntry => existingQuestionEntry.survey_id
+    )
+  );
+  const existingCombinedToplineSurveyIds = union(
+    updatedCombinedToplineEntries.map(
+      updatedCombinedToplineEntry => updatedCombinedToplineEntry.survey_id
+    )
+  );
+  const surveyIdsInBothCombinedListings = intersection(
+    existingCombinedQuestionSurveyIds,
+    existingCombinedToplineSurveyIds
+  );
+  filesByMimeType[xlsxMimeType].map((excelFile: File) => {
+    const fileName = excelFile.getName();
+    const surveyId = fileName.replace(".xlsx", "").replace("survey-", "");
+    if (surveyIdsInBothCombinedListings.includes(surveyId)) {
+      moveFileToSubfolder(gsResultsFolder, excelFile, "Processed");
+    }
+  });
+  filesByMimeType[gsheetMimeType].map((gsheetFile: File) => {
+    const fileName = gsheetFile.getName();
+    const surveyId = fileName.replace("survey-", "");
+    if (surveyIdsInBothCombinedListings.includes(surveyId)) {
+      moveFileToSubfolder(gsResultsFolder, gsheetFile, "Processed");
+    }
+  });
 
   console.info(`End of refreshSurveysAndCombinedListings()`);
   /* tslint:enable:no-console */
@@ -201,19 +238,36 @@ function ensureGsheetVersionsOfEachExcelFile(gsResultsFolder: Folder) {
             e
           );
           // Move file instead
-          console.log(`Moving file to the "Moved Duplicates" folder instead`);
-          const movedDuplicatesFolder = gsResultsFolder
-            .getFoldersByName("Moved Duplicates")
-            .next();
-          movedDuplicatesFolder.addFile(existingGsheetFileDuplicate);
-          existingGsheetFileDuplicate
-            .getParents()
-            .next()
-            .removeFile(existingGsheetFileDuplicate);
+          moveFileToSubfolder(
+            gsResultsFolder,
+            existingGsheetFileDuplicate,
+            "Moved Duplicates"
+          );
         }
       });
       /* tslint:enable:no-console */
     }
   });
   return filesByMimeType;
+}
+
+/**
+ * @hidden
+ */
+function moveFileToSubfolder(
+  folder: Folder,
+  existingFile: File,
+  subFolderName: string
+) {
+  /* tslint:disable:no-console */
+  console.log(
+    `Moving file "${existingFile.getName()}" to the "${subFolderName}" folder`
+  );
+  /* tslint:enable:no-console */
+  const subFolder = folder.getFoldersByName(subFolderName).next();
+  subFolder.addFile(existingFile);
+  existingFile
+    .getParents()
+    .next()
+    .removeFile(existingFile);
 }
