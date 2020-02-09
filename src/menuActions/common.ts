@@ -5,8 +5,10 @@ import File = GoogleAppsScript.Drive.File;
 import Spreadsheet = GoogleAppsScript.Spreadsheet.Spreadsheet;
 import groupBy from "lodash/groupBy";
 import {
+  CombinedQuestionEntry,
   combinedQuestionsSheetHeaders,
   combinedQuestionsSheetName,
+  CombinedToplineEntry,
   combinedToplineSheetHeaders,
   combinedToplineSheetName,
   surveysSheetHeaders,
@@ -341,8 +343,8 @@ export function fetchAndVerifyCombinedToplineSheet(
  */
 export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
   combinedQuestionsSheet,
-  combinedQuestionEntries,
-  combinedToplineEntries,
+  combinedQuestionEntries: CombinedQuestionEntry[],
+  combinedToplineEntries: CombinedToplineEntry[],
   startRow: number,
   numRows: number
 ) {
@@ -397,7 +399,9 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     numRows
   );
 
-  const combineSurveyIdAndQuestionNumber = combinedEntry => {
+  const combineSurveyIdAndQuestionNumber = (
+    combinedEntry: CombinedQuestionEntry | CombinedToplineEntry
+  ) => {
     if (!combinedEntry.survey_id) {
       console.log("The entry did not have survey_id set", {
         combinedEntry
@@ -438,7 +442,8 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
       }
       return matchingCombinedToplineEntries
         .map(
-          matchingCombinedToplineEntry => matchingCombinedToplineEntry.answer
+          (matchingCombinedToplineEntry: CombinedToplineEntry) =>
+            matchingCombinedToplineEntry.answer
         )
         .join(" - ");
     },
@@ -469,7 +474,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
         return "(No topline entries found)";
       }
       return matchingCombinedToplineEntries
-        .map(matchingCombinedToplineEntry =>
+        .map((matchingCombinedToplineEntry: CombinedToplineEntry) =>
           matchingCombinedToplineEntry.answer_by_percent
             ? percentStringRoundedToOneDecimal(
                 matchingCombinedToplineEntry.answer_by_percent

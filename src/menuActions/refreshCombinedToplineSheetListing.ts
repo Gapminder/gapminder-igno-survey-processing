@@ -8,6 +8,7 @@ import {
   combinedToplineSheetHeaders,
   combinedToplineSheetValueRowToCombinedToplineEntry,
   surveysSheetValueRowToSurveyEntry,
+  ToplineEntry,
   toplineEntryToCombinedToplineSheetValueRow,
   toplineSheetValueRowToToplineEntry
 } from "../gsheetsData/hardcodedConstants";
@@ -146,7 +147,10 @@ export function refreshCombinedToplineSheetListing(
       }
     );
     // flatten
-    const entriesToAdd = [].concat.apply([], arraysOfEntriesToAdd);
+    const entriesToAdd: ToplineEntry[] = [].concat.apply(
+      [],
+      arraysOfEntriesToAdd
+    );
     // actually add rows
     const rowsToAdd = entriesToAdd.map(
       toplineEntryToCombinedToplineSheetValueRow

@@ -4,10 +4,13 @@ import File = GoogleAppsScript.Drive.File;
 import intersection from "lodash/intersection";
 import union from "lodash/union";
 import {
+  CombinedQuestionEntry,
   combinedQuestionsSheetHeaders,
   combinedQuestionsSheetValueRowToCombinedQuestionEntry,
-  overviewEntryToCombinedQuestionSheetValueRow,
-  overviewSheetValueRowToOverviewEntry,
+  combinedToplineSheetValueRowToCombinedToplineEntry,
+  overviewSheetValueRowToQuestionEntry,
+  QuestionEntry,
+  questionEntryToCombinedQuestionSheetValueRow,
   questionEntryToCombinedQuestionsSheetValueRow,
   surveysSheetValueRowToSurveyEntry
 } from "../gsheetsData/hardcodedConstants";
@@ -15,8 +18,7 @@ import {
   adjustSheetRowsAndColumnsCount,
   fileNameToSurveyId,
   openSpreadsheetByIdAtMostOncePerScriptRun,
-  updateCombinedQuestionSheetFormulasAndCalculatedColumns,
-  updateCombinedToplineSheetFormulasAndCalculatedColumns
+  updateCombinedQuestionSheetFormulasAndCalculatedColumns
 } from "./common";
 
 /**
@@ -137,7 +139,7 @@ export function refreshCombinedQuestionsSheetListing(
         // const sourceHeaderRows = sourceValuesIncludingHeaderRow.slice(0, 1);
         const sourceValues = sourceValuesIncludingHeaderRow.slice(1);
         const targetEntries = sourceValues.map(
-          overviewSheetValueRowToOverviewEntry
+          overviewSheetValueRowToQuestionEntry
         );
         console.info(
           `Read ${
@@ -148,10 +150,13 @@ export function refreshCombinedQuestionsSheetListing(
       }
     );
     // flatten
-    const entriesToAdd = [].concat.apply([], arraysOfEntriesToAdd);
+    const entriesToAdd: QuestionEntry[] = [].concat.apply(
+      [],
+      arraysOfEntriesToAdd
+    );
     // actually add rows
     const rowsToAdd = entriesToAdd.map(
-      overviewEntryToCombinedQuestionSheetValueRow
+      questionEntryToCombinedQuestionSheetValueRow
     );
     const startRow = updatedCombinedQuestionEntries.length + 2;
     console.info(
@@ -175,7 +180,7 @@ export function refreshCombinedQuestionsSheetListing(
     console.info(`Updating formulas and calculated columns for the new rows`);
     updateCombinedQuestionSheetFormulasAndCalculatedColumns(
       combinedQuestionsSheet,
-      rowsToAdd,
+      rowsToAdd.map(combinedQuestionsSheetValueRowToCombinedQuestionEntry),
       updatedCombinedToplineEntries,
       2,
       rowsToAdd.length
