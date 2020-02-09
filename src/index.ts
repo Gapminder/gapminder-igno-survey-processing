@@ -4,6 +4,7 @@
  * Note: Global functions must be exposed to the (global as any) object, or it will not be picked up by gas-webpack-plugin.
  */
 
+import { menuDevUpdateFormulasAndCalculatedColumns } from "./menuActions/menuDevUpdateFormulasAndCalculatedColumns";
 import { menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames } from "./menuActions/menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames";
 import { menuRefreshSurveysAndCombinedListings } from "./menuActions/menuRefreshSurveysAndCombinedListings";
 
@@ -22,9 +23,15 @@ import { menuRefreshSurveysAndCombinedListings } from "./menuActions/menuRefresh
     `Extract Survey IDs from copy-pasted linked survey names`,
     "menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames"
   );
+  menu.addItem(
+    `(For developer use only) Update formulas and calculated columns`,
+    "menuDevUpdateFormulasAndCalculatedColumns"
+  );
   menu.addToUi();
 };
 
 (global as any).menuRefreshSurveysAndCombinedListings = menuRefreshSurveysAndCombinedListings;
 
 (global as any).menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames = menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames;
+
+(global as any).menuDevUpdateFormulasAndCalculatedColumns = menuDevUpdateFormulasAndCalculatedColumns;

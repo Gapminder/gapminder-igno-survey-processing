@@ -5,10 +5,23 @@
 
 ### Functions
 
+* [menuDevUpdateFormulasAndCalculatedColumns](README.md#menudevupdateformulasandcalculatedcolumns)
 * [menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames](README.md#menuextractsurveyidsfromcopypastedlinkedsurveynames)
 * [menuRefreshSurveysAndCombinedListings](README.md#menurefreshsurveysandcombinedlistings)
 
 ## Functions
+
+###  menuDevUpdateFormulasAndCalculatedColumns
+
+▸ **menuDevUpdateFormulasAndCalculatedColumns**(): *void*
+
+*Defined in [menuActions/menuDevUpdateFormulasAndCalculatedColumns.ts:20](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.3.0/src/menuActions/menuDevUpdateFormulasAndCalculatedColumns.ts#L20)*
+
+Menu item action for "Gapminder Igno Survey Process -> (For developer use only) Update formulas and calculated columns"
+
+**Returns:** *void*
+
+___
 
 ###  menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames
 
@@ -26,7 +39,7 @@ ___
 
 ▸ **menuRefreshSurveysAndCombinedListings**(): *void*
 
-*Defined in [menuActions/menuRefreshSurveysAndCombinedListings.ts:31](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.3.0/src/menuActions/menuRefreshSurveysAndCombinedListings.ts#L31)*
+*Defined in [menuActions/menuRefreshSurveysAndCombinedListings.ts:23](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.3.0/src/menuActions/menuRefreshSurveysAndCombinedListings.ts#L23)*
 
 Menu item action for "Gapminder Igno Survey Process -> Refresh surveys and combined topline listings"
 

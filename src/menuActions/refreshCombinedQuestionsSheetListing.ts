@@ -1,7 +1,6 @@
 import difference from "lodash/difference";
 import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 import File = GoogleAppsScript.Drive.File;
-import groupBy from "lodash/groupBy";
 import intersection from "lodash/intersection";
 import union from "lodash/union";
 import {
@@ -10,14 +9,11 @@ import {
   overviewEntryToCombinedQuestionSheetValueRow,
   overviewSheetValueRowToOverviewEntry,
   questionEntryToCombinedQuestionsSheetValueRow,
-  surveysSheetName,
   surveysSheetValueRowToSurveyEntry
 } from "../gsheetsData/hardcodedConstants";
 import {
   adjustSheetRowsAndColumnsCount,
   fileNameToSurveyId,
-  fillColumnWithFormulas,
-  fillColumnWithValues,
   openSpreadsheetByIdAtMostOncePerScriptRun
 } from "./common";
 
@@ -184,187 +180,6 @@ export function refreshCombinedQuestionsSheetListing(
     combinedQuestionsSheet,
     updatedCombinedQuestionEntries.length + 1,
     combinedQuestionsSheetValuesIncludingHeaderRow[0].length
-  );
-
-  console.info(`Filling formula columns`);
-  fillColumnWithFormulas(
-    combinedQuestionsSheet,
-    combinedQuestionsSheetHeaders,
-    "Survey Name",
-    `=VLOOKUP("survey-"&A[ROW],{${surveysSheetName}!G$2:G,${surveysSheetName}!A$2:A},2,FALSE)`,
-    updatedCombinedQuestionEntries.length
-  );
-
-  fillColumnWithFormulas(
-    combinedQuestionsSheet,
-    combinedQuestionsSheetHeaders,
-    "Igno Index Question",
-    `=VLOOKUP(E[ROW],imported_igno_questions_info!$A$3:$C,2,FALSE)`,
-    updatedCombinedQuestionEntries.length
-  );
-
-  fillColumnWithFormulas(
-    combinedQuestionsSheet,
-    combinedQuestionsSheetHeaders,
-    "Answer to Igno Index Question",
-    `=VLOOKUP(E[ROW],imported_igno_questions_info!$A$3:$C,3,FALSE)`,
-    updatedCombinedQuestionEntries.length
-  );
-
-  fillColumnWithFormulas(
-    combinedQuestionsSheet,
-    combinedQuestionsSheetHeaders,
-    "Foreign Country Igno Question",
-    `=VLOOKUP(F[ROW],imported_igno_questions_info!$D$3:$E,2,FALSE)`,
-    updatedCombinedQuestionEntries.length
-  );
-
-  fillColumnWithFormulas(
-    combinedQuestionsSheet,
-    combinedQuestionsSheetHeaders,
-    "Answer to Foreign Country Igno Question",
-    `=VLOOKUP(F[ROW],imported_igno_questions_info!$D$3:$E,3,FALSE)`,
-    updatedCombinedQuestionEntries.length
-  );
-
-  const combineSurveyIdAndQuestionNumber = updatedCombinedEntry => {
-    if (!updatedCombinedEntry.survey_id) {
-      console.log("The entry did not have survey_id set", {
-        updatedCombinedEntry
-      });
-      throw new Error("The entry did not have survey_id set");
-    }
-    if (!updatedCombinedEntry.question_number) {
-      console.log("The entry did not have question_number set", {
-        updatedCombinedEntry
-      });
-      throw new Error("The entry did not have question_number set");
-    }
-    return `${updatedCombinedEntry.survey_id}-${updatedCombinedEntry.question_number}`;
-  };
-  const updatedCombinedToplineEntriesBySurveyIdAndQuestionNumber = groupBy(
-    updatedCombinedToplineEntries,
-    combineSurveyIdAndQuestionNumber
-  );
-
-  fillColumnWithValues(
-    combinedQuestionsSheet,
-    combinedQuestionsSheetHeaders,
-    "The answer options",
-    // `=JOIN(" - ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW]))`,
-    rowNumber => {
-      // Row number 2 corresponds to index 0 in the entries array
-      const updatedCombinedQuestionEntry =
-        updatedCombinedQuestionEntries[rowNumber - 2];
-      const matchingUpdatedCombinedToplineEntries =
-        updatedCombinedToplineEntriesBySurveyIdAndQuestionNumber[
-          combineSurveyIdAndQuestionNumber(updatedCombinedQuestionEntry)
-        ];
-      if (
-        !matchingUpdatedCombinedToplineEntries ||
-        matchingUpdatedCombinedToplineEntries.length === 0
-      ) {
-        return "(No topline entries found)";
-      }
-      return matchingUpdatedCombinedToplineEntries
-        .map(
-          matchingUpdatedCombinedToplineEntry =>
-            matchingUpdatedCombinedToplineEntry.answer
-        )
-        .join(" - ");
-    },
-    updatedCombinedQuestionEntries.length
-  );
-
-  const percentStringRoundedToOneDecimal = (percentString: string) =>
-    parseFloat(percentString.replace("%", "")).toFixed(1) + "%";
-
-  fillColumnWithValues(
-    combinedQuestionsSheet,
-    combinedQuestionsSheetHeaders,
-    "Answers by percent",
-    // `=JOIN(" - ",ARRAYFORMULA(TEXT(FILTER(topline_combo!$G$2:$G,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW]), "0.0%")))`,
-    rowNumber => {
-      // Row number 2 corresponds to index 0 in the entries array
-      const updatedCombinedQuestionEntry =
-        updatedCombinedQuestionEntries[rowNumber - 2];
-      const matchingUpdatedCombinedToplineEntries =
-        updatedCombinedToplineEntriesBySurveyIdAndQuestionNumber[
-          combineSurveyIdAndQuestionNumber(updatedCombinedQuestionEntry)
-        ];
-      if (
-        !matchingUpdatedCombinedToplineEntries ||
-        matchingUpdatedCombinedToplineEntries.length === 0
-      ) {
-        return "(No topline entries found)";
-      }
-      return matchingUpdatedCombinedToplineEntries
-        .map(matchingUpdatedCombinedToplineEntry =>
-          matchingUpdatedCombinedToplineEntry.answer_by_percent
-            ? percentStringRoundedToOneDecimal(
-                matchingUpdatedCombinedToplineEntry.answer_by_percent
-              )
-            : matchingUpdatedCombinedToplineEntry.answer_by_percent
-        )
-        .join(" - ");
-    },
-    updatedCombinedQuestionEntries.length
-  );
-
-  fillColumnWithFormulas(
-    combinedQuestionsSheet,
-    combinedQuestionsSheetHeaders,
-    "Correct answer(s)",
-    `=JOIN("; ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW],topline_combo!$F$2:$F = "x"))`,
-    updatedCombinedQuestionEntries.length
-  );
-
-  fillColumnWithFormulas(
-    combinedQuestionsSheet,
-    combinedQuestionsSheetHeaders,
-    "% that answered correctly",
-    `=SUMIFS(topline_combo!$G$2:$G,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,"x")`,
-    updatedCombinedQuestionEntries.length
-  );
-
-  fillColumnWithFormulas(
-    combinedQuestionsSheet,
-    combinedQuestionsSheetHeaders,
-    "Overall Summary",
-    `=IFERROR("Response count: "&I[ROW]&"
-The answer options: "&J[ROW]&"
-Answers by percent: "&K[ROW]&"
-Correct answer(s): "&L[ROW]&"
-% that answered correctly: "&TEXT(M[ROW], "0.0%"), "Results not processed yet")`,
-    updatedCombinedQuestionEntries.length
-  );
-
-  fillColumnWithValues(
-    combinedQuestionsSheet,
-    combinedQuestionsSheetHeaders,
-    "Amount of answer options",
-    // `=COUNTIFS(topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW])`,
-    rowNumber => {
-      // Row number 2 corresponds to index 0 in the entries array
-      const updatedCombinedQuestionEntry =
-        updatedCombinedQuestionEntries[rowNumber - 2];
-      const matchingUpdatedCombinedToplineEntries =
-        updatedCombinedToplineEntriesBySurveyIdAndQuestionNumber[
-          combineSurveyIdAndQuestionNumber(updatedCombinedQuestionEntry)
-        ];
-      return !matchingUpdatedCombinedToplineEntries
-        ? "(No topline entries found)"
-        : matchingUpdatedCombinedToplineEntries.length;
-    },
-    updatedCombinedQuestionEntries.length
-  );
-
-  fillColumnWithFormulas(
-    combinedQuestionsSheet,
-    combinedQuestionsSheetHeaders,
-    "% that would have answered correctly in an abc-type question",
-    `=M[ROW]*O[ROW]/3`,
-    updatedCombinedQuestionEntries.length
   );
 
   console.info(`End of refreshCombinedQuestionsSheetListing()`);

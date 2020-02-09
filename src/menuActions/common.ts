@@ -3,10 +3,15 @@ import Blob = GoogleAppsScript.Base.Blob;
 import Folder = GoogleAppsScript.Drive.Folder;
 import File = GoogleAppsScript.Drive.File;
 import {
+  combinedQuestionsSheetHeaders,
   combinedQuestionsSheetName,
-  surveysSheetHeaders
+  combinedToplineSheetHeaders,
+  combinedToplineSheetName,
+  surveysSheetHeaders,
+  surveysSheetName
 } from "../gsheetsData/hardcodedConstants";
 import { removeEmptyRowsAtTheEnd } from "../lib/cleanInputRange";
+import Spreadsheet = GoogleAppsScript.Spreadsheet.Spreadsheet;
 
 /**
  * @hidden
@@ -240,4 +245,88 @@ export function openSpreadsheetByIdAtMostOncePerScriptRun(id: string) {
   /* tslint:enable:no-console */
   openedSpreadsheetsByIdMemoryCache[id] = SpreadsheetApp.openById(id);
   return openedSpreadsheetsByIdMemoryCache[id];
+}
+
+/**
+ * @hidden
+ */
+export function fetchAndVerifySurveysSheet(activeSpreadsheet: Spreadsheet) {
+  let surveysSheet = activeSpreadsheet.getSheetByName(surveysSheetName);
+  if (surveysSheet === null) {
+    surveysSheet = createSheet(
+      activeSpreadsheet,
+      surveysSheetName,
+      surveysSheetHeaders
+    );
+  }
+  const surveysSheetValuesIncludingHeaderRow = getSheetDataIncludingHeaderRow(
+    surveysSheet,
+    surveysSheetHeaders
+  );
+  // Verify that the first headers are as expected
+  assertCorrectLeftmostSheetColumnHeaders(
+    surveysSheetHeaders,
+    surveysSheetName,
+    surveysSheetValuesIncludingHeaderRow
+  );
+  return { surveysSheet, surveysSheetValuesIncludingHeaderRow };
+}
+/**
+ * @hidden
+ */
+export function fetchAndVerifyCombinedQuestionsSheet(
+  activeSpreadsheet: Spreadsheet
+) {
+  let combinedQuestionsSheet = activeSpreadsheet.getSheetByName(
+    combinedQuestionsSheetName
+  );
+  if (combinedQuestionsSheet === null) {
+    combinedQuestionsSheet = createSheet(
+      activeSpreadsheet,
+      combinedQuestionsSheetName,
+      combinedQuestionsSheetHeaders
+    );
+  }
+  const combinedQuestionsSheetValuesIncludingHeaderRow = getSheetDataIncludingHeaderRow(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders
+  );
+  // Verify that the first headers are as expected
+  assertCorrectLeftmostSheetColumnHeaders(
+    combinedQuestionsSheetHeaders,
+    combinedQuestionsSheetName,
+    combinedQuestionsSheetValuesIncludingHeaderRow
+  );
+  return {
+    combinedQuestionsSheet,
+    combinedQuestionsSheetValuesIncludingHeaderRow
+  };
+}
+/**
+ * @hidden
+ */
+export function fetchAndVerifyCombinedToplineSheet(
+  activeSpreadsheet: Spreadsheet
+) {
+  let combinedToplineSheet = activeSpreadsheet.getSheetByName(
+    combinedToplineSheetName
+  );
+  if (combinedToplineSheet === null) {
+    combinedToplineSheet = createSheet(
+      activeSpreadsheet,
+      combinedToplineSheetName,
+      combinedToplineSheetHeaders
+    );
+  }
+  const combinedToplineSheetValuesIncludingHeaderRow = getSheetDataIncludingHeaderRow(
+    combinedToplineSheet,
+    combinedToplineSheetHeaders
+  );
+  // Verify that the first headers are as expected
+  assertCorrectLeftmostSheetColumnHeaders(
+    combinedToplineSheetHeaders,
+    combinedToplineSheetName,
+    combinedToplineSheetValuesIncludingHeaderRow
+  );
+  return { combinedToplineSheet, combinedToplineSheetValuesIncludingHeaderRow };
 }

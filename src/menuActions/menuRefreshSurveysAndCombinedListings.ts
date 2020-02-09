@@ -1,17 +1,9 @@
-import {
-  combinedQuestionsSheetHeaders,
-  combinedQuestionsSheetName,
-  combinedToplineSheetHeaders,
-  combinedToplineSheetName,
-  gsResultsFolderName,
-  surveysSheetHeaders,
-  surveysSheetName
-} from "../gsheetsData/hardcodedConstants";
+import { gsResultsFolderName } from "../gsheetsData/hardcodedConstants";
 import {
   addGsheetConvertedVersionOfExcelFileToFolder,
-  assertCorrectLeftmostSheetColumnHeaders,
-  createSheet,
-  getSheetDataIncludingHeaderRow,
+  fetchAndVerifyCombinedQuestionsSheet,
+  fetchAndVerifyCombinedToplineSheet,
+  fetchAndVerifySurveysSheet,
   gsheetMimeType,
   xlsxMimeType
 } from "./common";
@@ -100,68 +92,18 @@ function refreshSurveysAndCombinedListings() {
 
   console.info(`Fetching and verifying existing worksheets`);
   const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  let surveysSheet = activeSpreadsheet.getSheetByName(surveysSheetName);
-  if (surveysSheet === null) {
-    surveysSheet = createSheet(
-      activeSpreadsheet,
-      surveysSheetName,
-      surveysSheetHeaders
-    );
-  }
-
-  let combinedQuestionsSheet = activeSpreadsheet.getSheetByName(
-    combinedQuestionsSheetName
-  );
-  if (combinedQuestionsSheet === null) {
-    combinedQuestionsSheet = createSheet(
-      activeSpreadsheet,
-      combinedQuestionsSheetName,
-      combinedQuestionsSheetHeaders
-    );
-  }
-
-  let combinedToplineSheet = activeSpreadsheet.getSheetByName(
-    combinedToplineSheetName
-  );
-  if (combinedToplineSheet === null) {
-    combinedToplineSheet = createSheet(
-      activeSpreadsheet,
-      combinedToplineSheetName,
-      combinedToplineSheetHeaders
-    );
-  }
-
-  const surveysSheetValuesIncludingHeaderRow = getSheetDataIncludingHeaderRow(
+  const {
     surveysSheet,
-    surveysSheetHeaders
-  );
-
-  const combinedQuestionsSheetValuesIncludingHeaderRow = getSheetDataIncludingHeaderRow(
-    combinedQuestionsSheet,
-    combinedQuestionsSheetHeaders
-  );
-
-  const combinedToplineSheetValuesIncludingHeaderRow = getSheetDataIncludingHeaderRow(
-    combinedToplineSheet,
-    combinedToplineSheetHeaders
-  );
-
-  // Verify that the first headers are as expected
-  assertCorrectLeftmostSheetColumnHeaders(
-    surveysSheetHeaders,
-    surveysSheetName,
     surveysSheetValuesIncludingHeaderRow
-  );
-  assertCorrectLeftmostSheetColumnHeaders(
-    combinedQuestionsSheetHeaders,
-    combinedQuestionsSheetName,
+  } = fetchAndVerifySurveysSheet(activeSpreadsheet);
+  const {
+    combinedQuestionsSheet,
     combinedQuestionsSheetValuesIncludingHeaderRow
-  );
-  assertCorrectLeftmostSheetColumnHeaders(
-    combinedToplineSheetHeaders,
-    combinedToplineSheetName,
+  } = fetchAndVerifyCombinedQuestionsSheet(activeSpreadsheet);
+  const {
+    combinedToplineSheet,
     combinedToplineSheetValuesIncludingHeaderRow
-  );
+  } = fetchAndVerifyCombinedToplineSheet(activeSpreadsheet);
 
   // Read files in the folder called "gs_results" (the first found, in case there are many),
   // ensuring that there is a Gsheet version of each uploaded Excel file

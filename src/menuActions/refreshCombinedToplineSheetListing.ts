@@ -7,7 +7,6 @@ import {
   combinedToplineEntryToCombinedToplineSheetValueRow,
   combinedToplineSheetHeaders,
   combinedToplineSheetValueRowToCombinedToplineEntry,
-  surveysSheetName,
   surveysSheetValueRowToSurveyEntry,
   toplineEntryToCombinedToplineSheetValueRow,
   toplineSheetValueRowToToplineEntry
@@ -15,7 +14,6 @@ import {
 import {
   adjustSheetRowsAndColumnsCount,
   fileNameToSurveyId,
-  fillColumnWithFormulas,
   openSpreadsheetByIdAtMostOncePerScriptRun
 } from "./common";
 
@@ -181,15 +179,6 @@ export function refreshCombinedToplineSheetListing(
     combinedToplineSheet,
     updatedCombinedToplineEntries.length + 1,
     combinedToplineSheetValuesIncludingHeaderRow[0].length
-  );
-
-  console.info(`Filling formula columns`);
-  fillColumnWithFormulas(
-    combinedToplineSheet,
-    combinedToplineSheetHeaders,
-    "Survey Name",
-    `=VLOOKUP("survey-"&A[ROW],{${surveysSheetName}!G$2:G,${surveysSheetName}!A$2:A},2,FALSE)`,
-    updatedCombinedToplineEntries.length
   );
 
   console.info(`End of refreshCombinedToplineSheetListing()`);
