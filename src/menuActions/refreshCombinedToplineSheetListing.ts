@@ -4,6 +4,7 @@ import File = GoogleAppsScript.Drive.File;
 import intersection from "lodash/intersection";
 import union from "lodash/union";
 import {
+  CombinedToplineEntry,
   combinedToplineEntryToCombinedToplineSheetValueRow,
   combinedToplineSheetHeaders,
   combinedToplineSheetValueRowToCombinedToplineEntry,
@@ -167,18 +168,21 @@ export function refreshCombinedToplineSheetListing(
         combinedToplineSheetHeaders.length
       )
       .setValues(rowsToAdd);
-    // Add to the array that tracks the current sheet entries
-    updatedCombinedToplineEntries = updatedCombinedToplineEntries.concat(
-      rowsToAdd.map(combinedToplineSheetValueRowToCombinedToplineEntry)
-    );
     console.info(
       `Added ${rowsToAdd.length} rows. The total amount of data rows is now ${updatedCombinedToplineEntries.length}`
+    );
+    const correspondingNewCombinedToplineEntries: CombinedToplineEntry[] = rowsToAdd.map(
+      combinedToplineSheetValueRowToCombinedToplineEntry
     );
     console.info(`Updating formulas and calculated columns for the new rows`);
     updateCombinedToplineSheetFormulasAndCalculatedColumns(
       combinedToplineSheet,
-      2,
+      updatedCombinedToplineEntries.length + 2,
       entriesToAdd.length
+    );
+    // Add to the array that tracks the current sheet entries
+    updatedCombinedToplineEntries = updatedCombinedToplineEntries.concat(
+      correspondingNewCombinedToplineEntries
     );
   }
 

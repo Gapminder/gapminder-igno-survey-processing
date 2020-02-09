@@ -170,20 +170,23 @@ export function refreshCombinedQuestionsSheetListing(
         combinedQuestionsSheetHeaders.length
       )
       .setValues(rowsToAdd);
-    // Add to the array that tracks the current sheet entries
-    updatedCombinedQuestionEntries = updatedCombinedQuestionEntries.concat(
-      rowsToAdd.map(combinedQuestionsSheetValueRowToCombinedQuestionEntry)
-    );
     console.info(
       `Added ${rowsToAdd.length} rows. The total amount of data rows is now ${updatedCombinedQuestionEntries.length}`
+    );
+    const correspondingNewCombinedQuestionEntries: CombinedQuestionEntry[] = rowsToAdd.map(
+      combinedQuestionsSheetValueRowToCombinedQuestionEntry
     );
     console.info(`Updating formulas and calculated columns for the new rows`);
     updateCombinedQuestionSheetFormulasAndCalculatedColumns(
       combinedQuestionsSheet,
-      rowsToAdd.map(combinedQuestionsSheetValueRowToCombinedQuestionEntry),
+      correspondingNewCombinedQuestionEntries,
       updatedCombinedToplineEntries,
-      2,
+      updatedCombinedQuestionEntries.length + 2,
       rowsToAdd.length
+    );
+    // Add to the array that tracks the current sheet entries
+    updatedCombinedQuestionEntries = updatedCombinedQuestionEntries.concat(
+      correspondingNewCombinedQuestionEntries
     );
   }
 
