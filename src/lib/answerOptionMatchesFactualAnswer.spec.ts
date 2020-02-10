@@ -9,7 +9,7 @@ const testAnswerOptionMatchesFactualAnswer: Macro<any> = (
   { answerOption, factualAnswer, expectedOutput }
 ) => {
   const output = answerOptionMatchesFactualAnswer(answerOption, factualAnswer);
-  t.log({ output, expectedOutput });
+  // t.log({ answerOption, factualAnswer, output, expectedOutput });
   t.deepEqual(output, expectedOutput);
 };
 
@@ -23,6 +23,51 @@ const testAnswerOptionMatchesFactualAnswer: Macro<any> = (
   {
     answerOption: "1%",
     factualAnswer: "1% ",
+    expectedOutput: true
+  },
+  {
+    answerOption: "30-40%",
+    factualAnswer: "24%",
+    expectedOutput: false
+  },
+  {
+    answerOption: "30-40%",
+    factualAnswer: "34%",
+    expectedOutput: true
+  },
+  {
+    answerOption: "30-40%",
+    factualAnswer: "44%",
+    expectedOutput: false
+  },
+  {
+    answerOption: "30-40%",
+    factualAnswer: "30%",
+    expectedOutput: true
+  },
+  {
+    answerOption: "30-40%",
+    factualAnswer: "40%",
+    expectedOutput: true
+  },
+  {
+    answerOption: "30-40%",
+    factualAnswer: "20%",
+    expectedOutput: false
+  },
+  {
+    answerOption: "20-30%",
+    factualAnswer: "30%",
+    expectedOutput: true
+  },
+  {
+    answerOption: "20-30%",
+    factualAnswer: "30.0%",
+    expectedOutput: true
+  },
+  {
+    answerOption: "20-30%",
+    factualAnswer: "29.9%",
     expectedOutput: true
   }
   /* tslint:enable:object-literal-sort-keys */
