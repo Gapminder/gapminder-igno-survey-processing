@@ -396,9 +396,103 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     numRows
   );
 
-  // TODO:   auto_mapped_igno_index_question_id
-  // TODO:   auto_mapped_foreign_country_igno_question_id
-  // importedIgnoQuestionsInfoEntries
+  console.info(`Creating igno_index_question lookup index`);
+  const importedIgnoQuestionsInfoEntryIgnoIndexMatchKey = (
+    importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry
+  ) => {
+    if (!importedIgnoQuestionsInfoEntry.igno_index_question) {
+      console.log("The entry did not have igno_index_question set", {
+        importedIgnoQuestionsInfoEntry
+      });
+      throw new Error("The entry did not have igno_index_question set");
+    }
+    return `${importedIgnoQuestionsInfoEntry.igno_index_question.trim()}`;
+  };
+  const importedIgnoQuestionsInfoEntryIgnoIndexLookupIndex = groupBy(
+    importedIgnoQuestionsInfoEntries.filter(
+      (importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry) =>
+        !!importedIgnoQuestionsInfoEntry.igno_index_question
+    ),
+    importedIgnoQuestionsInfoEntryIgnoIndexMatchKey
+  );
+
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Auto-mapped Igno Index Question ID",
+    rowNumber => {
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      const matchingImportedIgnoQuestionsInfoEntries =
+        importedIgnoQuestionsInfoEntryIgnoIndexLookupIndex[
+          combinedQuestionEntry.question_text.trim()
+        ];
+      if (
+        !matchingImportedIgnoQuestionsInfoEntries ||
+        matchingImportedIgnoQuestionsInfoEntries.length === 0
+      ) {
+        return "(No identically matching questions found)";
+      }
+      return matchingImportedIgnoQuestionsInfoEntries
+        .map(
+          (importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry) =>
+            importedIgnoQuestionsInfoEntry.igno_index_question_id
+        )
+        .join("; ");
+    },
+    startRow,
+    numRows
+  );
+
+  console.info(`Creating foreign_country_igno_question lookup index`);
+  const importedIgnoQuestionsInfoEntryForeignCountryIgnoIndexMatchKey = (
+    importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry
+  ) => {
+    if (!importedIgnoQuestionsInfoEntry.foreign_country_igno_question) {
+      console.log("The entry did not have foreign_country_igno_question set", {
+        importedIgnoQuestionsInfoEntry
+      });
+      throw new Error(
+        "The entry did not have foreign_country_igno_question set"
+      );
+    }
+    return `${importedIgnoQuestionsInfoEntry.foreign_country_igno_question.trim()}`;
+  };
+  const importedIgnoQuestionsInfoEntryForeignCountryIgnoIndexLookupIndex = groupBy(
+    importedIgnoQuestionsInfoEntries.filter(
+      (importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry) =>
+        !!importedIgnoQuestionsInfoEntry.foreign_country_igno_question
+    ),
+    importedIgnoQuestionsInfoEntryForeignCountryIgnoIndexMatchKey
+  );
+
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Auto-mapped Foreign Country Igno Question ID",
+    rowNumber => {
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      const matchingImportedIgnoQuestionsInfoEntries =
+        importedIgnoQuestionsInfoEntryForeignCountryIgnoIndexLookupIndex[
+          combinedQuestionEntry.question_text.trim()
+        ];
+      if (
+        !matchingImportedIgnoQuestionsInfoEntries ||
+        matchingImportedIgnoQuestionsInfoEntries.length === 0
+      ) {
+        return "(No identically matching questions found)";
+      }
+      return matchingImportedIgnoQuestionsInfoEntries
+        .map(
+          (importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry) =>
+            importedIgnoQuestionsInfoEntry.foreign_country_igno_question_id
+        )
+        .join("; ");
+    },
+    startRow,
+    numRows
+  );
 
   fillColumnWithFormulas(
     combinedQuestionsSheet,
@@ -436,6 +530,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     numRows
   );
 
+  console.info(`Creating survey_id+question_number lookup index`);
   const combineSurveyIdAndQuestionNumber = (
     combinedEntry: CombinedQuestionEntry | CombinedToplineEntry
   ) => {
