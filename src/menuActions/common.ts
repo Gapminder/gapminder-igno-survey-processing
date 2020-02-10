@@ -382,6 +382,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
   /* tslint:disable:no-console */
   if (numRows === 0) {
     console.info(`No rows to update, skipping`);
+    return;
   }
 
   console.info(
@@ -785,6 +786,7 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
   /* tslint:disable:no-console */
   if (numRows === 0) {
     console.info(`No rows to update, skipping`);
+    return;
   }
 
   console.info(
