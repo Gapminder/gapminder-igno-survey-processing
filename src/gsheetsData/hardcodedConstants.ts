@@ -111,9 +111,11 @@ export const gsDashboardSurveyListingsSheetHeaders = [
  */
 export const importedIgnoQuestionsInfoSheetHeaders = [
   "Igno Question ID",
+  "Igno Question World Views Survey Batch Number",
   "Igno Question",
   "Igno Question Correct Answer",
   "Foreign Country Question ID",
+  "Foreign Country Country Views Survey Batch Number",
   "Foreign Country Question",
   "Foreign Country Question Correct Answer"
 ];
@@ -204,9 +206,11 @@ export interface CombinedToplineEntry {
  */
 export interface ImportedIgnoQuestionsInfoEntry {
   igno_index_question_id: any;
+  igno_index_world_views_survey_batch_number: any;
   igno_index_question: any;
   answer_to_igno_index_question: any;
   foreign_country_igno_question_id: any;
+  foreign_country_country_views_survey_batch_number: any;
   foreign_country_igno_question: any;
   answer_to_foreign_country_igno_question: any;
 }
@@ -428,25 +432,33 @@ export const importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEn
 ): ImportedIgnoQuestionsInfoEntry => {
   return {
     igno_index_question_id: importedIgnoQuestionsInfoSheetRow[0],
-    igno_index_question: importedIgnoQuestionsInfoSheetRow[1],
-    answer_to_igno_index_question: importedIgnoQuestionsInfoSheetRow[2],
-    foreign_country_igno_question_id: importedIgnoQuestionsInfoSheetRow[3],
-    foreign_country_igno_question: importedIgnoQuestionsInfoSheetRow[4],
+    igno_index_world_views_survey_batch_number:
+      importedIgnoQuestionsInfoSheetRow[1],
+    igno_index_question: importedIgnoQuestionsInfoSheetRow[2],
+    answer_to_igno_index_question: importedIgnoQuestionsInfoSheetRow[3],
+    foreign_country_igno_question_id: importedIgnoQuestionsInfoSheetRow[4],
+    foreign_country_country_views_survey_batch_number:
+      importedIgnoQuestionsInfoSheetRow[5],
+    foreign_country_igno_question: importedIgnoQuestionsInfoSheetRow[6],
     answer_to_foreign_country_igno_question:
-      importedIgnoQuestionsInfoSheetRow[5]
+      importedIgnoQuestionsInfoSheetRow[7]
   };
 };
 
 /**
  * @hidden
  */
+/*
 export const importedIgnoQuestionsInfoEntryToImportedIgnoQuestionsInfoSheetValueRow = (
   importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry
 ) => [
   importedIgnoQuestionsInfoEntry.igno_index_question_id,
+  importedIgnoQuestionsInfoEntry.igno_index_world_views_survey_batch_number,
   importedIgnoQuestionsInfoEntry.igno_index_question,
   importedIgnoQuestionsInfoEntry.answer_to_igno_index_question,
   importedIgnoQuestionsInfoEntry.foreign_country_igno_question_id,
+  importedIgnoQuestionsInfoEntry.foreign_country_country_views_survey_batch_number,
   importedIgnoQuestionsInfoEntry.foreign_country_igno_question,
   importedIgnoQuestionsInfoEntry.answer_to_foreign_country_igno_question
 ];
+*/

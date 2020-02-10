@@ -18,6 +18,7 @@ import {
   surveysSheetName
 } from "../gsheetsData/hardcodedConstants";
 import { removeEmptyRowsAtTheEnd } from "../lib/cleanInputRange";
+import { parseSurveyName } from "../lib/parseSurveyName";
 
 /**
  * @hidden
@@ -396,21 +397,37 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     numRows
   );
 
-  console.info(`Creating igno_index_question lookup index`);
+  console.info(
+    `Creating igno_index_world_views_survey_batch_number+igno_index_question lookup index`
+  );
   const importedIgnoQuestionsInfoEntryIgnoIndexMatchKey = (
     importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry
   ) => {
+    if (
+      !importedIgnoQuestionsInfoEntry.igno_index_world_views_survey_batch_number
+    ) {
+      console.log(
+        "The entry did not have igno_index_world_views_survey_batch_number set",
+        {
+          importedIgnoQuestionsInfoEntry
+        }
+      );
+      throw new Error(
+        "The entry did not have igno_index_world_views_survey_batch_number set"
+      );
+    }
     if (!importedIgnoQuestionsInfoEntry.igno_index_question) {
       console.log("The entry did not have igno_index_question set", {
         importedIgnoQuestionsInfoEntry
       });
       throw new Error("The entry did not have igno_index_question set");
     }
-    return `${importedIgnoQuestionsInfoEntry.igno_index_question.trim()}`;
+    return `${importedIgnoQuestionsInfoEntry.igno_index_world_views_survey_batch_number.trim()}-${importedIgnoQuestionsInfoEntry.igno_index_question.trim()}`;
   };
   const importedIgnoQuestionsInfoEntryIgnoIndexLookupIndex = groupBy(
     importedIgnoQuestionsInfoEntries.filter(
       (importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry) =>
+        !!importedIgnoQuestionsInfoEntry.igno_index_world_views_survey_batch_number &&
         !!importedIgnoQuestionsInfoEntry.igno_index_question
     ),
     importedIgnoQuestionsInfoEntryIgnoIndexMatchKey
@@ -423,6 +440,18 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     rowNumber => {
       const combinedQuestionEntry =
         combinedQuestionEntries[rowNumber - startRow];
+      if (combinedQuestionEntry.survey_name === "#N/A") {
+        return `(No survey name available yet)`;
+      }
+      const { worldViewsSurveyBatchNumber } = parseSurveyName(
+        combinedQuestionEntry.survey_name
+      );
+      if (worldViewsSurveyBatchNumber === false) {
+        return `n/a`;
+      }
+      if (worldViewsSurveyBatchNumber === null) {
+        return `(No world views batch number found in survey name "${combinedQuestionEntry.survey_name}")`;
+      }
       const matchingImportedIgnoQuestionsInfoEntries =
         importedIgnoQuestionsInfoEntryIgnoIndexLookupIndex[
           combinedQuestionEntry.question_text.trim()
@@ -431,7 +460,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
         !matchingImportedIgnoQuestionsInfoEntries ||
         matchingImportedIgnoQuestionsInfoEntries.length === 0
       ) {
-        return "(No identically matching questions found)";
+        return `(No identical questions within batch ${worldViewsSurveyBatchNumber} found)`;
       }
       return matchingImportedIgnoQuestionsInfoEntries
         .map(
@@ -444,10 +473,25 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     numRows
   );
 
-  console.info(`Creating foreign_country_igno_question lookup index`);
+  console.info(
+    `Creating foreign_country_country_views_survey_batch_number+foreign_country_igno_question lookup index`
+  );
   const importedIgnoQuestionsInfoEntryForeignCountryIgnoIndexMatchKey = (
     importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry
   ) => {
+    if (
+      !importedIgnoQuestionsInfoEntry.foreign_country_country_views_survey_batch_number
+    ) {
+      console.log(
+        "The entry did not have foreign_country_country_views_survey_batch_number set",
+        {
+          importedIgnoQuestionsInfoEntry
+        }
+      );
+      throw new Error(
+        "The entry did not have foreign_country_country_views_survey_batch_number set"
+      );
+    }
     if (!importedIgnoQuestionsInfoEntry.foreign_country_igno_question) {
       console.log("The entry did not have foreign_country_igno_question set", {
         importedIgnoQuestionsInfoEntry
@@ -456,11 +500,12 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
         "The entry did not have foreign_country_igno_question set"
       );
     }
-    return `${importedIgnoQuestionsInfoEntry.foreign_country_igno_question.trim()}`;
+    return `${importedIgnoQuestionsInfoEntry.foreign_country_country_views_survey_batch_number.trim()}-${importedIgnoQuestionsInfoEntry.foreign_country_igno_question.trim()}`;
   };
   const importedIgnoQuestionsInfoEntryForeignCountryIgnoIndexLookupIndex = groupBy(
     importedIgnoQuestionsInfoEntries.filter(
       (importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry) =>
+        !!importedIgnoQuestionsInfoEntry.foreign_country_country_views_survey_batch_number &&
         !!importedIgnoQuestionsInfoEntry.foreign_country_igno_question
     ),
     importedIgnoQuestionsInfoEntryForeignCountryIgnoIndexMatchKey
@@ -473,15 +518,27 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     rowNumber => {
       const combinedQuestionEntry =
         combinedQuestionEntries[rowNumber - startRow];
+      if (combinedQuestionEntry.survey_name === "#N/A") {
+        return `(No survey name available yet)`;
+      }
+      const { countryViewsSurveyBatchNumber } = parseSurveyName(
+        combinedQuestionEntry.survey_name
+      );
+      if (countryViewsSurveyBatchNumber === false) {
+        return `n/a`;
+      }
+      if (countryViewsSurveyBatchNumber === null) {
+        return `(No country views batch number found in survey name "${combinedQuestionEntry.survey_name}")`;
+      }
       const matchingImportedIgnoQuestionsInfoEntries =
         importedIgnoQuestionsInfoEntryForeignCountryIgnoIndexLookupIndex[
-          combinedQuestionEntry.question_text.trim()
+          `${countryViewsSurveyBatchNumber}-${combinedQuestionEntry.question_text.trim()}`
         ];
       if (
         !matchingImportedIgnoQuestionsInfoEntries ||
         matchingImportedIgnoQuestionsInfoEntries.length === 0
       ) {
-        return "(No identically matching questions found)";
+        return `(No identical questions within batch ${countryViewsSurveyBatchNumber} found)`;
       }
       return matchingImportedIgnoQuestionsInfoEntries
         .map(
@@ -498,7 +555,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Igno Index Question",
-    `=VLOOKUP(E[ROW],${importedIgnoQuestionsInfoSheetName}!$A$2:$C,2,FALSE)`,
+    `=VLOOKUP(E[ROW],${importedIgnoQuestionsInfoSheetName}!$A$2:$D,3,FALSE)`,
     startRow,
     numRows
   );
@@ -507,7 +564,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Answer to Igno Index Question",
-    `=VLOOKUP(E[ROW],${importedIgnoQuestionsInfoSheetName}!$A$2:$C,3,FALSE)`,
+    `=VLOOKUP(E[ROW],${importedIgnoQuestionsInfoSheetName}!$A$2:$D,4,FALSE)`,
     startRow,
     numRows
   );
@@ -516,7 +573,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Foreign Country Igno Question",
-    `=VLOOKUP(G[ROW],${importedIgnoQuestionsInfoSheetName}!$D$2:$F,2,FALSE)`,
+    `=VLOOKUP(G[ROW],${importedIgnoQuestionsInfoSheetName}!$E$2:$H,3,FALSE)`,
     startRow,
     numRows
   );
@@ -525,7 +582,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Answer to Foreign Country Igno Question",
-    `=VLOOKUP(G[ROW],${importedIgnoQuestionsInfoSheetName}!$D$2:$Fs,3,FALSE)`,
+    `=VLOOKUP(G[ROW],${importedIgnoQuestionsInfoSheetName}!$E$2:$H,4,FALSE)`,
     startRow,
     numRows
   );
