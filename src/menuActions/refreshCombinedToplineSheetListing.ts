@@ -168,21 +168,23 @@ export function refreshCombinedToplineSheetListing(
         combinedToplineSheetHeaders.length
       )
       .setValues(rowsToAdd);
-    console.info(
-      `Added ${rowsToAdd.length} rows. The total amount of data rows is now ${updatedCombinedToplineEntries.length}`
-    );
     const correspondingNewCombinedToplineEntries: CombinedToplineEntry[] = rowsToAdd.map(
       combinedToplineSheetValueRowToCombinedToplineEntry
-    );
-    console.info(`Updating formulas and calculated columns for the new rows`);
-    updateCombinedToplineSheetFormulasAndCalculatedColumns(
-      combinedToplineSheet,
-      updatedCombinedToplineEntries.length + 2,
-      entriesToAdd.length
     );
     // Add to the array that tracks the current sheet entries
     updatedCombinedToplineEntries = updatedCombinedToplineEntries.concat(
       correspondingNewCombinedToplineEntries
+    );
+    console.info(
+      `Added ${rowsToAdd.length} rows. The total amount of data rows is now ${updatedCombinedToplineEntries.length}`
+    );
+    console.info(`Updating formulas and calculated columns for the new rows`);
+    updateCombinedToplineSheetFormulasAndCalculatedColumns(
+      combinedToplineSheet,
+      updatedCombinedToplineEntries.length -
+        correspondingNewCombinedToplineEntries.length +
+        2,
+      entriesToAdd.length
     );
   }
 
