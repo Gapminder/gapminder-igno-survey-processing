@@ -11,6 +11,9 @@ import {
   CombinedToplineEntry,
   combinedToplineSheetHeaders,
   combinedToplineSheetName,
+  ImportedIgnoQuestionsInfoEntry,
+  importedIgnoQuestionsInfoSheetHeaders,
+  importedIgnoQuestionsInfoSheetName,
   surveysSheetHeaders,
   surveysSheetName
 } from "../gsheetsData/hardcodedConstants";
@@ -309,6 +312,7 @@ export function fetchAndVerifyCombinedQuestionsSheet(
     combinedQuestionsSheetValuesIncludingHeaderRow
   };
 }
+
 /**
  * @hidden
  */
@@ -341,19 +345,48 @@ export function fetchAndVerifyCombinedToplineSheet(
 /**
  * @hidden
  */
+export function fetchAndVerifyImportedIgnoQuestionsInfoSheet(
+  activeSpreadsheet: Spreadsheet
+) {
+  const importedIgnoQuestionsInfoSheet = activeSpreadsheet.getSheetByName(
+    importedIgnoQuestionsInfoSheetName
+  );
+  if (importedIgnoQuestionsInfoSheet === null) {
+    throw new Error(
+      `The required sheet "${importedIgnoQuestionsInfoSheetName}" is missing. Please add it and run this script again.`
+    );
+  }
+  const importedIgnoQuestionsInfoSheetValuesIncludingHeaderRow = getSheetDataIncludingHeaderRow(
+    importedIgnoQuestionsInfoSheet,
+    importedIgnoQuestionsInfoSheetHeaders
+  );
+  return {
+    importedIgnoQuestionsInfoSheet,
+    importedIgnoQuestionsInfoSheetValuesIncludingHeaderRow
+  };
+}
+
+/**
+ * @hidden
+ */
 export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
   combinedQuestionsSheet,
   combinedQuestionEntries: CombinedQuestionEntry[],
   combinedToplineEntries: CombinedToplineEntry[],
+  importedIgnoQuestionsInfoEntries: ImportedIgnoQuestionsInfoEntry[],
   startRow: number,
   numRows: number
 ) {
   /* tslint:disable:no-console */
+  if (numRows === 0) {
+    console.info(`No rows to update, skipping`);
+  }
+
   console.info(
     `Start of updateCombinedQuestionSheetFormulasAndCalculatedColumns()`
   );
 
-  console.info(`Filling formula columns`);
+  console.info(`Filling formula / calculated value columns`);
   fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
@@ -363,11 +396,15 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     numRows
   );
 
+  // TODO:   auto_mapped_igno_index_question_id
+  // TODO:   auto_mapped_foreign_country_igno_question_id
+  // importedIgnoQuestionsInfoEntries
+
   fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Igno Index Question",
-    `=VLOOKUP(E[ROW],imported_igno_questions_info!$A$3:$C,2,FALSE)`,
+    `=VLOOKUP(E[ROW],${importedIgnoQuestionsInfoSheetName}!$A$2:$C,2,FALSE)`,
     startRow,
     numRows
   );
@@ -376,7 +413,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Answer to Igno Index Question",
-    `=VLOOKUP(E[ROW],imported_igno_questions_info!$A$3:$C,3,FALSE)`,
+    `=VLOOKUP(E[ROW],${importedIgnoQuestionsInfoSheetName}!$A$2:$C,3,FALSE)`,
     startRow,
     numRows
   );
@@ -385,7 +422,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Foreign Country Igno Question",
-    `=VLOOKUP(G[ROW],imported_igno_questions_info!$D$3:$F,2,FALSE)`,
+    `=VLOOKUP(G[ROW],${importedIgnoQuestionsInfoSheetName}!$D$2:$F,2,FALSE)`,
     startRow,
     numRows
   );
@@ -394,7 +431,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Answer to Foreign Country Igno Question",
-    `=VLOOKUP(G[ROW],imported_igno_questions_info!$D$3:$Fs,3,FALSE)`,
+    `=VLOOKUP(G[ROW],${importedIgnoQuestionsInfoSheetName}!$D$2:$Fs,3,FALSE)`,
     startRow,
     numRows
   );
@@ -559,15 +596,21 @@ Correct answer(s): "&P[ROW]&"
  */
 export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
   combinedToplineSheet,
+  combinedQuestionEntries: CombinedQuestionEntry[],
+  importedIgnoQuestionsInfoEntries: ImportedIgnoQuestionsInfoEntry[],
   startRow: number,
   numRows: number
 ) {
   /* tslint:disable:no-console */
+  if (numRows === 0) {
+    console.info(`No rows to update, skipping`);
+  }
+
   console.info(
     `Start of updateCombinedToplineSheetFormulasAndCalculatedColumns()`
   );
 
-  console.info(`Filling formula columns`);
+  console.info(`Filling formula / calculated value columns`);
   fillColumnWithFormulas(
     combinedToplineSheet,
     combinedToplineSheetHeaders,
@@ -576,6 +619,8 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
     startRow,
     numRows
   );
+
+  // TODO: auto_marked_correct_answers
 
   console.info(
     `End of updateCombinedToplineSheetFormulasAndCalculatedColumns()`

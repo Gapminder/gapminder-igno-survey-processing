@@ -16,8 +16,7 @@ import {
 import {
   adjustSheetRowsAndColumnsCount,
   fileNameToSurveyId,
-  openSpreadsheetByIdAtMostOncePerScriptRun,
-  updateCombinedToplineSheetFormulasAndCalculatedColumns
+  openSpreadsheetByIdAtMostOncePerScriptRun
 } from "./common";
 
 /**
@@ -121,6 +120,7 @@ export function refreshCombinedToplineSheetListing(
     }
   );
   // Open each not-yet-included gsheet file and add rows to the end of the sheet
+  let newCombinedToplineEntries: CombinedToplineEntry[] = [];
   if (notYetIncludedGsResultsFolderGsheetFiles.length > 0) {
     console.info(
       `Adding the contents of the ${notYetIncludedGsResultsFolderGsheetFiles.length} not-yet-included gsheet file(s) to the end of the sheet`
@@ -168,23 +168,15 @@ export function refreshCombinedToplineSheetListing(
         combinedToplineSheetHeaders.length
       )
       .setValues(rowsToAdd);
-    const correspondingNewCombinedToplineEntries: CombinedToplineEntry[] = rowsToAdd.map(
+    newCombinedToplineEntries = rowsToAdd.map(
       combinedToplineSheetValueRowToCombinedToplineEntry
     );
     // Add to the array that tracks the current sheet entries
     updatedCombinedToplineEntries = updatedCombinedToplineEntries.concat(
-      correspondingNewCombinedToplineEntries
+      newCombinedToplineEntries
     );
     console.info(
       `Added ${rowsToAdd.length} rows. The total amount of data rows is now ${updatedCombinedToplineEntries.length}`
-    );
-    console.info(`Updating formulas and calculated columns for the new rows`);
-    updateCombinedToplineSheetFormulasAndCalculatedColumns(
-      combinedToplineSheet,
-      updatedCombinedToplineEntries.length -
-        correspondingNewCombinedToplineEntries.length +
-        2,
-      entriesToAdd.length
     );
   }
 
@@ -201,5 +193,5 @@ export function refreshCombinedToplineSheetListing(
   console.info(`End of refreshCombinedToplineSheetListing()`);
   /* tslint:enable:no-console */
 
-  return { updatedCombinedToplineEntries };
+  return { updatedCombinedToplineEntries, newCombinedToplineEntries };
 }

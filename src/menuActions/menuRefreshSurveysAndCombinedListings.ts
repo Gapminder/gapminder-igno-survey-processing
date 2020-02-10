@@ -1,12 +1,22 @@
 import intersection from "lodash/intersection";
 import union from "lodash/union";
 import {
+  ImportedIgnoQuestionsInfoEntry,
+  importedIgnoQuestionsInfoSheetHeaders,
+  importedIgnoQuestionsInfoSheetName,
+  importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEntry
+} from "../gsheetsData/hardcodedConstants";
+import {
   addGsheetConvertedVersionOfExcelFileToFolder,
   fetchAndVerifyCombinedQuestionsSheet,
   fetchAndVerifyCombinedToplineSheet,
+  fetchAndVerifyImportedIgnoQuestionsInfoSheet,
   fetchAndVerifySurveysSheet,
   fileNameToSurveyId,
+  getSheetDataIncludingHeaderRow,
   gsheetMimeType,
+  updateCombinedQuestionSheetFormulasAndCalculatedColumns,
+  updateCombinedToplineSheetFormulasAndCalculatedColumns,
   xlsxMimeType
 } from "./common";
 import { refreshCombinedQuestionsSheetListing } from "./refreshCombinedQuestionsSheetListing";
@@ -100,19 +110,17 @@ function refreshSurveysAndCombinedListings() {
     "setting_gs_results_folder_name"
   );
   if (settingGsResultsFolderNameRange === null) {
-    SpreadsheetApp.getUi().alert(
+    throw new Error(
       "No named range 'setting_gs_results_folder_name' was found. It is mandatory since it is used to configure what Drive folder the script should look in for uploaded Google Survey results. Please add it to your spreadsheet and run this script again."
     );
-    return;
   }
   const gsResultsFolderName = String(
     settingGsResultsFolderNameRange.getValue()
   ).trim();
   if (gsResultsFolderName === "") {
-    SpreadsheetApp.getUi().alert(
+    throw new Error(
       "The named range 'setting_gs_results_folder_name' was found empty. It needs to contain the name of the Drive folder the script should look in for uploaded Google Survey results. Please make sure that it is not empty and run this script again."
     );
-    return;
   }
   console.info(`Read setting gsResultsFolderName: ${gsResultsFolderName}`);
 
@@ -129,6 +137,16 @@ function refreshSurveysAndCombinedListings() {
     combinedToplineSheet,
     combinedToplineSheetValuesIncludingHeaderRow
   } = fetchAndVerifyCombinedToplineSheet(activeSpreadsheet);
+  const {
+    importedIgnoQuestionsInfoSheet,
+    importedIgnoQuestionsInfoSheetValuesIncludingHeaderRow
+  } = fetchAndVerifyImportedIgnoQuestionsInfoSheet(activeSpreadsheet);
+  const importedIgnoQuestionsInfoSheetValues = importedIgnoQuestionsInfoSheetValuesIncludingHeaderRow.slice(
+    1
+  );
+  const importedIgnoQuestionsInfoEntries = importedIgnoQuestionsInfoSheetValues.map(
+    importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEntry
+  );
 
   // Read files in the gs results folder with the name specified in the relevant settings named range
   // (the first found, in case there are many), ensuring that there is a Gsheet version of each uploaded Excel file
@@ -152,7 +170,10 @@ function refreshSurveysAndCombinedListings() {
   );
 
   console.info(`Refreshing combined topline listing`);
-  const { updatedCombinedToplineEntries } = refreshCombinedToplineSheetListing(
+  const {
+    updatedCombinedToplineEntries,
+    newCombinedToplineEntries
+  } = refreshCombinedToplineSheetListing(
     updatedSurveysSheetValues,
     combinedToplineSheet,
     combinedToplineSheetValuesIncludingHeaderRow,
@@ -161,13 +182,39 @@ function refreshSurveysAndCombinedListings() {
 
   console.info(`Refreshing combined questions listing`);
   const {
-    updatedCombinedQuestionEntries
+    updatedCombinedQuestionEntries,
+    newCombinedQuestionEntries
   } = refreshCombinedQuestionsSheetListing(
     updatedSurveysSheetValues,
     updatedCombinedToplineEntries,
     combinedQuestionsSheet,
     combinedQuestionsSheetValuesIncludingHeaderRow,
     gsResultsFolderGsheetFiles
+  );
+
+  console.info(
+    `Updating formulas and calculated columns for the new combined question rows`
+  );
+  updateCombinedQuestionSheetFormulasAndCalculatedColumns(
+    combinedQuestionsSheet,
+    newCombinedQuestionEntries,
+    updatedCombinedToplineEntries,
+    importedIgnoQuestionsInfoEntries,
+    updatedCombinedQuestionEntries.length -
+      newCombinedQuestionEntries.length +
+      2,
+    newCombinedQuestionEntries.length
+  );
+
+  console.info(
+    `Updating formulas and calculated columns for the new combined topline rows`
+  );
+  updateCombinedToplineSheetFormulasAndCalculatedColumns(
+    combinedToplineSheet,
+    newCombinedQuestionEntries,
+    importedIgnoQuestionsInfoEntries,
+    updatedCombinedToplineEntries.length - newCombinedToplineEntries.length + 2,
+    newCombinedToplineEntries.length
   );
 
   console.info(

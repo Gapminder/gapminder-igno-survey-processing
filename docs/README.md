@@ -15,7 +15,7 @@
 
 ▸ **menuDevUpdateFormulasAndCalculatedColumns**(): *void*
 
-*Defined in [menuActions/menuDevUpdateFormulasAndCalculatedColumns.ts:15](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.3.0/src/menuActions/menuDevUpdateFormulasAndCalculatedColumns.ts#L15)*
+*Defined in [menuActions/menuDevUpdateFormulasAndCalculatedColumns.ts:17](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.3.0/src/menuActions/menuDevUpdateFormulasAndCalculatedColumns.ts#L17)*
 
 Menu item action for "Gapminder Igno Survey Process -> (For developer use only) Update formulas and calculated columns"
 
@@ -39,7 +39,7 @@ ___
 
 ▸ **menuRefreshSurveysAndCombinedListings**(): *void*
 
-*Defined in [menuActions/menuRefreshSurveysAndCombinedListings.ts:25](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.3.0/src/menuActions/menuRefreshSurveysAndCombinedListings.ts#L25)*
+*Defined in [menuActions/menuRefreshSurveysAndCombinedListings.ts:35](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.3.0/src/menuActions/menuRefreshSurveysAndCombinedListings.ts#L35)*
 
 Menu item action for "Gapminder Igno Survey Process -> Refresh surveys and combined topline listings"
 

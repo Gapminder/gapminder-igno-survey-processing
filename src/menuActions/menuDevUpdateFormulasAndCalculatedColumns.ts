@@ -1,10 +1,12 @@
 import {
   combinedQuestionsSheetValueRowToCombinedQuestionEntry,
-  combinedToplineSheetValueRowToCombinedToplineEntry
+  combinedToplineSheetValueRowToCombinedToplineEntry,
+  importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEntry
 } from "../gsheetsData/hardcodedConstants";
 import {
   fetchAndVerifyCombinedQuestionsSheet,
   fetchAndVerifyCombinedToplineSheet,
+  fetchAndVerifyImportedIgnoQuestionsInfoSheet,
   updateCombinedQuestionSheetFormulasAndCalculatedColumns,
   updateCombinedToplineSheetFormulasAndCalculatedColumns
 } from "./common";
@@ -53,6 +55,10 @@ function devUpdateFormulasAndCalculatedColumns() {
     combinedToplineSheet,
     combinedToplineSheetValuesIncludingHeaderRow
   } = fetchAndVerifyCombinedToplineSheet(activeSpreadsheet);
+  const {
+    importedIgnoQuestionsInfoSheet,
+    importedIgnoQuestionsInfoSheetValuesIncludingHeaderRow
+  } = fetchAndVerifyImportedIgnoQuestionsInfoSheet(activeSpreadsheet);
 
   const combinedQuestionsSheetValues = combinedQuestionsSheetValuesIncludingHeaderRow.slice(
     1
@@ -68,15 +74,25 @@ function devUpdateFormulasAndCalculatedColumns() {
     combinedToplineSheetValueRowToCombinedToplineEntry
   );
 
+  const importedIgnoQuestionsInfoSheetValues = importedIgnoQuestionsInfoSheetValuesIncludingHeaderRow.slice(
+    1
+  );
+  const importedIgnoQuestionsInfoEntries = importedIgnoQuestionsInfoSheetValues.map(
+    importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEntry
+  );
+
   updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionEntries,
     combinedToplineEntries,
+    importedIgnoQuestionsInfoEntries,
     2,
     combinedQuestionEntries.length
   );
   updateCombinedToplineSheetFormulasAndCalculatedColumns(
     combinedToplineSheet,
+    combinedQuestionEntries,
+    importedIgnoQuestionsInfoEntries,
     2,
     combinedToplineEntries.length
   );

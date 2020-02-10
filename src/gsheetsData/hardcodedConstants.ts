@@ -28,6 +28,12 @@ export const gsDashboardSurveyListingsSheetName =
 /**
  * @hidden
  */
+export const importedIgnoQuestionsInfoSheetName =
+  "imported_igno_questions_info";
+
+/**
+ * @hidden
+ */
 export const surveysSheetHeaders = [
   "Survey Name",
   "Input Sheet",
@@ -95,6 +101,21 @@ export const gsDashboardSurveyListingsSheetHeaders = [
   "Last run",
   "Next run",
   "URL"
+];
+
+/**
+ * Note: These headers are informative only and will not match (nor be verified to match) the underlying sheet
+ * since the headers are imported from other sheets and may be changed at will.
+ * The position of the headers should remain intact.
+ * @hidden
+ */
+export const importedIgnoQuestionsInfoSheetHeaders = [
+  "Igno Question ID",
+  "Igno Question",
+  "Igno Question Correct Answer",
+  "Foreign Country Question ID",
+  "Foreign Country Question",
+  "Foreign Country Question Correct Answer"
 ];
 
 /**
@@ -176,6 +197,18 @@ export interface CombinedToplineEntry {
   answer_by_percent: any;
   metadata: any;
   weighted_by: any;
+}
+
+/**
+ * @hidden
+ */
+export interface ImportedIgnoQuestionsInfoEntry {
+  igno_index_question_id: any;
+  igno_index_question: any;
+  answer_to_igno_index_question: any;
+  foreign_country_igno_question_id: any;
+  foreign_country_igno_question: any;
+  answer_to_foreign_country_igno_question: any;
 }
 
 /**
@@ -385,4 +418,35 @@ export const combinedToplineEntryToCombinedToplineSheetValueRow = (
   combinedToplineEntry.answer_by_percent,
   combinedToplineEntry.metadata,
   combinedToplineEntry.weighted_by
+];
+
+/**
+ * @hidden
+ */
+export const importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEntry = (
+  importedIgnoQuestionsInfoSheetRow: any[]
+): ImportedIgnoQuestionsInfoEntry => {
+  return {
+    igno_index_question_id: importedIgnoQuestionsInfoSheetRow[0],
+    igno_index_question: importedIgnoQuestionsInfoSheetRow[1],
+    answer_to_igno_index_question: importedIgnoQuestionsInfoSheetRow[2],
+    foreign_country_igno_question_id: importedIgnoQuestionsInfoSheetRow[3],
+    foreign_country_igno_question: importedIgnoQuestionsInfoSheetRow[4],
+    answer_to_foreign_country_igno_question:
+      importedIgnoQuestionsInfoSheetRow[5]
+  };
+};
+
+/**
+ * @hidden
+ */
+export const importedIgnoQuestionsInfoEntryToImportedIgnoQuestionsInfoSheetValueRow = (
+  importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry
+) => [
+  importedIgnoQuestionsInfoEntry.igno_index_question_id,
+  importedIgnoQuestionsInfoEntry.igno_index_question,
+  importedIgnoQuestionsInfoEntry.answer_to_igno_index_question,
+  importedIgnoQuestionsInfoEntry.foreign_country_igno_question_id,
+  importedIgnoQuestionsInfoEntry.foreign_country_igno_question,
+  importedIgnoQuestionsInfoEntry.answer_to_foreign_country_igno_question
 ];

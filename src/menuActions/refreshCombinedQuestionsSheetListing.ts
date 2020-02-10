@@ -7,6 +7,7 @@ import {
   CombinedQuestionEntry,
   combinedQuestionsSheetHeaders,
   combinedQuestionsSheetValueRowToCombinedQuestionEntry,
+  CombinedToplineEntry,
   combinedToplineSheetValueRowToCombinedToplineEntry,
   overviewSheetValueRowToQuestionEntry,
   QuestionEntry,
@@ -17,8 +18,7 @@ import {
 import {
   adjustSheetRowsAndColumnsCount,
   fileNameToSurveyId,
-  openSpreadsheetByIdAtMostOncePerScriptRun,
-  updateCombinedQuestionSheetFormulasAndCalculatedColumns
+  openSpreadsheetByIdAtMostOncePerScriptRun
 } from "./common";
 
 /**
@@ -26,7 +26,7 @@ import {
  */
 export function refreshCombinedQuestionsSheetListing(
   updatedSurveysSheetValues: any[][],
-  updatedCombinedToplineEntries,
+  updatedCombinedToplineEntries: CombinedToplineEntry[],
   combinedQuestionsSheet: Sheet,
   combinedQuestionsSheetValuesIncludingHeaderRow: any[][],
   gsResultsFolderGsheetFiles: File[]
@@ -123,6 +123,7 @@ export function refreshCombinedQuestionsSheetListing(
     }
   );
   // Open each not-yet-included gsheet file and add rows to the end of the sheet
+  let newCombinedQuestionEntries: CombinedQuestionEntry[] = [];
   if (notYetIncludedGsResultsFolderGsheetFiles.length > 0) {
     console.info(
       `Adding the contents of the ${notYetIncludedGsResultsFolderGsheetFiles.length} not-yet-included gsheet file(s) to the end of the sheet`
@@ -170,25 +171,15 @@ export function refreshCombinedQuestionsSheetListing(
         combinedQuestionsSheetHeaders.length
       )
       .setValues(rowsToAdd);
-    const correspondingNewCombinedQuestionEntries: CombinedQuestionEntry[] = rowsToAdd.map(
+    newCombinedQuestionEntries = rowsToAdd.map(
       combinedQuestionsSheetValueRowToCombinedQuestionEntry
     );
     // Add to the array that tracks the current sheet entries
     updatedCombinedQuestionEntries = updatedCombinedQuestionEntries.concat(
-      correspondingNewCombinedQuestionEntries
+      newCombinedQuestionEntries
     );
     console.info(
       `Added ${rowsToAdd.length} rows. The total amount of data rows is now ${updatedCombinedQuestionEntries.length}`
-    );
-    console.info(`Updating formulas and calculated columns for the new rows`);
-    updateCombinedQuestionSheetFormulasAndCalculatedColumns(
-      combinedQuestionsSheet,
-      correspondingNewCombinedQuestionEntries,
-      updatedCombinedToplineEntries,
-      updatedCombinedQuestionEntries.length -
-        correspondingNewCombinedQuestionEntries.length +
-        2,
-      rowsToAdd.length
     );
   }
 
@@ -205,5 +196,5 @@ export function refreshCombinedQuestionsSheetListing(
   console.info(`End of refreshCombinedQuestionsSheetListing()`);
   /* tslint:enable:no-console */
 
-  return { updatedCombinedQuestionEntries };
+  return { updatedCombinedQuestionEntries, newCombinedQuestionEntries };
 }
