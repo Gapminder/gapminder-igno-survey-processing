@@ -1,3 +1,4 @@
+import { chunk } from "lodash";
 import {
   combinedQuestionsSheetValueRowToCombinedQuestionEntry,
   combinedToplineSheetValueRowToCombinedToplineEntry,
@@ -81,21 +82,34 @@ function devUpdateFormulasAndCalculatedColumns() {
     importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEntry
   );
 
-  updateCombinedQuestionSheetFormulasAndCalculatedColumns(
-    combinedQuestionsSheet,
-    combinedQuestionEntries,
-    combinedToplineEntries,
-    importedIgnoQuestionsInfoEntries,
-    2,
-    combinedQuestionEntries.length
+  const maxRowsToUpdateInEachRound = 8000;
+
+  chunk(combinedQuestionEntries, maxRowsToUpdateInEachRound).map(
+    ($combinedQuestionEntries, index) => {
+      const startRow = index * maxRowsToUpdateInEachRound + 2;
+      updateCombinedQuestionSheetFormulasAndCalculatedColumns(
+        combinedQuestionsSheet,
+        $combinedQuestionEntries,
+        combinedToplineEntries,
+        importedIgnoQuestionsInfoEntries,
+        startRow,
+        $combinedQuestionEntries.length
+      );
+    }
   );
-  updateCombinedToplineSheetFormulasAndCalculatedColumns(
-    combinedToplineSheet,
-    combinedToplineEntries,
-    combinedQuestionEntries,
-    importedIgnoQuestionsInfoEntries,
-    2,
-    combinedToplineEntries.length
+
+  chunk(combinedToplineEntries, maxRowsToUpdateInEachRound).map(
+    ($combinedToplineEntries, index) => {
+      const startRow = index * maxRowsToUpdateInEachRound + 2;
+      updateCombinedToplineSheetFormulasAndCalculatedColumns(
+        combinedToplineSheet,
+        $combinedToplineEntries,
+        combinedQuestionEntries,
+        importedIgnoQuestionsInfoEntries,
+        startRow,
+        $combinedToplineEntries.length
+      );
+    }
   );
 
   console.info(`End of devUpdateFormulasAndCalculatedColumns()`);

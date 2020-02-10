@@ -15,7 +15,7 @@
 
 ▸ **menuDevUpdateFormulasAndCalculatedColumns**(): *void*
 
-*Defined in [menuActions/menuDevUpdateFormulasAndCalculatedColumns.ts:17](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.3.0/src/menuActions/menuDevUpdateFormulasAndCalculatedColumns.ts#L17)*
+*Defined in [menuActions/menuDevUpdateFormulasAndCalculatedColumns.ts:18](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.3.0/src/menuActions/menuDevUpdateFormulasAndCalculatedColumns.ts#L18)*
 
 Menu item action for "Gapminder Igno Survey Process -> (For developer use only) Update formulas and calculated columns"
 

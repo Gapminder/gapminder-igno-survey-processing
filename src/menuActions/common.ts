@@ -389,7 +389,9 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     `Start of updateCombinedQuestionSheetFormulasAndCalculatedColumns()`
   );
 
-  console.info(`Filling formula / calculated value columns`);
+  console.info(
+    `Filling formula / calculated value columns for ${numRows} rows`
+  );
   fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
@@ -793,14 +795,8 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
     `Start of updateCombinedToplineSheetFormulasAndCalculatedColumns()`
   );
 
-  console.info(`Filling formula / calculated value columns`);
-  fillColumnWithFormulas(
-    combinedToplineSheet,
-    combinedToplineSheetHeaders,
-    "Survey Name",
-    `=VLOOKUP("survey-"&A[ROW],{${surveysSheetName}!G$2:G,${surveysSheetName}!A$2:A},2,FALSE)`,
-    startRow,
-    numRows
+  console.info(
+    `Filling formula / calculated value columns for ${numRows} rows`
   );
 
   console.info(`Creating lookup indices`);
@@ -915,6 +911,15 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
       const combinedToplineEntry = combinedToplineEntries[rowNumber - startRow];
       return combinedToplineEntry.x_marks_correct_answers;
     },
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedToplineSheet,
+    combinedToplineSheetHeaders,
+    "Survey Name",
+    `=VLOOKUP("survey-"&A[ROW],{${surveysSheetName}!G$2:G,${surveysSheetName}!A$2:A},2,FALSE)`,
     startRow,
     numRows
   );
