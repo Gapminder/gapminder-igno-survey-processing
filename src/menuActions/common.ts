@@ -473,6 +473,33 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     numRows
   );
 
+  const validAutoMappedId = autoMappedId =>
+    autoMappedId.indexOf("ID") === 0 &&
+    autoMappedId.indexOf(";") === -1 &&
+    autoMappedId.indexOf("(") === -1 &&
+    autoMappedId.indexOf("n/a") === -1;
+
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Igno Index Question ID",
+    rowNumber => {
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      const autoMappedId =
+        combinedQuestionEntry.auto_mapped_igno_index_question_id;
+      if (
+        combinedQuestionEntry.igno_index_question_id.trim() === "" &&
+        validAutoMappedId(autoMappedId)
+      ) {
+        return autoMappedId;
+      }
+      return combinedQuestionEntry.igno_index_question_id;
+    },
+    startRow,
+    numRows
+  );
+
   console.info(
     `Creating foreign_country_country_views_survey_batch_number+foreign_country_igno_question lookup index`
   );
@@ -546,6 +573,27 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
             importedIgnoQuestionsInfoEntry.foreign_country_igno_question_id
         )
         .join("; ");
+    },
+    startRow,
+    numRows
+  );
+
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Foreign Country Igno Question ID",
+    rowNumber => {
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      const autoMappedId =
+        combinedQuestionEntry.auto_mapped_foreign_country_igno_question_id;
+      if (
+        combinedQuestionEntry.foreign_country_igno_question_id.trim() === "" &&
+        validAutoMappedId(autoMappedId)
+      ) {
+        return autoMappedId;
+      }
+      return combinedQuestionEntry.foreign_country_igno_question_id;
     },
     startRow,
     numRows
