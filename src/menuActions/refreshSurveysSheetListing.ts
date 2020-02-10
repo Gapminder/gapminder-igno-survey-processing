@@ -33,8 +33,6 @@ export function refreshSurveysSheetListing(
       if (existingSurveyEntry.file_name === "") {
         return existingSurveyEntry;
       }
-      let link_if_found_in_gs_results_folder =
-        "(Not found in gs_results folder)";
       const matchingGsResultsFolderGsheetFiles = gsResultsFolderGsheetFiles.filter(
         (gsResultsFolderGsheetFile: File) =>
           existingSurveyEntry.file_name === gsResultsFolderGsheetFile.getName()
@@ -45,12 +43,9 @@ export function refreshSurveysSheetListing(
         fileNamesEncounteredInExistingEntries.push(
           matchingGsResultsFolderGsheetFile.getName()
         );
-        link_if_found_in_gs_results_folder = matchingGsResultsFolderGsheetFile.getUrl();
+        existingSurveyEntry.link_if_found_in_gs_results_folder = matchingGsResultsFolderGsheetFile.getUrl();
       }
-      return {
-        ...existingSurveyEntry,
-        link_if_found_in_gs_results_folder
-      };
+      return existingSurveyEntry;
     }
   );
 
