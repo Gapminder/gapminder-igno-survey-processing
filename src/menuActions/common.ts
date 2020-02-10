@@ -883,7 +883,7 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
         return `(Question ID not mapped)`;
       }
       if (factualAnswer === undefined || factualAnswer.trim() === "") {
-        return `(Empty factual answer in the matching ${importedIgnoQuestionsInfoSheetName}) row`;
+        return `(No factual answer provided in input sheet)`;
       }
       return answerOptionMatchesFactualAnswer(
         combinedToplineEntry.answer,
