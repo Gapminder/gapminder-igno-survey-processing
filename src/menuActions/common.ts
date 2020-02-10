@@ -462,23 +462,26 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
       ) {
         return `(No identical questions within batch ${worldViewsSurveyBatchNumber} found)`;
       }
-      return matchingImportedIgnoQuestionsInfoEntries
+      const autoMappedId = matchingImportedIgnoQuestionsInfoEntries
         .map(
           (importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry) =>
             importedIgnoQuestionsInfoEntry.igno_index_question_id
         )
         .join("; ");
+      // Also set the igno_index_question_id if not already set
+      if (
+        matchingImportedIgnoQuestionsInfoEntries.length === 1 &&
+        combinedQuestionEntry.igno_index_question_id.trim() === ""
+      ) {
+        combinedQuestionEntry.igno_index_question_id = autoMappedId;
+      }
+      return autoMappedId;
     },
     startRow,
     numRows
   );
 
-  const validAutoMappedId = autoMappedId =>
-    autoMappedId.indexOf("ID") === 0 &&
-    autoMappedId.indexOf(";") === -1 &&
-    autoMappedId.indexOf("(") === -1 &&
-    autoMappedId.indexOf("n/a") === -1;
-
+  // Write values of combinedQuestionEntry.igno_index_question_id which we effected above
   fillColumnWithValues(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
@@ -486,14 +489,6 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     rowNumber => {
       const combinedQuestionEntry =
         combinedQuestionEntries[rowNumber - startRow];
-      const autoMappedId =
-        combinedQuestionEntry.auto_mapped_igno_index_question_id;
-      if (
-        combinedQuestionEntry.igno_index_question_id.trim() === "" &&
-        validAutoMappedId(autoMappedId)
-      ) {
-        return autoMappedId;
-      }
       return combinedQuestionEntry.igno_index_question_id;
     },
     startRow,
@@ -567,17 +562,26 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
       ) {
         return `(No identical questions within batch ${countryViewsSurveyBatchNumber} found)`;
       }
-      return matchingImportedIgnoQuestionsInfoEntries
+      const autoMappedId = matchingImportedIgnoQuestionsInfoEntries
         .map(
           (importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry) =>
             importedIgnoQuestionsInfoEntry.foreign_country_igno_question_id
         )
         .join("; ");
+      // Also set the igno_index_question_id if not already set
+      if (
+        matchingImportedIgnoQuestionsInfoEntries.length === 1 &&
+        combinedQuestionEntry.foreign_country_igno_question_id.trim() === ""
+      ) {
+        combinedQuestionEntry.foreign_country_igno_question_id = autoMappedId;
+      }
+      return autoMappedId;
     },
     startRow,
     numRows
   );
 
+  // Write values of combinedQuestionEntry.foreign_country_igno_question_id which we effected above
   fillColumnWithValues(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
@@ -585,14 +589,6 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     rowNumber => {
       const combinedQuestionEntry =
         combinedQuestionEntries[rowNumber - startRow];
-      const autoMappedId =
-        combinedQuestionEntry.auto_mapped_foreign_country_igno_question_id;
-      if (
-        combinedQuestionEntry.foreign_country_igno_question_id.trim() === "" &&
-        validAutoMappedId(autoMappedId)
-      ) {
-        return autoMappedId;
-      }
       return combinedQuestionEntry.foreign_country_igno_question_id;
     },
     startRow,
