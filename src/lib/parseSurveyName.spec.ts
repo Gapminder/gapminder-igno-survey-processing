@@ -9,7 +9,7 @@ const testParseSurveyName: Macro<any> = (
   { surveyName, expectedOutput }
 ) => {
   const output = parseSurveyName(surveyName);
-  t.log({ output, expectedOutput });
+  // t.log({ output, expectedOutput });
   t.deepEqual(output, expectedOutput);
 };
 

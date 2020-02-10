@@ -91,6 +91,7 @@ function devUpdateFormulasAndCalculatedColumns() {
   );
   updateCombinedToplineSheetFormulasAndCalculatedColumns(
     combinedToplineSheet,
+    combinedToplineEntries,
     combinedQuestionEntries,
     importedIgnoQuestionsInfoEntries,
     2,

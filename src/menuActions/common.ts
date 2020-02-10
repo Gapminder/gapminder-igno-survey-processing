@@ -17,6 +17,7 @@ import {
   surveysSheetHeaders,
   surveysSheetName
 } from "../gsheetsData/hardcodedConstants";
+import { answerOptionMatchesFactualAnswer } from "../lib/answerOptionMatchesFactualAnswer";
 import { removeEmptyRowsAtTheEnd } from "../lib/cleanInputRange";
 import { parseSurveyName } from "../lib/parseSurveyName";
 
@@ -632,23 +633,6 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
   );
 
   console.info(`Creating survey_id+question_number lookup index`);
-  const combineSurveyIdAndQuestionNumber = (
-    combinedEntry: CombinedQuestionEntry | CombinedToplineEntry
-  ) => {
-    if (!combinedEntry.survey_id) {
-      console.log("The entry did not have survey_id set", {
-        combinedEntry
-      });
-      throw new Error("The entry did not have survey_id set");
-    }
-    if (!combinedEntry.question_number) {
-      console.log("The entry did not have question_number set", {
-        combinedEntry
-      });
-      throw new Error("The entry did not have question_number set");
-    }
-    return `${combinedEntry.survey_id}-${combinedEntry.question_number}`;
-  };
   const combinedToplineEntriesBySurveyIdAndQuestionNumber = groupBy(
     combinedToplineEntries,
     combineSurveyIdAndQuestionNumber
@@ -792,6 +776,7 @@ Correct answer(s): "&P[ROW]&"
  */
 export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
   combinedToplineSheet,
+  combinedToplineEntries: CombinedToplineEntry[],
   combinedQuestionEntries: CombinedQuestionEntry[],
   importedIgnoQuestionsInfoEntries: ImportedIgnoQuestionsInfoEntry[],
   startRow: number,
@@ -816,10 +801,141 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
     numRows
   );
 
-  // TODO: auto_marked_correct_answers
+  console.info(`Creating lookup indices`);
+  const combinedQuestionEntriesBySurveyIdAndQuestionNumber = groupBy(
+    combinedQuestionEntries,
+    combineSurveyIdAndQuestionNumber
+  ) as { [k: string]: CombinedQuestionEntry[] };
+
+  const importedIgnoQuestionsInfoEntriesByIgnoQuestionId = groupBy(
+    importedIgnoQuestionsInfoEntries.filter(
+      importedIgnoQuestionsInfoEntry =>
+        !!importedIgnoQuestionsInfoEntry.igno_index_question_id
+    ),
+    importedIgnoQuestionsInfoEntry =>
+      importedIgnoQuestionsInfoEntry.igno_index_question_id
+  ) as { [k: string]: ImportedIgnoQuestionsInfoEntry[] };
+
+  const importedIgnoQuestionsInfoEntriesByForeignCountryIgnoQuestionId = groupBy(
+    importedIgnoQuestionsInfoEntries.filter(
+      importedIgnoQuestionsInfoEntry =>
+        !!importedIgnoQuestionsInfoEntry.foreign_country_igno_question_id
+    ),
+    importedIgnoQuestionsInfoEntry =>
+      importedIgnoQuestionsInfoEntry.foreign_country_igno_question_id
+  ) as { [k: string]: ImportedIgnoQuestionsInfoEntry[] };
+
+  fillColumnWithValues(
+    combinedToplineSheet,
+    combinedToplineSheetHeaders,
+    "Auto-marked correct answers",
+    rowNumber => {
+      const combinedToplineEntry = combinedToplineEntries[rowNumber - startRow];
+      const correspondingCombinedQuestionEntries =
+        combinedQuestionEntriesBySurveyIdAndQuestionNumber[
+          combineSurveyIdAndQuestionNumber(combinedToplineEntry)
+        ];
+      if (
+        !correspondingCombinedQuestionEntries ||
+        correspondingCombinedQuestionEntries.length === 0
+      ) {
+        return `(No corresponding question entry found in ${combinedQuestionsSheetName})`;
+      }
+      const correspondingCombinedQuestionEntry =
+        correspondingCombinedQuestionEntries[0];
+      let factualAnswer;
+      if (
+        correspondingCombinedQuestionEntry.igno_index_question_id &&
+        correspondingCombinedQuestionEntry.igno_index_question_id.trim() !== ""
+      ) {
+        const correspondingImportedIgnoQuestionsInfoEntries =
+          importedIgnoQuestionsInfoEntriesByIgnoQuestionId[
+            correspondingCombinedQuestionEntry.igno_index_question_id
+          ];
+        if (
+          !correspondingImportedIgnoQuestionsInfoEntries ||
+          correspondingImportedIgnoQuestionsInfoEntries.length === 0
+        ) {
+          return `(No matching imported igno question info entry found in ${importedIgnoQuestionsInfoSheetName})`;
+        }
+        factualAnswer =
+          correspondingImportedIgnoQuestionsInfoEntries[0]
+            .answer_to_igno_index_question;
+      } else if (
+        correspondingCombinedQuestionEntry.foreign_country_igno_question_id &&
+        correspondingCombinedQuestionEntry.foreign_country_igno_question_id.trim() !==
+          ""
+      ) {
+        const correspondingImportedIgnoQuestionsInfoEntries =
+          importedIgnoQuestionsInfoEntriesByForeignCountryIgnoQuestionId[
+            correspondingCombinedQuestionEntry.foreign_country_igno_question_id
+          ];
+        if (
+          !correspondingImportedIgnoQuestionsInfoEntries ||
+          correspondingImportedIgnoQuestionsInfoEntries.length === 0
+        ) {
+          return `(No matching imported igno question info entry found in ${importedIgnoQuestionsInfoSheetName})`;
+        }
+        factualAnswer =
+          correspondingImportedIgnoQuestionsInfoEntries[0]
+            .answer_to_foreign_country_igno_question;
+      } else {
+        return `(Question ID not mapped)`;
+      }
+      if (factualAnswer === undefined || factualAnswer.trim() === "") {
+        return `(Empty factual answer in the matching ${importedIgnoQuestionsInfoSheetName}) row`;
+      }
+      return answerOptionMatchesFactualAnswer(
+        combinedToplineEntry.answer,
+        factualAnswer
+      )
+        ? "x"
+        : "";
+    },
+    startRow,
+    numRows
+  );
+
+  // Write values of combinedQuestionEntry.igno_index_question_id which we effected above
+  /*
+  fillColumnWithValues(
+    combinedToplineSheet,
+    combinedToplineSheetHeaders,
+    'Correct? ("x" marks correct answers)',
+    rowNumber => {
+      const combinedToplineEntry = combinedToplineEntries[rowNumber - startRow];
+      return combinedToplineEntry.x_marks_correct_answers;
+    },
+    startRow,
+    numRows
+  );
+   */
 
   console.info(
     `End of updateCombinedToplineSheetFormulasAndCalculatedColumns()`
   );
   /* tslint:enable:no-console */
 }
+
+/**
+ * @hidden
+ */
+const combineSurveyIdAndQuestionNumber = (
+  combinedEntry: CombinedQuestionEntry | CombinedToplineEntry
+) => {
+  /* tslint:disable:no-console */
+  if (!combinedEntry.survey_id) {
+    console.log("The entry did not have survey_id set", {
+      combinedEntry
+    });
+    throw new Error("The entry did not have survey_id set");
+  }
+  if (!combinedEntry.question_number) {
+    console.log("The entry did not have question_number set", {
+      combinedEntry
+    });
+    throw new Error("The entry did not have question_number set");
+  }
+  /* tslint:enable:no-console */
+  return `${combinedEntry.survey_id}-${combinedEntry.question_number}`;
+};

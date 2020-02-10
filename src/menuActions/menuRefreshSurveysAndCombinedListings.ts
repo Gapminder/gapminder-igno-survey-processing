@@ -211,6 +211,7 @@ function refreshSurveysAndCombinedListings() {
   );
   updateCombinedToplineSheetFormulasAndCalculatedColumns(
     combinedToplineSheet,
+    updatedCombinedToplineEntries,
     newCombinedQuestionEntries,
     importedIgnoQuestionsInfoEntries,
     updatedCombinedToplineEntries.length - newCombinedToplineEntries.length + 2,
