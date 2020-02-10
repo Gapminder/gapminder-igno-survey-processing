@@ -885,19 +885,26 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
       if (factualAnswer === undefined || factualAnswer.trim() === "") {
         return `(No factual answer provided in input sheet)`;
       }
-      return answerOptionMatchesFactualAnswer(
+
+      const autoMarkedAsCorrect = answerOptionMatchesFactualAnswer(
         combinedToplineEntry.answer,
         factualAnswer
-      )
-        ? "x"
-        : "";
+      );
+
+      // Update the actual x markings if no correct answers had been marked previously
+      if (correspondingCombinedQuestionEntry.correct_answers === "#N/A") {
+        combinedToplineEntry.x_marks_correct_answers = autoMarkedAsCorrect
+          ? "x"
+          : "";
+      }
+
+      return autoMarkedAsCorrect ? "x" : "";
     },
     startRow,
     numRows
   );
 
-  // Write values of combinedQuestionEntry.igno_index_question_id which we effected above
-  /*
+  // Write values of combinedToplineEntry.x_marks_correct_answers which we effected above
   fillColumnWithValues(
     combinedToplineSheet,
     combinedToplineSheetHeaders,
@@ -909,7 +916,6 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
     startRow,
     numRows
   );
-   */
 
   console.info(
     `End of updateCombinedToplineSheetFormulasAndCalculatedColumns()`
