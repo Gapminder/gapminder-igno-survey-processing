@@ -1,6 +1,5 @@
 import intersection from "lodash/intersection";
 import union from "lodash/union";
-import { gsResultsFolderName } from "../gsheetsData/hardcodedConstants";
 import {
   addGsheetConvertedVersionOfExcelFileToFolder,
   fetchAndVerifyCombinedQuestionsSheet,
@@ -48,7 +47,7 @@ export function menuRefreshSurveysAndCombinedListings() {
     console.log("Removed cache entry. The script can run again now");
 
     SpreadsheetApp.getUi().alert(
-      "Refreshed the surveys and combined listings (based on files in the gs_results folder)."
+      "Refreshed the surveys and combined listings (based on files in the Google Surveys results folder)."
     );
   } catch (e) {
     // Make sure that the error ends up in the logs, regardless of if the user sees the error or not
@@ -93,8 +92,31 @@ function refreshSurveysAndCombinedListings() {
   /* tslint:disable:no-console */
   console.info(`Start of refreshSurveysAndCombinedListings()`);
 
-  console.info(`Fetching and verifying existing worksheets`);
   const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+
+  // Read relevant settings
+  console.info(`Reading relevant settings`);
+  const settingGsResultsFolderNameRange = activeSpreadsheet.getRangeByName(
+    "setting_gs_results_folder_name"
+  );
+  if (settingGsResultsFolderNameRange === null) {
+    SpreadsheetApp.getUi().alert(
+      "No named range 'setting_gs_results_folder_name' was found. It is mandatory since it is used to configure what Drive folder the script should look in for uploaded Google Survey results. Please add it to your spreadsheet and run this script again."
+    );
+    return;
+  }
+  const gsResultsFolderName = String(
+    settingGsResultsFolderNameRange.getValue()
+  ).trim();
+  if (gsResultsFolderName === "") {
+    SpreadsheetApp.getUi().alert(
+      "The named range 'setting_gs_results_folder_name' was found empty. It needs to contain the name of the Drive folder the script should look in for uploaded Google Survey results. Please make sure that it is not empty and run this script again."
+    );
+    return;
+  }
+  console.info(`Read setting gsResultsFolderName: ${gsResultsFolderName}`);
+
+  console.info(`Fetching and verifying existing worksheets`);
   const {
     surveysSheet,
     surveysSheetValuesIncludingHeaderRow
@@ -108,10 +130,11 @@ function refreshSurveysAndCombinedListings() {
     combinedToplineSheetValuesIncludingHeaderRow
   } = fetchAndVerifyCombinedToplineSheet(activeSpreadsheet);
 
-  // Read files in the folder called "gs_results" (the first found, in case there are many),
-  // ensuring that there is a Gsheet version of each uploaded Excel file
+  // Read files in the gs results folder with the name specified in the relevant settings named range
+  // (the first found, in case there are many), ensuring that there is a Gsheet version of each uploaded Excel file
   console.info(
-    `Reading files in the folder called "gs_results", ensuring that there is a Gsheet version of each uploaded Excel file`
+    `Reading files in the folder called "${gsResultsFolderName}", ` +
+      `ensuring that there is a Gsheet version of each uploaded Excel file`
   );
   const folders = DriveApp.getFoldersByName(gsResultsFolderName);
   if (!folders.hasNext()) {

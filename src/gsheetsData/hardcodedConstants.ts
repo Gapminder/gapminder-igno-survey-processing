@@ -28,11 +28,6 @@ export const gsDashboardSurveyListingsSheetName =
 /**
  * @hidden
  */
-export const gsResultsFolderName = "gs_results";
-
-/**
- * @hidden
- */
 export const surveysSheetHeaders = [
   "Survey Name",
   "Input Sheet",
@@ -41,7 +36,7 @@ export const surveysSheetHeaders = [
   "Sample Size",
   "Survey Date",
   "Filename",
-  "Link to results (if found in gs_results folder)",
+  "Link to results (as first encountered in the Google Surveys results folder)",
   "Number of rows in questions_combo",
   "Number of rows in topline_combo"
 ];
