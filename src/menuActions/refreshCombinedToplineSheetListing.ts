@@ -61,6 +61,10 @@ export function refreshCombinedToplineSheetListing(
   );
 
   // Remove orphaned rows in the combined topline listing if necessary
+  // Inactivated because of the new (faster)  paradigm of only importing
+  // new rows, never touching old rows by default
+  // Would require formula-calculations directly instead of "..." placeholder to reactivate
+  /*
   if (
     toplineEntriesWithSurveyEntry.length < combinedToplineSheetValues.length
   ) {
@@ -95,6 +99,8 @@ export function refreshCombinedToplineSheetListing(
   } else {
     updatedCombinedToplineEntries = existingToplineEntries;
   }
+  */
+  updatedCombinedToplineEntries = existingToplineEntries;
 
   console.info(
     `Finding which gsheet files are not-yet-included in the combined topline listing`
