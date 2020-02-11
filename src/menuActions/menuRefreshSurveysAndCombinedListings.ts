@@ -2,12 +2,8 @@ import groupBy from "lodash/groupBy";
 import intersection from "lodash/intersection";
 import union from "lodash/union";
 import {
-  CombinedQuestionEntry,
   GsDashboardSurveyListingsEntry,
   gsDashboardSurveyListingsSheetValueRowToGsDashboardSurveyListingsEntry,
-  ImportedIgnoQuestionsInfoEntry,
-  importedIgnoQuestionsInfoSheetHeaders,
-  importedIgnoQuestionsInfoSheetName,
   importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEntry
 } from "../gsheetsData/hardcodedConstants";
 import {
@@ -142,7 +138,6 @@ function refreshSurveysAndCombinedListings() {
     combinedToplineSheetValuesIncludingHeaderRow
   } = fetchAndVerifyCombinedToplineSheet(activeSpreadsheet);
   const {
-    importedIgnoQuestionsInfoSheet,
     importedIgnoQuestionsInfoSheetValuesIncludingHeaderRow
   } = fetchAndVerifyImportedIgnoQuestionsInfoSheet(activeSpreadsheet);
   const importedIgnoQuestionsInfoSheetValues = importedIgnoQuestionsInfoSheetValuesIncludingHeaderRow.slice(
@@ -152,7 +147,6 @@ function refreshSurveysAndCombinedListings() {
     importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEntry
   );
   const {
-    gsDashboardSurveyListingsSheet,
     gsDashboardSurveyListingsSheetValuesIncludingHeaderRow
   } = fetchAndVerifyGsDashboardSurveyListingsSheet(activeSpreadsheet);
   const gsDashboardSurveyListingsSheetValues = gsDashboardSurveyListingsSheetValuesIncludingHeaderRow.slice(

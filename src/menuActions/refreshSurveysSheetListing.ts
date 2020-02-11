@@ -1,15 +1,9 @@
 import difference from "lodash/difference";
 import {
-  combinedQuestionsSheetName,
-  combinedToplineSheetName,
   surveyEntryToSurveysSheetValueRow,
-  surveysSheetHeaders,
   surveysSheetValueRowToSurveyEntry
 } from "../gsheetsData/hardcodedConstants";
-import {
-  adjustSheetRowsAndColumnsCount,
-  fillColumnWithFormulas
-} from "./common";
+import { adjustSheetRowsAndColumnsCount } from "./common";
 import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 import File = GoogleAppsScript.Drive.File;
 

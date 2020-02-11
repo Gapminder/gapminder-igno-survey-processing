@@ -1,7 +1,6 @@
 import difference from "lodash/difference";
 import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 import File = GoogleAppsScript.Drive.File;
-import intersection from "lodash/intersection";
 import union from "lodash/union";
 import {
   CombinedQuestionEntry,
@@ -12,7 +11,6 @@ import {
   overviewSheetValueRowToQuestionEntry,
   QuestionEntry,
   questionEntryToCombinedQuestionSheetValueRow,
-  questionEntryToCombinedQuestionsSheetValueRow,
   SurveyEntry
 } from "../gsheetsData/hardcodedConstants";
 import {
@@ -40,24 +38,29 @@ export function refreshCombinedQuestionsSheetListing(
 
   let updatedCombinedQuestionEntries;
 
-  // From the existing sheet contents, purge entries that does not have an entry in the surveys sheet
-  // so that the combined question listing only contains rows that are relevant for analysis
-  console.info(`Checking for orphaned rows in the combined question listing`);
   const combinedQuestionsSheetValues = combinedQuestionsSheetValuesIncludingHeaderRow.slice(
     1
   );
   const existingQuestionEntries = combinedQuestionsSheetValues.map(
     combinedQuestionsSheetValueRowToCombinedQuestionEntry
   );
-  const existingSurveysSurveyIds = updatedSurveyEntries.map(
-    existingSurveyEntry => fileNameToSurveyId(existingSurveyEntry.file_name)
-  );
+
   const existingQuestionSurveyIds = union(
     existingQuestionEntries.map(
       existingQuestionEntry => existingQuestionEntry.survey_id
     )
   );
 
+  // From the existing sheet contents, purge entries that does not have an entry in the surveys sheet
+  // so that the combined question listing only contains rows that are relevant for analysis
+  // Inactivated because of the new (faster)  paradigm of only importing
+  // new rows, never touching old rows by default
+  // Would require formula-calculations directly instead of "..." placeholder to reactivate
+  /*
+  console.info(`Checking for orphaned rows in the combined question listing`);
+  const existingSurveysSurveyIds = updatedSurveyEntries.map(
+    existingSurveyEntry => fileNameToSurveyId(existingSurveyEntry.file_name)
+  );
   const surveyIdsInBothListings = intersection(
     existingSurveysSurveyIds,
     existingQuestionSurveyIds
@@ -68,10 +71,6 @@ export function refreshCombinedQuestionsSheetListing(
   );
 
   // Remove orphaned rows in the combined question listing if necessary
-  // Inactivated because of the new (faster)  paradigm of only importing
-  // new rows, never touching old rows by default
-  // Would require formula-calculations directly instead of "..." placeholder to reactivate
-  /*
   if (
     questionEntriesWithSurveyEntry.length < combinedQuestionsSheetValues.length
   ) {

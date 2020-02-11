@@ -1,11 +1,9 @@
 import difference from "lodash/difference";
 import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 import File = GoogleAppsScript.Drive.File;
-import intersection from "lodash/intersection";
 import union from "lodash/union";
 import {
   CombinedToplineEntry,
-  combinedToplineEntryToCombinedToplineSheetValueRow,
   combinedToplineSheetHeaders,
   combinedToplineSheetValueRowToCombinedToplineEntry,
   GsDashboardSurveyListingsEntry,
@@ -38,24 +36,29 @@ export function refreshCombinedToplineSheetListing(
 
   let updatedCombinedToplineEntries;
 
-  // From the existing sheet contents, purge entries that does not have an entry in the surveys sheet
-  // so that the combined topline listing only contains rows that are relevant for analysis
-  console.info(`Checking for orphaned rows in the combined topline listing`);
   const combinedToplineSheetValues = combinedToplineSheetValuesIncludingHeaderRow.slice(
     1
   );
   const existingToplineEntries = combinedToplineSheetValues.map(
     combinedToplineSheetValueRowToCombinedToplineEntry
   );
-  const existingSurveysSurveyIds = updatedSurveyEntries.map(
-    existingSurveyEntry => fileNameToSurveyId(existingSurveyEntry.file_name)
-  );
+
   const existingToplineSurveyIds = union(
     existingToplineEntries.map(
       existingToplineEntry => existingToplineEntry.survey_id
     )
   );
 
+  // From the existing sheet contents, purge entries that does not have an entry in the surveys sheet
+  // so that the combined topline listing only contains rows that are relevant for analysis
+  // Inactivated because of the new (faster)  paradigm of only importing
+  // new rows, never touching old rows by default
+  // Would require formula-calculations directly instead of "..." placeholder to reactivate
+  /*
+  console.info(`Checking for orphaned rows in the combined topline listing`);
+  const existingSurveysSurveyIds = updatedSurveyEntries.map(
+    existingSurveyEntry => fileNameToSurveyId(existingSurveyEntry.file_name)
+  );
   const surveyIdsInBothListings = intersection(
     existingSurveysSurveyIds,
     existingToplineSurveyIds
@@ -66,10 +69,6 @@ export function refreshCombinedToplineSheetListing(
   );
 
   // Remove orphaned rows in the combined topline listing if necessary
-  // Inactivated because of the new (faster)  paradigm of only importing
-  // new rows, never touching old rows by default
-  // Would require formula-calculations directly instead of "..." placeholder to reactivate
-  /*
   if (
     toplineEntriesWithSurveyEntry.length < combinedToplineSheetValues.length
   ) {

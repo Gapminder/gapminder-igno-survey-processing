@@ -3,11 +3,9 @@ import {
   gsDashboardSurveyListingsSheetName
 } from "../gsheetsData/hardcodedConstants";
 import {
-  assertCorrectLeftmostSheetColumnHeaders,
   ensuredColumnIndex,
   fetchAndVerifyGsDashboardSurveyListingsSheet,
-  getColumnValuesRange,
-  getSheetDataIncludingHeaderRow
+  getColumnValuesRange
 } from "./common";
 import Spreadsheet = GoogleAppsScript.Spreadsheet.Spreadsheet;
 import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
