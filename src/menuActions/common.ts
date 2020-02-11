@@ -480,9 +480,7 @@ export function updateSurveysSheetFormulasAndCalculatedColumns(
     numRows
   );
 
-  console.info(
-    `End of updateCombinedToplineSheetFormulasAndCalculatedColumns()`
-  );
+  console.info(`End of updateSurveysSheetFormulasAndCalculatedColumns()`);
   /* tslint:enable:no-console */
 }
 

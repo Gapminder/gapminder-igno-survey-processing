@@ -187,7 +187,7 @@ function refreshSurveysAndCombinedListings() {
     `Updating formulas and calculated columns for the new surveys sheet rows`
   );
   updateSurveysSheetFormulasAndCalculatedColumns(
-    combinedQuestionsSheet,
+    surveysSheet,
     updatedSurveyEntries,
     gsDashboardSurveyListingsEntriesBySurveyId,
     updatedSurveyEntries.length - updatedSurveyEntries.length + 2,
