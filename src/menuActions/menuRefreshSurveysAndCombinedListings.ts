@@ -206,6 +206,7 @@ function refreshSurveysAndCombinedListings() {
     newCombinedToplineEntries
   } = refreshCombinedToplineSheetListing(
     updatedSurveyEntries,
+    gsDashboardSurveyListingsEntriesBySurveyId,
     combinedToplineSheet,
     combinedToplineSheetValuesIncludingHeaderRow,
     gsResultsFolderGsheetFiles
@@ -218,6 +219,7 @@ function refreshSurveysAndCombinedListings() {
   } = refreshCombinedQuestionsSheetListing(
     updatedSurveyEntries,
     updatedCombinedToplineEntries,
+    gsDashboardSurveyListingsEntriesBySurveyId,
     combinedQuestionsSheet,
     combinedQuestionsSheetValuesIncludingHeaderRow,
     gsResultsFolderGsheetFiles

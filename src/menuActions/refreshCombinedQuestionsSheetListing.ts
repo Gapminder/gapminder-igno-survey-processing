@@ -8,6 +8,7 @@ import {
   combinedQuestionsSheetHeaders,
   combinedQuestionsSheetValueRowToCombinedQuestionEntry,
   CombinedToplineEntry,
+  GsDashboardSurveyListingsEntry,
   overviewSheetValueRowToQuestionEntry,
   QuestionEntry,
   questionEntryToCombinedQuestionSheetValueRow,
@@ -17,6 +18,7 @@ import {
 import {
   adjustSheetRowsAndColumnsCount,
   fileNameToSurveyId,
+  lookupGsDashboardSurveyListing,
   openSpreadsheetByIdAtMostOncePerScriptRun
 } from "./common";
 
@@ -26,6 +28,9 @@ import {
 export function refreshCombinedQuestionsSheetListing(
   updatedSurveyEntries: SurveyEntry[],
   updatedCombinedToplineEntries: CombinedToplineEntry[],
+  gsDashboardSurveyListingsEntriesBySurveyId: {
+    [survey_id: string]: GsDashboardSurveyListingsEntry[];
+  },
   combinedQuestionsSheet: Sheet,
   combinedQuestionsSheetValuesIncludingHeaderRow: any[][],
   gsResultsFolderGsheetFiles: File[]
@@ -149,6 +154,18 @@ export function refreshCombinedQuestionsSheetListing(
             targetEntries.length
           } rows from spreadsheet with id ${gsResultsFolderGsheetFile.getId()}`
         );
+
+        // skip entries that are without survey metadata
+        const firstEntry = targetEntries[0];
+        const gsDashboardSurveyListing = lookupGsDashboardSurveyListing(
+          firstEntry.survey_id,
+          gsDashboardSurveyListingsEntriesBySurveyId
+        );
+        if (!gsDashboardSurveyListing) {
+          console.info("Not including since survey metadata is missing");
+          return [];
+        }
+
         return targetEntries;
       }
     );
@@ -157,32 +174,34 @@ export function refreshCombinedQuestionsSheetListing(
       [],
       arraysOfEntriesToAdd
     );
-    // actually add rows
-    const rowsToAdd = entriesToAdd.map(
-      questionEntryToCombinedQuestionSheetValueRow
-    );
-    const startRow = updatedCombinedQuestionEntries.length + 2;
-    console.info(
-      `Adding ${rowsToAdd.length} rows to the end of the sheet (row ${startRow})`
-    );
-    combinedQuestionsSheet
-      .getRange(
-        startRow,
-        1,
-        rowsToAdd.length,
-        combinedQuestionsSheetHeaders.length
-      )
-      .setValues(rowsToAdd);
-    newCombinedQuestionEntries = rowsToAdd.map(
-      combinedQuestionsSheetValueRowToCombinedQuestionEntry
-    );
-    // Add to the array that tracks the current sheet entries
-    updatedCombinedQuestionEntries = updatedCombinedQuestionEntries.concat(
-      newCombinedQuestionEntries
-    );
-    console.info(
-      `Added ${rowsToAdd.length} rows. The total amount of data rows is now ${updatedCombinedQuestionEntries.length}`
-    );
+    if (entriesToAdd.length > 0) {
+      // actually add rows
+      const rowsToAdd = entriesToAdd.map(
+        questionEntryToCombinedQuestionSheetValueRow
+      );
+      const startRow = updatedCombinedQuestionEntries.length + 2;
+      console.info(
+        `Adding ${rowsToAdd.length} rows to the end of the sheet (row ${startRow})`
+      );
+      combinedQuestionsSheet
+        .getRange(
+          startRow,
+          1,
+          rowsToAdd.length,
+          combinedQuestionsSheetHeaders.length
+        )
+        .setValues(rowsToAdd);
+      newCombinedQuestionEntries = rowsToAdd.map(
+        combinedQuestionsSheetValueRowToCombinedQuestionEntry
+      );
+      // Add to the array that tracks the current sheet entries
+      updatedCombinedQuestionEntries = updatedCombinedQuestionEntries.concat(
+        newCombinedQuestionEntries
+      );
+      console.info(
+        `Added ${rowsToAdd.length} rows. The total amount of data rows is now ${updatedCombinedQuestionEntries.length}`
+      );
+    }
   }
 
   // Limit the amount of rows of the worksheet to the amount of entries

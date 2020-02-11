@@ -8,6 +8,7 @@ import {
   combinedToplineEntryToCombinedToplineSheetValueRow,
   combinedToplineSheetHeaders,
   combinedToplineSheetValueRowToCombinedToplineEntry,
+  GsDashboardSurveyListingsEntry,
   SurveyEntry,
   ToplineEntry,
   toplineEntryToCombinedToplineSheetValueRow,
@@ -16,6 +17,7 @@ import {
 import {
   adjustSheetRowsAndColumnsCount,
   fileNameToSurveyId,
+  lookupGsDashboardSurveyListing,
   openSpreadsheetByIdAtMostOncePerScriptRun
 } from "./common";
 
@@ -24,6 +26,9 @@ import {
  */
 export function refreshCombinedToplineSheetListing(
   updatedSurveyEntries: SurveyEntry[],
+  gsDashboardSurveyListingsEntriesBySurveyId: {
+    [survey_id: string]: GsDashboardSurveyListingsEntry[];
+  },
   combinedToplineSheet: Sheet,
   combinedToplineSheetValuesIncludingHeaderRow: any[][],
   gsResultsFolderGsheetFiles: File[]
@@ -147,6 +152,18 @@ export function refreshCombinedToplineSheetListing(
             targetEntries.length
           } rows from spreadsheet with id ${gsResultsFolderGsheetFile.getId()}`
         );
+
+        // skip entries that are without survey metadata
+        const firstEntry = targetEntries[0];
+        const gsDashboardSurveyListing = lookupGsDashboardSurveyListing(
+          firstEntry.survey_id,
+          gsDashboardSurveyListingsEntriesBySurveyId
+        );
+        if (!gsDashboardSurveyListing) {
+          console.info("Not including since survey metadata is missing");
+          return [];
+        }
+
         return targetEntries;
       }
     );
@@ -155,32 +172,34 @@ export function refreshCombinedToplineSheetListing(
       [],
       arraysOfEntriesToAdd
     );
-    // actually add rows
-    const rowsToAdd = entriesToAdd.map(
-      toplineEntryToCombinedToplineSheetValueRow
-    );
-    const startRow = updatedCombinedToplineEntries.length + 2;
-    console.info(
-      `Adding ${rowsToAdd.length} rows to the end of the sheet (row ${startRow})`
-    );
-    combinedToplineSheet
-      .getRange(
-        startRow,
-        1,
-        rowsToAdd.length,
-        combinedToplineSheetHeaders.length
-      )
-      .setValues(rowsToAdd);
-    newCombinedToplineEntries = rowsToAdd.map(
-      combinedToplineSheetValueRowToCombinedToplineEntry
-    );
-    // Add to the array that tracks the current sheet entries
-    updatedCombinedToplineEntries = updatedCombinedToplineEntries.concat(
-      newCombinedToplineEntries
-    );
-    console.info(
-      `Added ${rowsToAdd.length} rows. The total amount of data rows is now ${updatedCombinedToplineEntries.length}`
-    );
+    if (entriesToAdd.length > 0) {
+      // actually add rows
+      const rowsToAdd = entriesToAdd.map(
+        toplineEntryToCombinedToplineSheetValueRow
+      );
+      const startRow = updatedCombinedToplineEntries.length + 2;
+      console.info(
+        `Adding ${rowsToAdd.length} rows to the end of the sheet (row ${startRow})`
+      );
+      combinedToplineSheet
+        .getRange(
+          startRow,
+          1,
+          rowsToAdd.length,
+          combinedToplineSheetHeaders.length
+        )
+        .setValues(rowsToAdd);
+      newCombinedToplineEntries = rowsToAdd.map(
+        combinedToplineSheetValueRowToCombinedToplineEntry
+      );
+      // Add to the array that tracks the current sheet entries
+      updatedCombinedToplineEntries = updatedCombinedToplineEntries.concat(
+        newCombinedToplineEntries
+      );
+      console.info(
+        `Added ${rowsToAdd.length} rows. The total amount of data rows is now ${updatedCombinedToplineEntries.length}`
+      );
+    }
   }
 
   // Limit the amount of rows of the worksheet to the amount of entries
