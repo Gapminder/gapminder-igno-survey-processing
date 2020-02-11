@@ -8,7 +8,7 @@ import {
   combinedToplineEntryToCombinedToplineSheetValueRow,
   combinedToplineSheetHeaders,
   combinedToplineSheetValueRowToCombinedToplineEntry,
-  surveysSheetValueRowToSurveyEntry,
+  SurveyEntry,
   ToplineEntry,
   toplineEntryToCombinedToplineSheetValueRow,
   toplineSheetValueRowToToplineEntry
@@ -23,7 +23,7 @@ import {
  * @hidden
  */
 export function refreshCombinedToplineSheetListing(
-  updatedSurveysSheetValues: any[][],
+  updatedSurveyEntries: SurveyEntry[],
   combinedToplineSheet: Sheet,
   combinedToplineSheetValuesIncludingHeaderRow: any[][],
   gsResultsFolderGsheetFiles: File[]
@@ -39,13 +39,10 @@ export function refreshCombinedToplineSheetListing(
   const combinedToplineSheetValues = combinedToplineSheetValuesIncludingHeaderRow.slice(
     1
   );
-  const existingSurveyEntries = updatedSurveysSheetValues.map(
-    surveysSheetValueRowToSurveyEntry
-  );
   const existingToplineEntries = combinedToplineSheetValues.map(
     combinedToplineSheetValueRowToCombinedToplineEntry
   );
-  const existingSurveysSurveyIds = existingSurveyEntries.map(
+  const existingSurveysSurveyIds = updatedSurveyEntries.map(
     existingSurveyEntry => fileNameToSurveyId(existingSurveyEntry.file_name)
   );
   const existingToplineSurveyIds = union(

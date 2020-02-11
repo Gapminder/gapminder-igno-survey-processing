@@ -1,15 +1,22 @@
 import { chunk } from "lodash";
+import groupBy from "lodash/groupBy";
 import {
   combinedQuestionsSheetValueRowToCombinedQuestionEntry,
   combinedToplineSheetValueRowToCombinedToplineEntry,
-  importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEntry
+  GsDashboardSurveyListingsEntry,
+  gsDashboardSurveyListingsSheetValueRowToGsDashboardSurveyListingsEntry,
+  importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEntry,
+  surveysSheetValueRowToSurveyEntry
 } from "../gsheetsData/hardcodedConstants";
 import {
   fetchAndVerifyCombinedQuestionsSheet,
   fetchAndVerifyCombinedToplineSheet,
+  fetchAndVerifyGsDashboardSurveyListingsSheet,
   fetchAndVerifyImportedIgnoQuestionsInfoSheet,
+  fetchAndVerifySurveysSheet,
   updateCombinedQuestionSheetFormulasAndCalculatedColumns,
-  updateCombinedToplineSheetFormulasAndCalculatedColumns
+  updateCombinedToplineSheetFormulasAndCalculatedColumns,
+  updateSurveysSheetFormulasAndCalculatedColumns
 } from "./common";
 
 /**
@@ -49,6 +56,10 @@ function devUpdateFormulasAndCalculatedColumns() {
   console.info(`Fetching and verifying existing worksheets`);
   const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   const {
+    surveysSheet,
+    surveysSheetValuesIncludingHeaderRow
+  } = fetchAndVerifySurveysSheet(activeSpreadsheet);
+  const {
     combinedQuestionsSheet,
     combinedQuestionsSheetValuesIncludingHeaderRow
   } = fetchAndVerifyCombinedQuestionsSheet(activeSpreadsheet);
@@ -57,9 +68,16 @@ function devUpdateFormulasAndCalculatedColumns() {
     combinedToplineSheetValuesIncludingHeaderRow
   } = fetchAndVerifyCombinedToplineSheet(activeSpreadsheet);
   const {
-    importedIgnoQuestionsInfoSheet,
     importedIgnoQuestionsInfoSheetValuesIncludingHeaderRow
   } = fetchAndVerifyImportedIgnoQuestionsInfoSheet(activeSpreadsheet);
+  const {
+    gsDashboardSurveyListingsSheetValuesIncludingHeaderRow
+  } = fetchAndVerifyGsDashboardSurveyListingsSheet(activeSpreadsheet);
+
+  const surveysSheetValues = surveysSheetValuesIncludingHeaderRow.slice(1);
+  const surveyEntries = surveysSheetValues.map(
+    surveysSheetValueRowToSurveyEntry
+  );
 
   const combinedQuestionsSheetValues = combinedQuestionsSheetValuesIncludingHeaderRow.slice(
     1
@@ -75,6 +93,13 @@ function devUpdateFormulasAndCalculatedColumns() {
     combinedToplineSheetValueRowToCombinedToplineEntry
   );
 
+  const gsDashboardSurveyListingsSheetValues = gsDashboardSurveyListingsSheetValuesIncludingHeaderRow.slice(
+    1
+  );
+  const gsDashboardSurveyListingsEntries = gsDashboardSurveyListingsSheetValues.map(
+    gsDashboardSurveyListingsSheetValueRowToGsDashboardSurveyListingsEntry
+  );
+
   const importedIgnoQuestionsInfoSheetValues = importedIgnoQuestionsInfoSheetValuesIncludingHeaderRow.slice(
     1
   );
@@ -82,7 +107,26 @@ function devUpdateFormulasAndCalculatedColumns() {
     importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEntry
   );
 
+  const gsDashboardSurveyListingsEntriesBySurveyId = groupBy(
+    gsDashboardSurveyListingsEntries,
+    (gsDashboardSurveyListingsEntry: GsDashboardSurveyListingsEntry) =>
+      gsDashboardSurveyListingsEntry.survey_id
+  ) as { [survey_id: string]: GsDashboardSurveyListingsEntry[] };
+
   const maxRowsToUpdateInEachRound = 8000;
+
+  chunk(surveyEntries, maxRowsToUpdateInEachRound).map(
+    ($surveyEntries, index) => {
+      const startRow = index * maxRowsToUpdateInEachRound + 2;
+      updateSurveysSheetFormulasAndCalculatedColumns(
+        surveysSheet,
+        $surveyEntries,
+        gsDashboardSurveyListingsEntriesBySurveyId,
+        startRow,
+        $surveyEntries.length
+      );
+    }
+  );
 
   chunk(combinedQuestionEntries, maxRowsToUpdateInEachRound).map(
     ($combinedQuestionEntries, index) => {
@@ -92,6 +136,7 @@ function devUpdateFormulasAndCalculatedColumns() {
         $combinedQuestionEntries,
         combinedToplineEntries,
         importedIgnoQuestionsInfoEntries,
+        gsDashboardSurveyListingsEntriesBySurveyId,
         startRow,
         $combinedQuestionEntries.length
       );
@@ -106,6 +151,7 @@ function devUpdateFormulasAndCalculatedColumns() {
         $combinedToplineEntries,
         combinedQuestionEntries,
         importedIgnoQuestionsInfoEntries,
+        gsDashboardSurveyListingsEntriesBySurveyId,
         startRow,
         $combinedToplineEntries.length
       );

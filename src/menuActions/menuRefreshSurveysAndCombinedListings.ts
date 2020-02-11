@@ -1,6 +1,10 @@
+import groupBy from "lodash/groupBy";
 import intersection from "lodash/intersection";
 import union from "lodash/union";
 import {
+  CombinedQuestionEntry,
+  GsDashboardSurveyListingsEntry,
+  gsDashboardSurveyListingsSheetValueRowToGsDashboardSurveyListingsEntry,
   ImportedIgnoQuestionsInfoEntry,
   importedIgnoQuestionsInfoSheetHeaders,
   importedIgnoQuestionsInfoSheetName,
@@ -10,13 +14,13 @@ import {
   addGsheetConvertedVersionOfExcelFileToFolder,
   fetchAndVerifyCombinedQuestionsSheet,
   fetchAndVerifyCombinedToplineSheet,
+  fetchAndVerifyGsDashboardSurveyListingsSheet,
   fetchAndVerifyImportedIgnoQuestionsInfoSheet,
   fetchAndVerifySurveysSheet,
-  fileNameToSurveyId,
-  getSheetDataIncludingHeaderRow,
   gsheetMimeType,
   updateCombinedQuestionSheetFormulasAndCalculatedColumns,
   updateCombinedToplineSheetFormulasAndCalculatedColumns,
+  updateSurveysSheetFormulasAndCalculatedColumns,
   xlsxMimeType
 } from "./common";
 import { refreshCombinedQuestionsSheetListing } from "./refreshCombinedQuestionsSheetListing";
@@ -147,6 +151,16 @@ function refreshSurveysAndCombinedListings() {
   const importedIgnoQuestionsInfoEntries = importedIgnoQuestionsInfoSheetValues.map(
     importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEntry
   );
+  const {
+    gsDashboardSurveyListingsSheet,
+    gsDashboardSurveyListingsSheetValuesIncludingHeaderRow
+  } = fetchAndVerifyGsDashboardSurveyListingsSheet(activeSpreadsheet);
+  const gsDashboardSurveyListingsSheetValues = gsDashboardSurveyListingsSheetValuesIncludingHeaderRow.slice(
+    1
+  );
+  const gsDashboardSurveyListingsEntries = gsDashboardSurveyListingsSheetValues.map(
+    gsDashboardSurveyListingsSheetValueRowToGsDashboardSurveyListingsEntry
+  );
 
   // Read files in the gs results folder with the name specified in the relevant settings named range
   // (the first found, in case there are many), ensuring that there is a Gsheet version of each uploaded Excel file
@@ -163,10 +177,27 @@ function refreshSurveysAndCombinedListings() {
   const gsResultsFolderGsheetFiles = filesByMimeType[gsheetMimeType];
 
   console.info(`Refreshing survey listing`);
-  const { updatedSurveysSheetValues } = refreshSurveysSheetListing(
+  const { updatedSurveyEntries } = refreshSurveysSheetListing(
     surveysSheet,
     surveysSheetValuesIncludingHeaderRow,
     gsResultsFolderGsheetFiles
+  );
+
+  const gsDashboardSurveyListingsEntriesBySurveyId = groupBy(
+    gsDashboardSurveyListingsEntries,
+    (gsDashboardSurveyListingsEntry: GsDashboardSurveyListingsEntry) =>
+      gsDashboardSurveyListingsEntry.survey_id
+  ) as { [survey_id: string]: GsDashboardSurveyListingsEntry[] };
+
+  console.info(
+    `Updating formulas and calculated columns for the new surveys sheet rows`
+  );
+  updateSurveysSheetFormulasAndCalculatedColumns(
+    combinedQuestionsSheet,
+    updatedSurveyEntries,
+    gsDashboardSurveyListingsEntriesBySurveyId,
+    updatedSurveyEntries.length - updatedSurveyEntries.length + 2,
+    updatedSurveyEntries.length
   );
 
   console.info(`Refreshing combined topline listing`);
@@ -174,7 +205,7 @@ function refreshSurveysAndCombinedListings() {
     updatedCombinedToplineEntries,
     newCombinedToplineEntries
   } = refreshCombinedToplineSheetListing(
-    updatedSurveysSheetValues,
+    updatedSurveyEntries,
     combinedToplineSheet,
     combinedToplineSheetValuesIncludingHeaderRow,
     gsResultsFolderGsheetFiles
@@ -185,7 +216,7 @@ function refreshSurveysAndCombinedListings() {
     updatedCombinedQuestionEntries,
     newCombinedQuestionEntries
   } = refreshCombinedQuestionsSheetListing(
-    updatedSurveysSheetValues,
+    updatedSurveyEntries,
     updatedCombinedToplineEntries,
     combinedQuestionsSheet,
     combinedQuestionsSheetValuesIncludingHeaderRow,
@@ -200,6 +231,7 @@ function refreshSurveysAndCombinedListings() {
     newCombinedQuestionEntries,
     updatedCombinedToplineEntries,
     importedIgnoQuestionsInfoEntries,
+    gsDashboardSurveyListingsEntriesBySurveyId,
     updatedCombinedQuestionEntries.length -
       newCombinedQuestionEntries.length +
       2,
@@ -214,6 +246,7 @@ function refreshSurveysAndCombinedListings() {
     updatedCombinedToplineEntries,
     newCombinedQuestionEntries,
     importedIgnoQuestionsInfoEntries,
+    gsDashboardSurveyListingsEntriesBySurveyId,
     updatedCombinedToplineEntries.length - newCombinedToplineEntries.length + 2,
     newCombinedToplineEntries.length
   );

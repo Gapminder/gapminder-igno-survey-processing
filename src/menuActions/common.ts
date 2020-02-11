@@ -11,9 +11,13 @@ import {
   CombinedToplineEntry,
   combinedToplineSheetHeaders,
   combinedToplineSheetName,
+  GsDashboardSurveyListingsEntry,
+  gsDashboardSurveyListingsSheetHeaders,
+  gsDashboardSurveyListingsSheetName,
   ImportedIgnoQuestionsInfoEntry,
   importedIgnoQuestionsInfoSheetHeaders,
   importedIgnoQuestionsInfoSheetName,
+  SurveyEntry,
   surveysSheetHeaders,
   surveysSheetName
 } from "../gsheetsData/hardcodedConstants";
@@ -347,6 +351,34 @@ export function fetchAndVerifyCombinedToplineSheet(
 /**
  * @hidden
  */
+export function fetchAndVerifyGsDashboardSurveyListingsSheet(
+  activeSpreadsheet: Spreadsheet
+) {
+  const gsDashboardSurveyListingsSheet = activeSpreadsheet.getSheetByName(
+    gsDashboardSurveyListingsSheetName
+  );
+
+  const gsDashboardSurveyListingsSheetValuesIncludingHeaderRow = getSheetDataIncludingHeaderRow(
+    gsDashboardSurveyListingsSheet,
+    gsDashboardSurveyListingsSheetHeaders
+  );
+
+  // Verify that the first headers are as expected
+  assertCorrectLeftmostSheetColumnHeaders(
+    gsDashboardSurveyListingsSheetHeaders,
+    gsDashboardSurveyListingsSheetName,
+    gsDashboardSurveyListingsSheetValuesIncludingHeaderRow
+  );
+
+  return {
+    gsDashboardSurveyListingsSheet,
+    gsDashboardSurveyListingsSheetValuesIncludingHeaderRow
+  };
+}
+
+/**
+ * @hidden
+ */
 export function fetchAndVerifyImportedIgnoQuestionsInfoSheet(
   activeSpreadsheet: Spreadsheet
 ) {
@@ -371,11 +403,100 @@ export function fetchAndVerifyImportedIgnoQuestionsInfoSheet(
 /**
  * @hidden
  */
+export function updateSurveysSheetFormulasAndCalculatedColumns(
+  surveysSheet: Sheet,
+  surveyEntries: SurveyEntry[],
+  gsDashboardSurveyListingsEntriesBySurveyId: {
+    [survey_id: string]: GsDashboardSurveyListingsEntry[];
+  },
+  startRow: number,
+  numRows: number
+) {
+  /* tslint:disable:no-console */
+  if (numRows === 0) {
+    console.info(`No rows to update, skipping`);
+    return;
+  }
+
+  console.info(`Start of updateSurveysSheetFormulasAndCalculatedColumns()`);
+
+  console.info(
+    `Filling formula / calculated value columns for ${numRows} rows`
+  );
+
+  fillColumnWithValues(
+    surveysSheet,
+    surveysSheetHeaders,
+    "Survey Name",
+    rowNumber => {
+      const surveyEntry = surveyEntries[rowNumber - startRow];
+      const gsDashboardSurveyListing = lookupGsDashboardSurveyListing(
+        surveyEntry.file_name.replace("survey-", ""),
+        gsDashboardSurveyListingsEntriesBySurveyId
+      );
+      if (!gsDashboardSurveyListing) {
+        return "(No survey name information found)";
+      }
+      surveyEntry.survey_name = gsDashboardSurveyListing.survey_name_and_link;
+      return surveyEntry.survey_name;
+    },
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    surveysSheet,
+    surveysSheetHeaders,
+    "Sample Size",
+    `=SUBSTITUTE(SUBSTITUTE(VLOOKUP(SUBSTITUTE(G[ROW],"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,3,FALSE),"Complete","")," responses","")`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    surveysSheet,
+    surveysSheetHeaders,
+    "Survey Date",
+    `=VLOOKUP(SUBSTITUTE(G[ROW],"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,4,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    surveysSheet,
+    surveysSheetHeaders,
+    "Number of rows in questions_combo",
+    `=IF(G[ROW]="","",COUNTIF(${combinedQuestionsSheetName}!$A$2:$A, SUBSTITUTE(G[ROW],"survey-","")))`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    surveysSheet,
+    surveysSheetHeaders,
+    "Number of rows in topline_combo",
+    `=IF(G[ROW]="","",COUNTIF(${combinedToplineSheetName}!$A$2:$A, SUBSTITUTE(G[ROW],"survey-","")))`,
+    startRow,
+    numRows
+  );
+
+  console.info(
+    `End of updateCombinedToplineSheetFormulasAndCalculatedColumns()`
+  );
+  /* tslint:enable:no-console */
+}
+
+/**
+ * @hidden
+ */
 export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
   combinedQuestionsSheet,
   combinedQuestionEntries: CombinedQuestionEntry[],
   combinedToplineEntries: CombinedToplineEntry[],
   importedIgnoQuestionsInfoEntries: ImportedIgnoQuestionsInfoEntry[],
+  gsDashboardSurveyListingsEntriesBySurveyId: {
+    [survey_id: string]: GsDashboardSurveyListingsEntry[];
+  },
   startRow: number,
   numRows: number
 ) {
@@ -392,11 +513,24 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
   console.info(
     `Filling formula / calculated value columns for ${numRows} rows`
   );
-  fillColumnWithFormulas(
+  fillColumnWithValues(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Survey Name",
-    `=VLOOKUP("survey-"&A[ROW],{${surveysSheetName}!G$2:G,${surveysSheetName}!A$2:A},2,FALSE)`,
+    rowNumber => {
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      const gsDashboardSurveyListing = lookupGsDashboardSurveyListing(
+        combinedQuestionEntry.survey_id,
+        gsDashboardSurveyListingsEntriesBySurveyId
+      );
+      if (!gsDashboardSurveyListing) {
+        return "(No survey name information found)";
+      }
+      combinedQuestionEntry.survey_name =
+        gsDashboardSurveyListing.survey_name_and_link;
+      return combinedQuestionEntry.survey_name;
+    },
     startRow,
     numRows
   );
@@ -444,8 +578,12 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     rowNumber => {
       const combinedQuestionEntry =
         combinedQuestionEntries[rowNumber - startRow];
-      if (combinedQuestionEntry.survey_name === "#N/A") {
-        return `(No survey name available yet)`;
+      if (
+        combinedQuestionEntry.survey_name === "#N/A" ||
+        combinedQuestionEntry.survey_name === "" ||
+        combinedQuestionEntry.survey_name === "..."
+      ) {
+        return `(No survey name available)`;
       }
       const { worldViewsSurveyBatchNumber } = parseSurveyName(
         combinedQuestionEntry.survey_name
@@ -544,7 +682,11 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     rowNumber => {
       const combinedQuestionEntry =
         combinedQuestionEntries[rowNumber - startRow];
-      if (combinedQuestionEntry.survey_name === "#N/A") {
+      if (
+        combinedQuestionEntry.survey_name === "#N/A" ||
+        combinedQuestionEntry.survey_name === "" ||
+        combinedQuestionEntry.survey_name === "..."
+      ) {
         return `(No survey name available yet)`;
       }
       const { countryViewsSurveyBatchNumber } = parseSurveyName(
@@ -782,6 +924,9 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
   combinedToplineEntries: CombinedToplineEntry[],
   combinedQuestionEntries: CombinedQuestionEntry[],
   importedIgnoQuestionsInfoEntries: ImportedIgnoQuestionsInfoEntry[],
+  gsDashboardSurveyListingsEntriesBySurveyId: {
+    [survey_id: string]: GsDashboardSurveyListingsEntry[];
+  },
   startRow: number,
   numRows: number
 ) {
@@ -797,6 +942,27 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
 
   console.info(
     `Filling formula / calculated value columns for ${numRows} rows`
+  );
+
+  fillColumnWithValues(
+    combinedToplineSheet,
+    combinedToplineSheetHeaders,
+    "Survey Name",
+    rowNumber => {
+      const combinedToplineEntry = combinedToplineEntries[rowNumber - startRow];
+      const gsDashboardSurveyListing = lookupGsDashboardSurveyListing(
+        combinedToplineEntry.survey_id,
+        gsDashboardSurveyListingsEntriesBySurveyId
+      );
+      if (!gsDashboardSurveyListing) {
+        return "(No survey name information found)";
+      }
+      combinedToplineEntry.survey_name =
+        gsDashboardSurveyListing.survey_name_and_link;
+      return combinedToplineEntry.survey_name;
+    },
+    startRow,
+    numRows
   );
 
   console.info(`Creating lookup indices`);
@@ -919,15 +1085,6 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
     numRows
   );
 
-  fillColumnWithFormulas(
-    combinedToplineSheet,
-    combinedToplineSheetHeaders,
-    "Survey Name",
-    `=VLOOKUP("survey-"&A[ROW],{${surveysSheetName}!G$2:G,${surveysSheetName}!A$2:A},2,FALSE)`,
-    startRow,
-    numRows
-  );
-
   console.info(
     `End of updateCombinedToplineSheetFormulasAndCalculatedColumns()`
   );
@@ -955,4 +1112,24 @@ const combineSurveyIdAndQuestionNumber = (
   }
   /* tslint:enable:no-console */
   return `${combinedEntry.survey_id}-${combinedEntry.question_number}`;
+};
+
+/**
+ * @hidden
+ */
+export const lookupGsDashboardSurveyListing = (
+  surveyId,
+  gsDashboardSurveyListingsEntriesBySurveyId: {
+    [survey_id: string]: GsDashboardSurveyListingsEntry[];
+  }
+) => {
+  const matchingGsDashboardSurveyListingsEntries =
+    gsDashboardSurveyListingsEntriesBySurveyId[surveyId];
+  if (
+    !matchingGsDashboardSurveyListingsEntries ||
+    matchingGsDashboardSurveyListingsEntries.length === 0
+  ) {
+    return false;
+  }
+  return matchingGsDashboardSurveyListingsEntries[0];
 };

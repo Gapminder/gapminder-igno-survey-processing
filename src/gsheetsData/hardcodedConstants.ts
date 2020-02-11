@@ -204,6 +204,19 @@ export interface CombinedToplineEntry {
 /**
  * @hidden
  */
+export interface GsDashboardSurveyListingsEntry {
+  survey_id: any;
+  survey_name_and_link: any;
+  status: any;
+  created: any;
+  last_run: any;
+  next_run: any;
+  url: any;
+}
+
+/**
+ * @hidden
+ */
 export interface ImportedIgnoQuestionsInfoEntry {
   igno_index_question_id: any;
   igno_index_world_views_survey_batch_number: any;
@@ -423,6 +436,23 @@ export const combinedToplineEntryToCombinedToplineSheetValueRow = (
   combinedToplineEntry.metadata,
   combinedToplineEntry.weighted_by
 ];
+
+/**
+ * @hidden
+ */
+export const gsDashboardSurveyListingsSheetValueRowToGsDashboardSurveyListingsEntry = (
+  gsDashboardSurveyListingsSheetRow: any[]
+): GsDashboardSurveyListingsEntry => {
+  return {
+    survey_id: gsDashboardSurveyListingsSheetRow[0],
+    survey_name_and_link: gsDashboardSurveyListingsSheetRow[1],
+    status: gsDashboardSurveyListingsSheetRow[2],
+    created: gsDashboardSurveyListingsSheetRow[3],
+    last_run: gsDashboardSurveyListingsSheetRow[4],
+    next_run: gsDashboardSurveyListingsSheetRow[5],
+    url: gsDashboardSurveyListingsSheetRow[6]
+  };
+};
 
 /**
  * @hidden

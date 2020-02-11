@@ -103,54 +103,5 @@ export function refreshSurveysSheetListing(
     surveysSheetValuesIncludingHeaderRow[0].length
   );
 
-  const surveysSheetValueRowsCount = updatedSurveysSheetValues.length;
-
-  console.info(`Filling formula columns`);
-  /* tslint:enable:no-console */
-  fillColumnWithFormulas(
-    surveysSheet,
-    surveysSheetHeaders,
-    "Survey Name",
-    `=VLOOKUP(SUBSTITUTE(G[ROW],"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,2,FALSE)`,
-    2,
-    surveysSheetValueRowsCount
-  );
-
-  fillColumnWithFormulas(
-    surveysSheet,
-    surveysSheetHeaders,
-    "Sample Size",
-    `=SUBSTITUTE(SUBSTITUTE(VLOOKUP(SUBSTITUTE(G[ROW],"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,3,FALSE),"Complete","")," responses","")`,
-    2,
-    surveysSheetValueRowsCount
-  );
-
-  fillColumnWithFormulas(
-    surveysSheet,
-    surveysSheetHeaders,
-    "Survey Date",
-    `=VLOOKUP(SUBSTITUTE(G[ROW],"survey-",""),gs_dashboard_surveys_listing!$A$2:$G,4,FALSE)`,
-    2,
-    surveysSheetValueRowsCount
-  );
-
-  fillColumnWithFormulas(
-    surveysSheet,
-    surveysSheetHeaders,
-    "Number of rows in questions_combo",
-    `=IF(G[ROW]="","",COUNTIF(${combinedQuestionsSheetName}!$A$2:$A, SUBSTITUTE(G[ROW],"survey-","")))`,
-    2,
-    surveysSheetValueRowsCount
-  );
-
-  fillColumnWithFormulas(
-    surveysSheet,
-    surveysSheetHeaders,
-    "Number of rows in topline_combo",
-    `=IF(G[ROW]="","",COUNTIF(${combinedToplineSheetName}!$A$2:$A, SUBSTITUTE(G[ROW],"survey-","")))`,
-    2,
-    surveysSheetValueRowsCount
-  );
-
-  return { updatedSurveysSheetValues };
+  return { updatedSurveyEntries };
 }

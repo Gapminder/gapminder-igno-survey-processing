@@ -5,6 +5,7 @@ import {
 import {
   assertCorrectLeftmostSheetColumnHeaders,
   ensuredColumnIndex,
+  fetchAndVerifyGsDashboardSurveyListingsSheet,
   getColumnValuesRange,
   getSheetDataIncludingHeaderRow
 } from "./common";
@@ -49,21 +50,11 @@ function extractSurveyIdsFromCopyPastedLinkedSurveyNames() {
 
   console.info(`Fetching and verifying existing worksheets`);
   const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  const gsDashboardSurveyListingsSheet = activeSpreadsheet.getSheetByName(
-    gsDashboardSurveyListingsSheetName
-  );
 
-  const gsDashboardSurveyListingsSheetValuesIncludingHeaderRow = getSheetDataIncludingHeaderRow(
+  const {
     gsDashboardSurveyListingsSheet,
-    gsDashboardSurveyListingsSheetHeaders
-  );
-
-  // Verify that the first headers are as expected
-  assertCorrectLeftmostSheetColumnHeaders(
-    gsDashboardSurveyListingsSheetHeaders,
-    gsDashboardSurveyListingsSheetName,
     gsDashboardSurveyListingsSheetValuesIncludingHeaderRow
-  );
+  } = fetchAndVerifyGsDashboardSurveyListingsSheet(activeSpreadsheet);
 
   console.info(`Refreshing GS Dashboard survey listing sheet`);
   refreshGsDashboardSurveyListingsSheetListing(

@@ -8,12 +8,11 @@ import {
   combinedQuestionsSheetHeaders,
   combinedQuestionsSheetValueRowToCombinedQuestionEntry,
   CombinedToplineEntry,
-  combinedToplineSheetValueRowToCombinedToplineEntry,
   overviewSheetValueRowToQuestionEntry,
   QuestionEntry,
   questionEntryToCombinedQuestionSheetValueRow,
   questionEntryToCombinedQuestionsSheetValueRow,
-  surveysSheetValueRowToSurveyEntry
+  SurveyEntry
 } from "../gsheetsData/hardcodedConstants";
 import {
   adjustSheetRowsAndColumnsCount,
@@ -25,7 +24,7 @@ import {
  * @hidden
  */
 export function refreshCombinedQuestionsSheetListing(
-  updatedSurveysSheetValues: any[][],
+  updatedSurveyEntries: SurveyEntry[],
   updatedCombinedToplineEntries: CombinedToplineEntry[],
   combinedQuestionsSheet: Sheet,
   combinedQuestionsSheetValuesIncludingHeaderRow: any[][],
@@ -42,13 +41,10 @@ export function refreshCombinedQuestionsSheetListing(
   const combinedQuestionsSheetValues = combinedQuestionsSheetValuesIncludingHeaderRow.slice(
     1
   );
-  const existingSurveyEntries = updatedSurveysSheetValues.map(
-    surveysSheetValueRowToSurveyEntry
-  );
   const existingQuestionEntries = combinedQuestionsSheetValues.map(
     combinedQuestionsSheetValueRowToCombinedQuestionEntry
   );
-  const existingSurveysSurveyIds = existingSurveyEntries.map(
+  const existingSurveysSurveyIds = updatedSurveyEntries.map(
     existingSurveyEntry => fileNameToSurveyId(existingSurveyEntry.file_name)
   );
   const existingQuestionSurveyIds = union(
