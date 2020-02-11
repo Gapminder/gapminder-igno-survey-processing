@@ -889,8 +889,12 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
         factualAnswer
       );
 
-      // Update the actual x markings if no correct answers had been marked previously
-      if (correspondingCombinedQuestionEntry.correct_answers === "#N/A") {
+      // Update the actual x markings if no correct answers had been marked previously, which is true
+      // if the formula yields "#N/A" or if it is for a newly added row ("...")
+      if (
+        correspondingCombinedQuestionEntry.correct_answers === "#N/A" ||
+        correspondingCombinedQuestionEntry.correct_answers === "..."
+      ) {
         combinedToplineEntry.x_marks_correct_answers = autoMarkedAsCorrect
           ? "x"
           : "";
