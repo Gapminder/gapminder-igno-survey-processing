@@ -15,7 +15,7 @@
 
 ▸ **menuDevUpdateFormulasAndCalculatedColumns**(): *void*
 
-*Defined in [menuActions/menuDevUpdateFormulasAndCalculatedColumns.ts:25](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.3.0/src/menuActions/menuDevUpdateFormulasAndCalculatedColumns.ts#L25)*
+*Defined in [menuActions/menuDevUpdateFormulasAndCalculatedColumns.ts:25](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.4.0/src/menuActions/menuDevUpdateFormulasAndCalculatedColumns.ts#L25)*
 
 Menu item action for "Gapminder Igno Survey Process -> (For developer use only) Update formulas and calculated columns"
 
@@ -27,7 +27,7 @@ ___
 
 ▸ **menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames**(): *void*
 
-*Defined in [menuActions/menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames.ts:16](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.3.0/src/menuActions/menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames.ts#L16)*
+*Defined in [menuActions/menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames.ts:16](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.4.0/src/menuActions/menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames.ts#L16)*
 
 Menu item action for "Gapminder Igno Survey Process -> Extract Survey IDs from copy-pasted linked survey names"
 
@@ -39,7 +39,7 @@ ___
 
 ▸ **menuRefreshSurveysAndCombinedListings**(): *void*
 
-*Defined in [menuActions/menuRefreshSurveysAndCombinedListings.ts:35](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.3.0/src/menuActions/menuRefreshSurveysAndCombinedListings.ts#L35)*
+*Defined in [menuActions/menuRefreshSurveysAndCombinedListings.ts:35](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.4.0/src/menuActions/menuRefreshSurveysAndCombinedListings.ts#L35)*
 
 Menu item action for "Gapminder Igno Survey Process -> Refresh surveys and combined topline listings"
 

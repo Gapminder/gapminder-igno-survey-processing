@@ -1,6 +1,6 @@
 {
   "name": "gapminder-igno-survey-process-scripts",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Gapminder Igno Survey Process Scripts for specific Google Spreadsheets",
   "main": "src/index.js",
   "dependencies": {
