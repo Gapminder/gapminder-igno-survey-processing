@@ -3,9 +3,9 @@ import intersection from "lodash/intersection";
 import union from "lodash/union";
 import {
   GsDashboardSurveyListingsEntry,
-  gsDashboardSurveyListingsSheetValueRowToGsDashboardSurveyListingsEntry,
-  importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEntry
-} from "../gsheetsData/hardcodedConstants";
+  gsDashboardSurveyListingsSheetValueRowToGsDashboardSurveyListingsEntry
+} from "../gsheetsData/gsDashboardSurveyListingsSheet";
+import { importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEntry } from "../gsheetsData/importedIgnoQuestionsInfoSheet";
 import {
   addGsheetConvertedVersionOfExcelFileToFolder,
   fetchAndVerifyCombinedQuestionsSheet,

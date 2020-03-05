@@ -7,20 +7,28 @@ import groupBy from "lodash/groupBy";
 import {
   CombinedQuestionEntry,
   combinedQuestionsSheetHeaders,
-  combinedQuestionsSheetName,
+  combinedQuestionsSheetName
+} from "../gsheetsData/combinedQuestionsSheet";
+import {
   CombinedToplineEntry,
   combinedToplineSheetHeaders,
-  combinedToplineSheetName,
+  combinedToplineSheetName
+} from "../gsheetsData/combinedToplineSheet";
+import {
   GsDashboardSurveyListingsEntry,
   gsDashboardSurveyListingsSheetHeaders,
-  gsDashboardSurveyListingsSheetName,
+  gsDashboardSurveyListingsSheetName
+} from "../gsheetsData/gsDashboardSurveyListingsSheet";
+import {
   ImportedIgnoQuestionsInfoEntry,
   importedIgnoQuestionsInfoSheetHeaders,
-  importedIgnoQuestionsInfoSheetName,
+  importedIgnoQuestionsInfoSheetName
+} from "../gsheetsData/importedIgnoQuestionsInfoSheet";
+import {
   SurveyEntry,
   surveysSheetHeaders,
   surveysSheetName
-} from "../gsheetsData/hardcodedConstants";
+} from "../gsheetsData/surveysSheet";
 import { answerOptionMatchesFactualAnswer } from "../lib/answerOptionMatchesFactualAnswer";
 import { removeEmptyRowsAtTheEnd } from "../lib/cleanInputRange";
 import { parseSurveyName } from "../lib/parseSurveyName";

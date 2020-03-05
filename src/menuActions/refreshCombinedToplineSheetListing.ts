@@ -2,16 +2,17 @@ import difference from "lodash/difference";
 import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 import File = GoogleAppsScript.Drive.File;
 import union from "lodash/union";
+
 import {
   CombinedToplineEntry,
   combinedToplineSheetHeaders,
   combinedToplineSheetValueRowToCombinedToplineEntry,
-  GsDashboardSurveyListingsEntry,
-  SurveyEntry,
   ToplineEntry,
   toplineEntryToCombinedToplineSheetValueRow,
   toplineSheetValueRowToToplineEntry
-} from "../gsheetsData/hardcodedConstants";
+} from "../gsheetsData/combinedToplineSheet";
+import { GsDashboardSurveyListingsEntry } from "../gsheetsData/gsDashboardSurveyListingsSheet";
+import { SurveyEntry } from "../gsheetsData/surveysSheet";
 import {
   adjustSheetRowsAndColumnsCount,
   fileNameToSurveyId,

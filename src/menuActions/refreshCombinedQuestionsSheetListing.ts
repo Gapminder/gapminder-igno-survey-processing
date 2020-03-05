@@ -6,13 +6,13 @@ import {
   CombinedQuestionEntry,
   combinedQuestionsSheetHeaders,
   combinedQuestionsSheetValueRowToCombinedQuestionEntry,
-  CombinedToplineEntry,
-  GsDashboardSurveyListingsEntry,
   overviewSheetValueRowToQuestionEntry,
   QuestionEntry,
-  questionEntryToCombinedQuestionSheetValueRow,
-  SurveyEntry
-} from "../gsheetsData/hardcodedConstants";
+  questionEntryToCombinedQuestionSheetValueRow
+} from "../gsheetsData/combinedQuestionsSheet";
+import { CombinedToplineEntry } from "../gsheetsData/combinedToplineSheet";
+import { GsDashboardSurveyListingsEntry } from "../gsheetsData/gsDashboardSurveyListingsSheet";
+import { SurveyEntry } from "../gsheetsData/surveysSheet";
 import {
   adjustSheetRowsAndColumnsCount,
   fileNameToSurveyId,
