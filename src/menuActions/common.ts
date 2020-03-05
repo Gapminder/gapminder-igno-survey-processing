@@ -1022,7 +1022,7 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
         }
         factualAnswer =
           correspondingImportedIgnoQuestionsInfoEntries[0]
-            .answer_to_igno_index_question;
+            .igno_index_question_correct_answer;
       } else if (
         correspondingCombinedQuestionEntry.foreign_country_igno_question_id &&
         correspondingCombinedQuestionEntry.foreign_country_igno_question_id.trim() !==
@@ -1040,7 +1040,7 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
         }
         factualAnswer =
           correspondingImportedIgnoQuestionsInfoEntries[0]
-            .answer_to_foreign_country_igno_question;
+            .foreign_country_igno_question_correct_answer;
       } else {
         return `(Question ID not mapped)`;
       }

@@ -114,10 +114,14 @@ export const importedIgnoQuestionsInfoSheetHeaders = [
   "Igno Question World Views Survey Batch Number",
   "Igno Question",
   "Igno Question Correct Answer",
+  "Igno Question Answer Options",
+  "Igno Question Very Wrong Answer",
   "Foreign Country Question ID",
   "Foreign Country Country Views Survey Batch Number",
   "Foreign Country Question",
-  "Foreign Country Question Correct Answer"
+  "Foreign Country Question Correct Answer",
+  "Foreign Country Question Answer Options",
+  "Foreign Country Question Very Wrong Answer"
 ];
 
 /**
@@ -158,9 +162,9 @@ export interface CombinedQuestionEntry {
   foreign_country_igno_question_id: any;
   auto_mapped_foreign_country_igno_question_id: any;
   igno_index_question: any;
-  answer_to_igno_index_question: any;
+  igno_index_question_correct_answer: any;
   foreign_country_igno_question: any;
-  answer_to_foreign_country_igno_question: any;
+  foreign_country_igno_question_correct_answer: any;
   // winning_answer: any; // Ignoring this column since it is confusing next to the others
   response_count: any;
   the_answer_options: any;
@@ -221,11 +225,15 @@ export interface ImportedIgnoQuestionsInfoEntry {
   igno_index_question_id: any;
   igno_index_world_views_survey_batch_number: any;
   igno_index_question: any;
-  answer_to_igno_index_question: any;
+  igno_index_question_correct_answer: any;
+  igno_index_question_answer_options: any;
+  igno_index_question_very_wrong_answer: any;
   foreign_country_igno_question_id: any;
   foreign_country_country_views_survey_batch_number: any;
   foreign_country_igno_question: any;
-  answer_to_foreign_country_igno_question: any;
+  foreign_country_igno_question_correct_answer: any;
+  foreign_country_igno_question_answer_options: any;
+  foreign_country_igno_question_very_wrong_answer: any;
 }
 
 /**
@@ -290,11 +298,11 @@ export const questionEntryToCombinedQuestionSheetValueRow = (
   "", // igno_index_question_id blank on new rows
   "", // auto_mapped_igno_index_question_id blank on new rows
   "", // foreign_country_igno_question_id blank on new rows
-  "", // answer_to_foreign_country_igno_question blank on new rows
+  "", // auto_mapped_foreign_country_igno_question_id blank on new rows
   "...", // igno_index_question formula
-  "...", // answer_to_igno_index_question formula
+  "...", // igno_index_question_correct_answer formula
   "...", // foreign_country_igno_question formula
-  "...", // answer_to_foreign_country_igno_question formula
+  "...", // foreign_country_igno_question_correct_answer formula
   // questionEntry.winning_answer, // Ignoring this column since it is confusing next to the others
   questionEntry.response_count,
   "...", // the_answer_options formula
@@ -322,9 +330,9 @@ export const combinedQuestionsSheetValueRowToCombinedQuestionEntry = (
     foreign_country_igno_question_id: combinedQuestionsSheetRow[6],
     auto_mapped_foreign_country_igno_question_id: combinedQuestionsSheetRow[7],
     igno_index_question: combinedQuestionsSheetRow[8],
-    answer_to_igno_index_question: combinedQuestionsSheetRow[9],
+    igno_index_question_correct_answer: combinedQuestionsSheetRow[9],
     foreign_country_igno_question: combinedQuestionsSheetRow[10],
-    answer_to_foreign_country_igno_question: combinedQuestionsSheetRow[11],
+    foreign_country_igno_question_correct_answer: combinedQuestionsSheetRow[11],
     // winning_answer: combinedQuestionsSheetRow[12], // Ignoring this column since it is confusing next to the others
     response_count: combinedQuestionsSheetRow[12],
     the_answer_options: combinedQuestionsSheetRow[13],
@@ -351,9 +359,9 @@ export const questionEntryToCombinedQuestionsSheetValueRow = questionEntry => [
   questionEntry.foreign_country_igno_question_id,
   questionEntry.auto_mapped_foreign_country_igno_question_id,
   "...", // igno_index_question formula
-  "...", // answer_to_igno_index_question formula
+  "...", // igno_index_question_correct_answer formula
   "...", // foreign_country_igno_question formula
-  "...", // answer_to_foreign_country_igno_question formula
+  "...", // foreign_country_igno_question_correct_answer formula
   // questionEntry.winning_answer, // Ignoring this column since it is confusing next to the others
   questionEntry.response_count,
   "...", // the_answer_options formula
@@ -465,13 +473,19 @@ export const importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEn
     igno_index_world_views_survey_batch_number:
       importedIgnoQuestionsInfoSheetRow[1],
     igno_index_question: importedIgnoQuestionsInfoSheetRow[2],
-    answer_to_igno_index_question: importedIgnoQuestionsInfoSheetRow[3],
-    foreign_country_igno_question_id: importedIgnoQuestionsInfoSheetRow[4],
+    igno_index_question_correct_answer: importedIgnoQuestionsInfoSheetRow[3],
+    igno_index_question_answer_options: importedIgnoQuestionsInfoSheetRow[4],
+    igno_index_question_very_wrong_answer: importedIgnoQuestionsInfoSheetRow[5],
+    foreign_country_igno_question_id: importedIgnoQuestionsInfoSheetRow[6],
     foreign_country_country_views_survey_batch_number:
-      importedIgnoQuestionsInfoSheetRow[5],
-    foreign_country_igno_question: importedIgnoQuestionsInfoSheetRow[6],
-    answer_to_foreign_country_igno_question:
-      importedIgnoQuestionsInfoSheetRow[7]
+      importedIgnoQuestionsInfoSheetRow[7],
+    foreign_country_igno_question: importedIgnoQuestionsInfoSheetRow[8],
+    foreign_country_igno_question_correct_answer:
+      importedIgnoQuestionsInfoSheetRow[9],
+    foreign_country_igno_question_answer_options:
+      importedIgnoQuestionsInfoSheetRow[10],
+    foreign_country_igno_question_very_wrong_answer:
+      importedIgnoQuestionsInfoSheetRow[11]
   };
 };
 
@@ -485,10 +499,14 @@ export const importedIgnoQuestionsInfoEntryToImportedIgnoQuestionsInfoSheetValue
   importedIgnoQuestionsInfoEntry.igno_index_question_id,
   importedIgnoQuestionsInfoEntry.igno_index_world_views_survey_batch_number,
   importedIgnoQuestionsInfoEntry.igno_index_question,
-  importedIgnoQuestionsInfoEntry.answer_to_igno_index_question,
+  importedIgnoQuestionsInfoEntry.igno_index_question_correct_answer,
+  importedIgnoQuestionsInfoEntry.igno_index_question_answer_options,
+  importedIgnoQuestionsInfoEntry.igno_index_question_very_wrong_answer,
   importedIgnoQuestionsInfoEntry.foreign_country_igno_question_id,
   importedIgnoQuestionsInfoEntry.foreign_country_country_views_survey_batch_number,
   importedIgnoQuestionsInfoEntry.foreign_country_igno_question,
-  importedIgnoQuestionsInfoEntry.answer_to_foreign_country_igno_question
+  importedIgnoQuestionsInfoEntry.foreign_country_igno_question_correct_answer,
+  importedIgnoQuestionsInfoEntry.foreign_country_igno_question_answer_options,
+  importedIgnoQuestionsInfoEntry.foreign_country_igno_question_very_wrong_answer
 ];
 */
