@@ -4,6 +4,12 @@ import File = GoogleAppsScript.Drive.File;
 import union from "lodash/union";
 
 import {
+  adjustSheetRowsAndColumnsCount,
+  fileNameToSurveyId,
+  lookupGsDashboardSurveyListing,
+  openSpreadsheetByIdAtMostOncePerScriptRun
+} from "../common";
+import {
   CombinedToplineEntry,
   combinedToplineSheetHeaders,
   combinedToplineSheetValueRowToCombinedToplineEntry,
@@ -13,12 +19,6 @@ import {
 } from "../gsheetsData/combinedToplineSheet";
 import { GsDashboardSurveyListingsEntry } from "../gsheetsData/gsDashboardSurveyListingsSheet";
 import { SurveyEntry } from "../gsheetsData/surveysSheet";
-import {
-  adjustSheetRowsAndColumnsCount,
-  fileNameToSurveyId,
-  lookupGsDashboardSurveyListing,
-  openSpreadsheetByIdAtMostOncePerScriptRun
-} from "./common";
 
 /**
  * @hidden

@@ -1,14 +1,11 @@
 import Spreadsheet = GoogleAppsScript.Spreadsheet.Spreadsheet;
 import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
+import { ensuredColumnIndex, getColumnValuesRange } from "../common";
 import {
+  fetchAndVerifyGsDashboardSurveyListingsSheet,
   gsDashboardSurveyListingsSheetHeaders,
   gsDashboardSurveyListingsSheetName
 } from "../gsheetsData/gsDashboardSurveyListingsSheet";
-import {
-  ensuredColumnIndex,
-  fetchAndVerifyGsDashboardSurveyListingsSheet,
-  getColumnValuesRange
-} from "./common";
 
 /**
  * Menu item action for "Gapminder Igno Survey Process -> Extract Survey IDs from copy-pasted linked survey names"

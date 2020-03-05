@@ -1,23 +1,29 @@
 import { chunk } from "lodash";
 import groupBy from "lodash/groupBy";
-import { combinedQuestionsSheetValueRowToCombinedQuestionEntry } from "../gsheetsData/combinedQuestionsSheet";
-import { combinedToplineSheetValueRowToCombinedToplineEntry } from "../gsheetsData/combinedToplineSheet";
 import {
+  combinedQuestionsSheetValueRowToCombinedQuestionEntry,
+  fetchAndVerifyCombinedQuestionsSheet,
+  updateCombinedQuestionSheetFormulasAndCalculatedColumns
+} from "../gsheetsData/combinedQuestionsSheet";
+import {
+  combinedToplineSheetValueRowToCombinedToplineEntry,
+  fetchAndVerifyCombinedToplineSheet,
+  updateCombinedToplineSheetFormulasAndCalculatedColumns
+} from "../gsheetsData/combinedToplineSheet";
+import {
+  fetchAndVerifyGsDashboardSurveyListingsSheet,
   GsDashboardSurveyListingsEntry,
   gsDashboardSurveyListingsSheetValueRowToGsDashboardSurveyListingsEntry
 } from "../gsheetsData/gsDashboardSurveyListingsSheet";
-import { importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEntry } from "../gsheetsData/importedIgnoQuestionsInfoSheet";
-import { surveysSheetValueRowToSurveyEntry } from "../gsheetsData/surveysSheet";
 import {
-  fetchAndVerifyCombinedQuestionsSheet,
-  fetchAndVerifyCombinedToplineSheet,
-  fetchAndVerifyGsDashboardSurveyListingsSheet,
   fetchAndVerifyImportedIgnoQuestionsInfoSheet,
+  importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEntry
+} from "../gsheetsData/importedIgnoQuestionsInfoSheet";
+import {
   fetchAndVerifySurveysSheet,
-  updateCombinedQuestionSheetFormulasAndCalculatedColumns,
-  updateCombinedToplineSheetFormulasAndCalculatedColumns,
+  surveysSheetValueRowToSurveyEntry,
   updateSurveysSheetFormulasAndCalculatedColumns
-} from "./common";
+} from "../gsheetsData/surveysSheet";
 
 /**
  * Menu item action for "Gapminder Igno Survey Process -> (For developer use only) Update formulas and calculated columns"

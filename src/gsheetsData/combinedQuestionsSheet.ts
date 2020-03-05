@@ -4,6 +4,25 @@
  */
 /* tslint:disable:object-literal-sort-keys */
 
+import groupBy from "lodash/groupBy";
+import {
+  assertCorrectLeftmostSheetColumnHeaders,
+  combineSurveyIdAndQuestionNumber,
+  createSheet,
+  fillColumnWithFormulas,
+  fillColumnWithValues,
+  getSheetDataIncludingHeaderRow,
+  lookupGsDashboardSurveyListing
+} from "../common";
+import { parseSurveyName } from "../lib/parseSurveyName";
+import Spreadsheet = GoogleAppsScript.Spreadsheet.Spreadsheet;
+import { CombinedToplineEntry } from "./combinedToplineSheet";
+import { GsDashboardSurveyListingsEntry } from "./gsDashboardSurveyListingsSheet";
+import {
+  ImportedIgnoQuestionsInfoEntry,
+  importedIgnoQuestionsInfoSheetName
+} from "./importedIgnoQuestionsInfoSheet";
+
 /**
  * @hidden
  */
@@ -176,3 +195,465 @@ export const questionEntryToCombinedQuestionsSheetValueRow = questionEntry => [
   "...", // amount_of_answer_options formula
   "..." // percent_that_would_have_answered_correctly_in_an_abc_type_question formula
 ];
+
+/**
+ * @hidden
+ */
+export function fetchAndVerifyCombinedQuestionsSheet(
+  activeSpreadsheet: Spreadsheet
+) {
+  let combinedQuestionsSheet = activeSpreadsheet.getSheetByName(
+    combinedQuestionsSheetName
+  );
+  if (combinedQuestionsSheet === null) {
+    combinedQuestionsSheet = createSheet(
+      activeSpreadsheet,
+      combinedQuestionsSheetName,
+      combinedQuestionsSheetHeaders
+    );
+  }
+  const combinedQuestionsSheetValuesIncludingHeaderRow = getSheetDataIncludingHeaderRow(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders
+  );
+  // Verify that the first headers are as expected
+  assertCorrectLeftmostSheetColumnHeaders(
+    combinedQuestionsSheetHeaders,
+    combinedQuestionsSheetName,
+    combinedQuestionsSheetValuesIncludingHeaderRow
+  );
+  return {
+    combinedQuestionsSheet,
+    combinedQuestionsSheetValuesIncludingHeaderRow
+  };
+}
+
+/**
+ * @hidden
+ */
+export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
+  combinedQuestionsSheet,
+  combinedQuestionEntries: CombinedQuestionEntry[],
+  combinedToplineEntries: CombinedToplineEntry[],
+  importedIgnoQuestionsInfoEntries: ImportedIgnoQuestionsInfoEntry[],
+  gsDashboardSurveyListingsEntriesBySurveyId: {
+    [survey_id: string]: GsDashboardSurveyListingsEntry[];
+  },
+  startRow: number,
+  numRows: number
+) {
+  /* tslint:disable:no-console */
+  if (numRows === 0) {
+    console.info(`No rows to update, skipping`);
+    return;
+  }
+
+  console.info(
+    `Start of updateCombinedQuestionSheetFormulasAndCalculatedColumns()`
+  );
+
+  console.info(
+    `Filling formula / calculated value columns for ${numRows} rows`
+  );
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Survey Name",
+    rowNumber => {
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      const gsDashboardSurveyListing = lookupGsDashboardSurveyListing(
+        combinedQuestionEntry.survey_id,
+        gsDashboardSurveyListingsEntriesBySurveyId
+      );
+      if (!gsDashboardSurveyListing) {
+        return "(No survey name information found)";
+      }
+      combinedQuestionEntry.survey_name =
+        gsDashboardSurveyListing.survey_name_and_link;
+      return combinedQuestionEntry.survey_name;
+    },
+    startRow,
+    numRows
+  );
+
+  console.info(
+    `Creating igno_index_world_views_survey_batch_number+igno_index_question lookup index`
+  );
+  const importedIgnoQuestionsInfoEntryIgnoIndexMatchKey = (
+    importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry
+  ) => {
+    if (
+      !importedIgnoQuestionsInfoEntry.igno_index_world_views_survey_batch_number
+    ) {
+      console.log(
+        "The entry did not have igno_index_world_views_survey_batch_number set",
+        {
+          importedIgnoQuestionsInfoEntry
+        }
+      );
+      throw new Error(
+        "The entry did not have igno_index_world_views_survey_batch_number set"
+      );
+    }
+    if (!importedIgnoQuestionsInfoEntry.igno_index_question) {
+      console.log("The entry did not have igno_index_question set", {
+        importedIgnoQuestionsInfoEntry
+      });
+      throw new Error("The entry did not have igno_index_question set");
+    }
+    return `${importedIgnoQuestionsInfoEntry.igno_index_world_views_survey_batch_number.trim()}-${importedIgnoQuestionsInfoEntry.igno_index_question.trim()}`;
+  };
+  const importedIgnoQuestionsInfoEntryIgnoIndexLookupIndex = groupBy(
+    importedIgnoQuestionsInfoEntries.filter(
+      (importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry) =>
+        !!importedIgnoQuestionsInfoEntry.igno_index_world_views_survey_batch_number &&
+        !!importedIgnoQuestionsInfoEntry.igno_index_question
+    ),
+    importedIgnoQuestionsInfoEntryIgnoIndexMatchKey
+  );
+
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Auto-mapped Igno Index Question ID",
+    rowNumber => {
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      if (
+        combinedQuestionEntry.survey_name === "#N/A" ||
+        combinedQuestionEntry.survey_name === "" ||
+        combinedQuestionEntry.survey_name === "..."
+      ) {
+        return `(No survey name available)`;
+      }
+      const { worldViewsSurveyBatchNumber } = parseSurveyName(
+        combinedQuestionEntry.survey_name
+      );
+      if (worldViewsSurveyBatchNumber === false) {
+        return `n/a`;
+      }
+      if (worldViewsSurveyBatchNumber === null) {
+        return `(No world views batch number found in survey name "${combinedQuestionEntry.survey_name}")`;
+      }
+      const matchingImportedIgnoQuestionsInfoEntries =
+        importedIgnoQuestionsInfoEntryIgnoIndexLookupIndex[
+          combinedQuestionEntry.question_text.trim()
+        ];
+      if (
+        !matchingImportedIgnoQuestionsInfoEntries ||
+        matchingImportedIgnoQuestionsInfoEntries.length === 0
+      ) {
+        return `(No identical questions within batch ${worldViewsSurveyBatchNumber} found)`;
+      }
+      const autoMappedId = matchingImportedIgnoQuestionsInfoEntries
+        .map(
+          (importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry) =>
+            importedIgnoQuestionsInfoEntry.igno_index_question_id
+        )
+        .join("; ");
+      // Also set the igno_index_question_id if not already set
+      if (
+        matchingImportedIgnoQuestionsInfoEntries.length === 1 &&
+        combinedQuestionEntry.igno_index_question_id.trim() === ""
+      ) {
+        combinedQuestionEntry.igno_index_question_id = autoMappedId;
+      }
+      return autoMappedId;
+    },
+    startRow,
+    numRows
+  );
+
+  // Write values of combinedQuestionEntry.igno_index_question_id which we effected above
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Igno Index Question ID",
+    rowNumber => {
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      return combinedQuestionEntry.igno_index_question_id;
+    },
+    startRow,
+    numRows
+  );
+
+  console.info(
+    `Creating foreign_country_country_views_survey_batch_number+foreign_country_igno_question lookup index`
+  );
+  const importedIgnoQuestionsInfoEntryForeignCountryIgnoIndexMatchKey = (
+    importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry
+  ) => {
+    if (
+      !importedIgnoQuestionsInfoEntry.foreign_country_country_views_survey_batch_number
+    ) {
+      console.log(
+        "The entry did not have foreign_country_country_views_survey_batch_number set",
+        {
+          importedIgnoQuestionsInfoEntry
+        }
+      );
+      throw new Error(
+        "The entry did not have foreign_country_country_views_survey_batch_number set"
+      );
+    }
+    if (!importedIgnoQuestionsInfoEntry.foreign_country_igno_question) {
+      console.log("The entry did not have foreign_country_igno_question set", {
+        importedIgnoQuestionsInfoEntry
+      });
+      throw new Error(
+        "The entry did not have foreign_country_igno_question set"
+      );
+    }
+    return `${importedIgnoQuestionsInfoEntry.foreign_country_country_views_survey_batch_number.trim()}-${importedIgnoQuestionsInfoEntry.foreign_country_igno_question.trim()}`;
+  };
+  const importedIgnoQuestionsInfoEntryForeignCountryIgnoIndexLookupIndex = groupBy(
+    importedIgnoQuestionsInfoEntries.filter(
+      (importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry) =>
+        !!importedIgnoQuestionsInfoEntry.foreign_country_country_views_survey_batch_number &&
+        !!importedIgnoQuestionsInfoEntry.foreign_country_igno_question
+    ),
+    importedIgnoQuestionsInfoEntryForeignCountryIgnoIndexMatchKey
+  );
+
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Auto-mapped Foreign Country Igno Question ID",
+    rowNumber => {
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      if (
+        combinedQuestionEntry.survey_name === "#N/A" ||
+        combinedQuestionEntry.survey_name === "" ||
+        combinedQuestionEntry.survey_name === "..."
+      ) {
+        return `(No survey name available yet)`;
+      }
+      const { countryViewsSurveyBatchNumber } = parseSurveyName(
+        combinedQuestionEntry.survey_name
+      );
+      if (countryViewsSurveyBatchNumber === false) {
+        return `n/a`;
+      }
+      if (countryViewsSurveyBatchNumber === null) {
+        return `(No country views batch number found in survey name "${combinedQuestionEntry.survey_name}")`;
+      }
+      const matchingImportedIgnoQuestionsInfoEntries =
+        importedIgnoQuestionsInfoEntryForeignCountryIgnoIndexLookupIndex[
+          `${countryViewsSurveyBatchNumber}-${combinedQuestionEntry.question_text.trim()}`
+        ];
+      if (
+        !matchingImportedIgnoQuestionsInfoEntries ||
+        matchingImportedIgnoQuestionsInfoEntries.length === 0
+      ) {
+        return `(No identical questions within batch ${countryViewsSurveyBatchNumber} found)`;
+      }
+      const autoMappedId = matchingImportedIgnoQuestionsInfoEntries
+        .map(
+          (importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry) =>
+            importedIgnoQuestionsInfoEntry.foreign_country_igno_question_id
+        )
+        .join("; ");
+      // Also set the igno_index_question_id if not already set
+      if (
+        matchingImportedIgnoQuestionsInfoEntries.length === 1 &&
+        combinedQuestionEntry.foreign_country_igno_question_id.trim() === ""
+      ) {
+        combinedQuestionEntry.foreign_country_igno_question_id = autoMappedId;
+      }
+      return autoMappedId;
+    },
+    startRow,
+    numRows
+  );
+
+  // Write values of combinedQuestionEntry.foreign_country_igno_question_id which we effected above
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Foreign Country Igno Question ID",
+    rowNumber => {
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      return combinedQuestionEntry.foreign_country_igno_question_id;
+    },
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Igno Index Question",
+    `=VLOOKUP(E[ROW],${importedIgnoQuestionsInfoSheetName}!$A$2:$D,3,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Answer to Igno Index Question",
+    `=VLOOKUP(E[ROW],${importedIgnoQuestionsInfoSheetName}!$A$2:$D,4,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Foreign Country Igno Question",
+    `=VLOOKUP(G[ROW],${importedIgnoQuestionsInfoSheetName}!$E$2:$H,3,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Answer to Foreign Country Igno Question",
+    `=VLOOKUP(G[ROW],${importedIgnoQuestionsInfoSheetName}!$E$2:$H,4,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  console.info(`Creating survey_id+question_number lookup index`);
+  const combinedToplineEntriesBySurveyIdAndQuestionNumber = groupBy(
+    combinedToplineEntries,
+    combineSurveyIdAndQuestionNumber
+  );
+
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "The answer options",
+    // `=JOIN(" - ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW]))`,
+    rowNumber => {
+      // Row number startRow corresponds to index 0 in the entries array
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      const matchingCombinedToplineEntries =
+        combinedToplineEntriesBySurveyIdAndQuestionNumber[
+          combineSurveyIdAndQuestionNumber(combinedQuestionEntry)
+        ];
+      if (
+        !matchingCombinedToplineEntries ||
+        matchingCombinedToplineEntries.length === 0
+      ) {
+        return "(No topline entries found)";
+      }
+      return matchingCombinedToplineEntries
+        .map(
+          (matchingCombinedToplineEntry: CombinedToplineEntry) =>
+            matchingCombinedToplineEntry.answer
+        )
+        .join(" - ");
+    },
+    startRow,
+    numRows
+  );
+
+  const percentStringRoundedToOneDecimal = (percentString: string) =>
+    parseFloat(percentString.replace("%", "")).toFixed(1) + "%";
+
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Answers by percent",
+    // `=JOIN(" - ",ARRAYFORMULA(TEXT(FILTER(topline_combo!$G$2:$G,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW]), "0.0%")))`,
+    rowNumber => {
+      // Row number startRow corresponds to index 0 in the entries array
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      const matchingCombinedToplineEntries =
+        combinedToplineEntriesBySurveyIdAndQuestionNumber[
+          combineSurveyIdAndQuestionNumber(combinedQuestionEntry)
+        ];
+      if (
+        !matchingCombinedToplineEntries ||
+        matchingCombinedToplineEntries.length === 0
+      ) {
+        return "(No topline entries found)";
+      }
+      return matchingCombinedToplineEntries
+        .map((matchingCombinedToplineEntry: CombinedToplineEntry) =>
+          matchingCombinedToplineEntry.answer_by_percent
+            ? percentStringRoundedToOneDecimal(
+                matchingCombinedToplineEntry.answer_by_percent
+              )
+            : matchingCombinedToplineEntry.answer_by_percent
+        )
+        .join(" - ");
+    },
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Correct answer(s)",
+    `=JOIN("; ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW],topline_combo!$F$2:$F = "x"))`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "% that answered correctly",
+    `=SUMIFS(topline_combo!$H$2:$H,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,"x")`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Overall Summary",
+    `=IFERROR("Response count: "&M[ROW]&"
+The answer options: "&N[ROW]&"
+Answers by percent: "&O[ROW]&"
+Correct answer(s): "&P[ROW]&"
+% that answered correctly: "&TEXT(Q[ROW], "0.0%"), "Results not processed yet")`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Amount of answer options",
+    // `=COUNTIFS(topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW])`,
+    rowNumber => {
+      // Row number startRow corresponds to index 0 in the entries array
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      const matchingCombinedToplineEntries =
+        combinedToplineEntriesBySurveyIdAndQuestionNumber[
+          combineSurveyIdAndQuestionNumber(combinedQuestionEntry)
+        ];
+      return !matchingCombinedToplineEntries
+        ? "(No topline entries found)"
+        : matchingCombinedToplineEntries.length;
+    },
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "% that would have answered correctly in an abc-type question",
+    `=Q[ROW]*S[ROW]/3`,
+    startRow,
+    numRows
+  );
+
+  console.info(
+    `End of updateCombinedQuestionSheetFormulasAndCalculatedColumns()`
+  );
+  /* tslint:enable:no-console */
+}

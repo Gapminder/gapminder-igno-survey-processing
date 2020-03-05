@@ -3,6 +3,12 @@ import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 import File = GoogleAppsScript.Drive.File;
 import union from "lodash/union";
 import {
+  adjustSheetRowsAndColumnsCount,
+  fileNameToSurveyId,
+  lookupGsDashboardSurveyListing,
+  openSpreadsheetByIdAtMostOncePerScriptRun
+} from "../common";
+import {
   CombinedQuestionEntry,
   combinedQuestionsSheetHeaders,
   combinedQuestionsSheetValueRowToCombinedQuestionEntry,
@@ -13,12 +19,6 @@ import {
 import { CombinedToplineEntry } from "../gsheetsData/combinedToplineSheet";
 import { GsDashboardSurveyListingsEntry } from "../gsheetsData/gsDashboardSurveyListingsSheet";
 import { SurveyEntry } from "../gsheetsData/surveysSheet";
-import {
-  adjustSheetRowsAndColumnsCount,
-  fileNameToSurveyId,
-  lookupGsDashboardSurveyListing,
-  openSpreadsheetByIdAtMostOncePerScriptRun
-} from "./common";
 
 /**
  * @hidden

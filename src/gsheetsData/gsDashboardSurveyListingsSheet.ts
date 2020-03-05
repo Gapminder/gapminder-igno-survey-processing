@@ -4,6 +4,12 @@
  */
 /* tslint:disable:object-literal-sort-keys */
 
+import {
+  assertCorrectLeftmostSheetColumnHeaders,
+  getSheetDataIncludingHeaderRow
+} from "../common";
+import Spreadsheet = GoogleAppsScript.Spreadsheet.Spreadsheet;
+
 /**
  * @hidden
  */
@@ -52,3 +58,31 @@ export const gsDashboardSurveyListingsSheetValueRowToGsDashboardSurveyListingsEn
     url: gsDashboardSurveyListingsSheetRow[6]
   };
 };
+
+/**
+ * @hidden
+ */
+export function fetchAndVerifyGsDashboardSurveyListingsSheet(
+  activeSpreadsheet: Spreadsheet
+) {
+  const gsDashboardSurveyListingsSheet = activeSpreadsheet.getSheetByName(
+    gsDashboardSurveyListingsSheetName
+  );
+
+  const gsDashboardSurveyListingsSheetValuesIncludingHeaderRow = getSheetDataIncludingHeaderRow(
+    gsDashboardSurveyListingsSheet,
+    gsDashboardSurveyListingsSheetHeaders
+  );
+
+  // Verify that the first headers are as expected
+  assertCorrectLeftmostSheetColumnHeaders(
+    gsDashboardSurveyListingsSheetHeaders,
+    gsDashboardSurveyListingsSheetName,
+    gsDashboardSurveyListingsSheetValuesIncludingHeaderRow
+  );
+
+  return {
+    gsDashboardSurveyListingsSheet,
+    gsDashboardSurveyListingsSheetValuesIncludingHeaderRow
+  };
+}

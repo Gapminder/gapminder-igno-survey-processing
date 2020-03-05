@@ -4,6 +4,9 @@
  */
 /* tslint:disable:object-literal-sort-keys */
 
+import { getSheetDataIncludingHeaderRow } from "../common";
+import Spreadsheet = GoogleAppsScript.Spreadsheet.Spreadsheet;
+
 /**
  * Note: These headers are informative only and will not match (nor be verified to match) the underlying sheet
  * since the headers are imported from other sheets and may be changed at will.
@@ -79,21 +82,23 @@ export const importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEn
 /**
  * @hidden
  */
-/*
-export const importedIgnoQuestionsInfoEntryToImportedIgnoQuestionsInfoSheetValueRow = (
-  importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry
-) => [
-  importedIgnoQuestionsInfoEntry.igno_index_question_id,
-  importedIgnoQuestionsInfoEntry.igno_index_world_views_survey_batch_number,
-  importedIgnoQuestionsInfoEntry.igno_index_question,
-  importedIgnoQuestionsInfoEntry.igno_index_question_correct_answer,
-  importedIgnoQuestionsInfoEntry.igno_index_question_answer_options,
-  importedIgnoQuestionsInfoEntry.igno_index_question_very_wrong_answer,
-  importedIgnoQuestionsInfoEntry.foreign_country_igno_question_id,
-  importedIgnoQuestionsInfoEntry.foreign_country_country_views_survey_batch_number,
-  importedIgnoQuestionsInfoEntry.foreign_country_igno_question,
-  importedIgnoQuestionsInfoEntry.foreign_country_igno_question_correct_answer,
-  importedIgnoQuestionsInfoEntry.foreign_country_igno_question_answer_options,
-  importedIgnoQuestionsInfoEntry.foreign_country_igno_question_very_wrong_answer
-];
-*/
+export function fetchAndVerifyImportedIgnoQuestionsInfoSheet(
+  activeSpreadsheet: Spreadsheet
+) {
+  const importedIgnoQuestionsInfoSheet = activeSpreadsheet.getSheetByName(
+    importedIgnoQuestionsInfoSheetName
+  );
+  if (importedIgnoQuestionsInfoSheet === null) {
+    throw new Error(
+      `The required sheet "${importedIgnoQuestionsInfoSheetName}" is missing. Please add it and run this script again.`
+    );
+  }
+  const importedIgnoQuestionsInfoSheetValuesIncludingHeaderRow = getSheetDataIncludingHeaderRow(
+    importedIgnoQuestionsInfoSheet,
+    importedIgnoQuestionsInfoSheetHeaders
+  );
+  return {
+    importedIgnoQuestionsInfoSheet,
+    importedIgnoQuestionsInfoSheetValuesIncludingHeaderRow
+  };
+}

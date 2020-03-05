@@ -1,11 +1,11 @@
 import difference from "lodash/difference";
+import { adjustSheetRowsAndColumnsCount } from "../common";
 import Sheet = GoogleAppsScript.Spreadsheet.Sheet;
 import File = GoogleAppsScript.Drive.File;
 import {
   surveyEntryToSurveysSheetValueRow,
   surveysSheetValueRowToSurveyEntry
 } from "../gsheetsData/surveysSheet";
-import { adjustSheetRowsAndColumnsCount } from "./common";
 
 /**
  * @hidden
