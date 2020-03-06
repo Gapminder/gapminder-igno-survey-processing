@@ -1,23 +1,53 @@
 /**
  * @hidden
  */
+type BatchNumberParseResult = string | null | false;
+
+/**
+ * @hidden
+ */
 export function parseSurveyName(
   surveyName: string
 ): {
-  worldViewsSurveyBatchNumber: string | null | false;
-  countryViewsSurveyBatchNumber: string | null | false;
+  worldViewsSurveyBatchNumber: BatchNumberParseResult;
+  countryViewsSurveyBatchNumber: BatchNumberParseResult;
+  studySurveyBatchNumber: BatchNumberParseResult;
 } {
   const worldViewsTextFound = surveyName.indexOf("World Views ") > -1;
   const countryViewsTextFound = surveyName.indexOf("Country Views ") > -1;
-  const worldViewsSurveyBatchNumber = worldViewsTextFound
+  const studySurveyTextFound = surveyName.indexOf("Study Survey ") > -1;
+  let worldViewsSurveyBatchNumber: BatchNumberParseResult = worldViewsTextFound
     ? surveyName.trim().replace("World Views ", "")
-    : countryViewsTextFound
-    ? false
-    : null;
-  const countryViewsSurveyBatchNumber = countryViewsTextFound
+    : false;
+  let countryViewsSurveyBatchNumber: BatchNumberParseResult = countryViewsTextFound
     ? surveyName.trim().replace("Country Views ", "")
-    : worldViewsTextFound
-    ? false
-    : null;
-  return { worldViewsSurveyBatchNumber, countryViewsSurveyBatchNumber };
+    : false;
+  let studySurveyBatchNumber: BatchNumberParseResult = studySurveyTextFound
+    ? surveyName.trim().replace("Study Survey ", "")
+    : false;
+  // Some special cases
+  if (countryViewsSurveyBatchNumber === "383") {
+    studySurveyBatchNumber = "1/c383";
+  }
+  if (countryViewsSurveyBatchNumber === "384") {
+    studySurveyBatchNumber = "2/c384";
+  }
+  if (countryViewsSurveyBatchNumber === "385") {
+    studySurveyBatchNumber = "3/c385";
+  }
+  // Return nulls in case nothing was found at all
+  if (
+    worldViewsSurveyBatchNumber === false &&
+    countryViewsSurveyBatchNumber === false &&
+    studySurveyBatchNumber === false
+  ) {
+    worldViewsSurveyBatchNumber = null;
+    countryViewsSurveyBatchNumber = null;
+    studySurveyBatchNumber = null;
+  }
+  return {
+    countryViewsSurveyBatchNumber,
+    studySurveyBatchNumber,
+    worldViewsSurveyBatchNumber
+  };
 }

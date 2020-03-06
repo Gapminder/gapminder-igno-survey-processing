@@ -14,18 +14,29 @@ import Spreadsheet = GoogleAppsScript.Spreadsheet.Spreadsheet;
  * @hidden
  */
 export const importedIgnoQuestionsInfoSheetHeaders = [
-  "Igno Question ID",
-  "Igno Question World Views Survey Batch Number",
-  "Igno Question",
-  "Igno Question Correct Answer",
-  "Igno Question Answer Options",
-  "Igno Question Very Wrong Answer",
-  "Foreign Country Question ID",
-  "Foreign Country Country Views Survey Batch Number",
-  "Foreign Country Question",
-  "Foreign Country Question Correct Answer",
-  "Foreign Country Question Answer Options",
-  "Foreign Country Question Very Wrong Answer"
+  "igno_index_question_id",
+  "igno_index_world_views_survey_batch_number",
+  "igno_index_question",
+  "igno_index_question_correct_answer",
+  "igno_index_question_answer_options",
+  "igno_index_question_very_wrong_answer",
+  "foreign_country_igno_question_id",
+  "foreign_country_country_views_survey_batch_number",
+  "foreign_country_igno_question",
+  "foreign_country_igno_index_question_correct_answer",
+  "foreign_country_igno_question_answer_options",
+  "foreign_country_igno_index_question_very_wrong_answer",
+  "step5_question_id",
+  "step5_study_survey_batch_number",
+  "step5_question",
+  "step5_question_correct_answer",
+  "step5_question_answer_options",
+  "step5_question_very_wrong_answer",
+  "step5_question_asking_language",
+  "step5_question_translation_status",
+  "step5_question_translated_question",
+  "step5_question_translated_question_correct_answer",
+  "step5_question_translated_question_very_wrong_answer"
 ];
 
 /**
@@ -47,9 +58,21 @@ export interface ImportedIgnoQuestionsInfoEntry {
   foreign_country_igno_question_id: any;
   foreign_country_country_views_survey_batch_number: any;
   foreign_country_igno_question: any;
-  foreign_country_igno_question_correct_answer: any;
+  foreign_country_igno_index_question_correct_answer: any;
   foreign_country_igno_question_answer_options: any;
-  foreign_country_igno_question_very_wrong_answer: any;
+  foreign_country_igno_index_question_very_wrong_answer: any;
+  step5_question_id: any;
+  step5_study_survey_batch_number: any;
+  study_original_question_and_translation: any;
+  step5_question: any;
+  step5_question_correct_answer: any;
+  step5_question_answer_options: any;
+  step5_question_very_wrong_answer: any;
+  step5_question_asking_language: any;
+  step5_question_translation_status: any;
+  step5_question_translated_question: any;
+  step5_question_translated_question_correct_answer: any;
+  step5_question_translated_question_very_wrong_answer: any;
 }
 
 /**
@@ -70,12 +93,27 @@ export const importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEn
     foreign_country_country_views_survey_batch_number:
       importedIgnoQuestionsInfoSheetRow[7],
     foreign_country_igno_question: importedIgnoQuestionsInfoSheetRow[8],
-    foreign_country_igno_question_correct_answer:
+    foreign_country_igno_index_question_correct_answer:
       importedIgnoQuestionsInfoSheetRow[9],
     foreign_country_igno_question_answer_options:
       importedIgnoQuestionsInfoSheetRow[10],
-    foreign_country_igno_question_very_wrong_answer:
-      importedIgnoQuestionsInfoSheetRow[11]
+    foreign_country_igno_index_question_very_wrong_answer:
+      importedIgnoQuestionsInfoSheetRow[11],
+    step5_question_id: importedIgnoQuestionsInfoSheetRow[12],
+    step5_study_survey_batch_number: importedIgnoQuestionsInfoSheetRow[13],
+    study_original_question_and_translation:
+      importedIgnoQuestionsInfoSheetRow[14],
+    step5_question: importedIgnoQuestionsInfoSheetRow[15],
+    step5_question_correct_answer: importedIgnoQuestionsInfoSheetRow[16],
+    step5_question_answer_options: importedIgnoQuestionsInfoSheetRow[17],
+    step5_question_very_wrong_answer: importedIgnoQuestionsInfoSheetRow[18],
+    step5_question_asking_language: importedIgnoQuestionsInfoSheetRow[19],
+    step5_question_translation_status: importedIgnoQuestionsInfoSheetRow[20],
+    step5_question_translated_question: importedIgnoQuestionsInfoSheetRow[21],
+    step5_question_translated_question_correct_answer:
+      importedIgnoQuestionsInfoSheetRow[22],
+    step5_question_translated_question_very_wrong_answer:
+      importedIgnoQuestionsInfoSheetRow[23]
   };
 };
 

@@ -14,6 +14,7 @@ import {
   lookupGsDashboardSurveyListing
 } from "../common";
 import { answerOptionMatchesFactualAnswer } from "../lib/answerOptionMatchesFactualAnswer";
+import { chosenAnswerOptionIsThisManyAnswerOptionsAwayFromFactualAnswer } from "../lib/chosenAnswerOptionIsThisManyAnswerOptionsAwayFromFactualAnswer";
 import Spreadsheet = GoogleAppsScript.Spreadsheet.Spreadsheet;
 import {
   CombinedQuestionEntry,
@@ -34,8 +35,8 @@ export const combinedToplineSheetHeaders = [
   "Question number",
   "Question text",
   "Answer",
-  'Correct? ("x" marks correct answers)',
-  "Auto-marked correct answers",
+  "Correctness of answer option",
+  "Auto-marked correctness of answers",
   "Answer by percent",
   "Metadata",
   "Weighted by"
@@ -68,7 +69,7 @@ export interface CombinedToplineEntry {
   question_number: any;
   question_text: any;
   answer: any;
-  x_marks_correct_answers: any;
+  correctness_of_answer_option: any;
   auto_marked_correct_answers: any;
   answer_by_percent: any;
   metadata: any;
@@ -103,7 +104,7 @@ export const toplineEntryToCombinedToplineSheetValueRow = (
   toplineEntry.question_number,
   toplineEntry.question_text,
   toplineEntry.answer,
-  "", // x_marks_correct_answers left blank
+  "", // correctness_of_answer_option left blank
   "", // auto_marked_correct_answers left blank
   toplineEntry.answer_by_percent,
   toplineEntry.metadata,
@@ -122,7 +123,7 @@ export const combinedToplineSheetValueRowToCombinedToplineEntry = (
     question_number: combinedToplineSheetRow[2],
     question_text: combinedToplineSheetRow[3],
     answer: combinedToplineSheetRow[4],
-    x_marks_correct_answers: combinedToplineSheetRow[5],
+    correctness_of_answer_option: combinedToplineSheetRow[5],
     auto_marked_correct_answers: combinedToplineSheetRow[6],
     answer_by_percent: combinedToplineSheetRow[7],
     metadata: combinedToplineSheetRow[8],
@@ -141,7 +142,7 @@ export const combinedToplineEntryToCombinedToplineSheetValueRow = (
   combinedToplineEntry.question_number,
   combinedToplineEntry.question_text,
   combinedToplineEntry.answer,
-  combinedToplineEntry.x_marks_correct_answers,
+  combinedToplineEntry.correctness_of_answer_option,
   combinedToplineEntry.answer_by_percent,
   combinedToplineEntry.metadata,
   combinedToplineEntry.weighted_by
@@ -231,6 +232,11 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
     combineSurveyIdAndQuestionNumber
   ) as { [k: string]: CombinedQuestionEntry[] };
 
+  const combinedToplineEntriesBySurveyIdAndQuestionNumber = groupBy(
+    combinedToplineEntries,
+    combineSurveyIdAndQuestionNumber
+  ) as { [k: string]: CombinedToplineEntry[] };
+
   const importedIgnoQuestionsInfoEntriesByIgnoQuestionId = groupBy(
     importedIgnoQuestionsInfoEntries.filter(
       importedIgnoQuestionsInfoEntry =>
@@ -249,10 +255,19 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
       importedIgnoQuestionsInfoEntry.foreign_country_igno_question_id
   ) as { [k: string]: ImportedIgnoQuestionsInfoEntry[] };
 
+  const importedIgnoQuestionsInfoEntriesByStep5QuestionId = groupBy(
+    importedIgnoQuestionsInfoEntries.filter(
+      importedIgnoQuestionsInfoEntry =>
+        !!importedIgnoQuestionsInfoEntry.step5_question_id
+    ),
+    importedIgnoQuestionsInfoEntry =>
+      importedIgnoQuestionsInfoEntry.step5_question_id
+  ) as { [k: string]: ImportedIgnoQuestionsInfoEntry[] };
+
   fillColumnWithValues(
     combinedToplineSheet,
     combinedToplineSheetHeaders,
-    "Auto-marked correct answers",
+    "Auto-marked correctness of answers",
     rowNumber => {
       const combinedToplineEntry = combinedToplineEntries[rowNumber - startRow];
       const correspondingCombinedQuestionEntries =
@@ -267,7 +282,20 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
       }
       const correspondingCombinedQuestionEntry =
         correspondingCombinedQuestionEntries[0];
-      let factualAnswer;
+
+      const correspondingCombinedToplineEntries =
+        combinedToplineEntriesBySurveyIdAndQuestionNumber[
+          combineSurveyIdAndQuestionNumber(combinedToplineEntry)
+        ];
+      if (
+        !correspondingCombinedToplineEntries ||
+        correspondingCombinedToplineEntries.length === 0
+      ) {
+        return `(No corresponding topline entries found in ${combinedToplineSheetName})`;
+      }
+
+      let factualCorrectAnswer;
+      let factualVeryWrongAnswer;
       if (
         correspondingCombinedQuestionEntry.igno_index_question_id &&
         correspondingCombinedQuestionEntry.igno_index_question_id.trim() !== ""
@@ -282,9 +310,12 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
         ) {
           return `(No matching imported igno question info entry found in ${importedIgnoQuestionsInfoSheetName})`;
         }
-        factualAnswer =
+        factualCorrectAnswer =
           correspondingImportedIgnoQuestionsInfoEntries[0]
             .igno_index_question_correct_answer;
+        factualVeryWrongAnswer =
+          correspondingImportedIgnoQuestionsInfoEntries[0]
+            .igno_index_question_very_wrong_answer;
       } else if (
         correspondingCombinedQuestionEntry.foreign_country_igno_question_id &&
         correspondingCombinedQuestionEntry.foreign_country_igno_question_id.trim() !==
@@ -300,46 +331,114 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
         ) {
           return `(No matching imported igno question info entry found in ${importedIgnoQuestionsInfoSheetName})`;
         }
-        factualAnswer =
+        factualCorrectAnswer =
           correspondingImportedIgnoQuestionsInfoEntries[0]
-            .foreign_country_igno_question_correct_answer;
+            .foreign_country_igno_index_question_correct_answer;
+        factualVeryWrongAnswer =
+          correspondingImportedIgnoQuestionsInfoEntries[0]
+            .foreign_country_igno_index_question_very_wrong_answer;
+      } else if (
+        correspondingCombinedQuestionEntry.step5_question_id &&
+        correspondingCombinedQuestionEntry.step5_question_id.trim() !== ""
+      ) {
+        const correspondingImportedIgnoQuestionsInfoEntries =
+          importedIgnoQuestionsInfoEntriesByStep5QuestionId[
+            correspondingCombinedQuestionEntry.step5_question_id
+          ];
+        if (
+          !correspondingImportedIgnoQuestionsInfoEntries ||
+          correspondingImportedIgnoQuestionsInfoEntries.length === 0
+        ) {
+          return `(No matching imported igno question info entry found in ${importedIgnoQuestionsInfoSheetName})`;
+        }
+        const correspondingImportedIgnoQuestionsInfoEntry =
+          correspondingImportedIgnoQuestionsInfoEntries[0];
+        factualCorrectAnswer =
+          correspondingImportedIgnoQuestionsInfoEntry.step5_question_asking_language ===
+          "en"
+            ? correspondingImportedIgnoQuestionsInfoEntry.step5_question_correct_answer
+            : correspondingImportedIgnoQuestionsInfoEntry.step5_question_translated_question_correct_answer;
+        factualVeryWrongAnswer =
+          correspondingImportedIgnoQuestionsInfoEntry.step5_question_asking_language ===
+          "en"
+            ? correspondingImportedIgnoQuestionsInfoEntry.step5_question_very_wrong_answer
+            : correspondingImportedIgnoQuestionsInfoEntry.step5_question_translated_question_very_wrong_answer;
       } else {
         return `(Question ID not mapped)`;
       }
-      if (factualAnswer === undefined || factualAnswer.trim() === "") {
+      if (
+        factualCorrectAnswer === undefined ||
+        factualCorrectAnswer.trim() === ""
+      ) {
         return `(No factual answer provided in input sheet)`;
       }
 
       const autoMarkedAsCorrect = answerOptionMatchesFactualAnswer(
         combinedToplineEntry.answer,
-        factualAnswer
+        factualCorrectAnswer
       );
 
+      let autoMarkedAsVeryWrong = false;
+      if (
+        factualVeryWrongAnswer === undefined ||
+        factualVeryWrongAnswer.trim() === ""
+      ) {
+        // Determine very wrong answer numerically if possible
+        try {
+          const answerOptions = correspondingCombinedToplineEntries.map(
+            correspondingCombinedToplineEntry =>
+              correspondingCombinedToplineEntry.answer
+          );
+          const answerOptionsAwayFromFactualAnswer = chosenAnswerOptionIsThisManyAnswerOptionsAwayFromFactualAnswer(
+            combinedToplineEntry.answer,
+            answerOptions,
+            factualCorrectAnswer
+          );
+          autoMarkedAsVeryWrong = answerOptionsAwayFromFactualAnswer > 1;
+        } catch (e) {
+          // Ignore these error situations - simply not auto-marking as very wrong
+          if (
+            e.message !== "Answer options not all numerical" &&
+            e.message !== "No correct answer option found"
+          ) {
+            throw e;
+          }
+        }
+      } else {
+        autoMarkedAsVeryWrong = answerOptionMatchesFactualAnswer(
+          combinedToplineEntry.answer,
+          factualVeryWrongAnswer
+        );
+      }
+      const autoMarkedCorrectness = autoMarkedAsCorrect
+        ? 1
+        : autoMarkedAsVeryWrong
+        ? 3
+        : "";
+
       // Update the actual x markings if no correct answers had been marked previously, which is true
-      // if the formula yields "#N/A" or if it is for a newly added row ("...")
+      // if the correct_answers formula yields "#N/A" or if it is for a newly added row ("...")
       if (
         correspondingCombinedQuestionEntry.correct_answers === "#N/A" ||
         correspondingCombinedQuestionEntry.correct_answers === "..."
       ) {
-        combinedToplineEntry.x_marks_correct_answers = autoMarkedAsCorrect
-          ? "x"
-          : "";
+        combinedToplineEntry.correctness_of_answer_option = autoMarkedCorrectness;
       }
 
-      return autoMarkedAsCorrect ? "x" : "";
+      return autoMarkedCorrectness;
     },
     startRow,
     numRows
   );
 
-  // Write values of combinedToplineEntry.x_marks_correct_answers which we effected above
+  // Write values of combinedToplineEntry.correctness_of_answer_option which we effected above
   fillColumnWithValues(
     combinedToplineSheet,
     combinedToplineSheetHeaders,
-    'Correct? ("x" marks correct answers)',
+    "Correctness of answer option",
     rowNumber => {
       const combinedToplineEntry = combinedToplineEntries[rowNumber - startRow];
-      return combinedToplineEntry.x_marks_correct_answers;
+      return combinedToplineEntry.correctness_of_answer_option;
     },
     startRow,
     numRows

@@ -33,21 +33,31 @@ export const combinedQuestionsSheetHeaders = [
   "Question text",
   "Igno Index Question ID",
   "Auto-mapped Igno Index Question ID",
+  "Igno Index Question",
+  "Correct Answer to Igno Index Question",
+  "Very Wrong Answer to Igno Index Question",
   "Foreign Country Igno Question ID",
   "Auto-mapped Foreign Country Igno Question ID",
-  "Igno Index Question",
-  "Answer to Igno Index Question",
   "Foreign Country Igno Question",
-  "Answer to Foreign Country Igno Question",
+  "Correct Answer to Foreign Country Igno Question",
+  "Very Wrong Answer to Foreign Country Igno Question",
+  "Step 5 Question ID",
+  "Auto-mapped Step 5 Question ID",
+  "Step 5 Question",
+  "Correct Answer to Step 5 Question",
+  "Very Wrong Answer to Step 5 Question",
   // "Winning answer", // Ignoring this column since it is confusing next to the others
   "Response count",
   "The answer options",
   "Answers by percent",
   "Correct answer(s)",
+  "Very wrong answer(s)",
   "% that answered correctly",
+  "% that answered very wrong",
   "Overall Summary",
   "Amount of answer options",
-  "% that would have answered correctly in an abc-type question"
+  "% that would have answered correctly in an abc-type question",
+  "% that would have answered very wrong in an abc-type question"
 ];
 
 /**
@@ -76,21 +86,31 @@ export interface CombinedQuestionEntry {
   question_text: any;
   igno_index_question_id: any;
   auto_mapped_igno_index_question_id: any;
-  foreign_country_igno_question_id: any;
-  auto_mapped_foreign_country_igno_question_id: any;
   igno_index_question: any;
   igno_index_question_correct_answer: any;
+  igno_index_question_very_wrong_answer: any;
+  foreign_country_igno_question_id: any;
+  auto_mapped_foreign_country_igno_question_id: any;
   foreign_country_igno_question: any;
-  foreign_country_igno_question_correct_answer: any;
+  foreign_country_igno_index_question_correct_answer: any;
+  foreign_country_igno_index_question_very_wrong_answer: any;
+  step5_question_id: any;
+  auto_mapped_step5_question_id: any;
+  step5_question: any;
+  step5_question_correct_answer: any;
+  step5_question_very_wrong_answer: any;
   // winning_answer: any; // Ignoring this column since it is confusing next to the others
   response_count: any;
   the_answer_options: any;
   answers_by_percent: any;
   correct_answers: any;
+  very_wrong_answers: any;
   percent_that_answered_correctly: any;
+  percent_that_answered_very_wrong: any;
   overall_summary: any;
   amount_of_answer_options: any;
   percent_that_would_have_answered_correctly_in_an_abc_type_question: any;
+  percent_that_would_have_answered_very_wrong_in_an_abc_type_question: any;
 }
 
 /**
@@ -120,21 +140,31 @@ export const questionEntryToCombinedQuestionSheetValueRow = (
   questionEntry.question_text,
   "", // igno_index_question_id blank on new rows
   "", // auto_mapped_igno_index_question_id blank on new rows
-  "", // foreign_country_igno_question_id blank on new rows
-  "", // auto_mapped_foreign_country_igno_question_id blank on new rows
   "...", // igno_index_question formula
   "...", // igno_index_question_correct_answer formula
+  "...", // igno_index_question_very_wrong_answer formula
+  "", // foreign_country_igno_question_id blank on new rows
+  "", // auto_mapped_foreign_country_igno_question_id blank on new rows
   "...", // foreign_country_igno_question formula
-  "...", // foreign_country_igno_question_correct_answer formula
+  "...", // foreign_country_igno_index_question_correct_answer formula
+  "...", // foreign_country_igno_index_question_very_wrong_answer formula
+  "", // step5_question_id blank on new rows
+  "", // auto_mapped_step5_question_id blank on new rows
+  "...", // step5_question formula
+  "...", // step5_question_correct_answer formula
+  "...", // step5_question_very_wrong_answer formula
   // questionEntry.winning_answer, // Ignoring this column since it is confusing next to the others
   questionEntry.response_count,
   "...", // the_answer_options formula
   "...", // answers_by_percent formula
   "...", // correct_answers formula
+  "...", // very_wrong_answers formula
   "...", // percent_that_answered_correctly formula
+  "...", // percent_that_answered_very_wrong formula
   "...", // overall_summary formula
   "...", // amount_of_answer_options formula
-  "..." // percent_that_would_have_answered_correctly_in_an_abc_type_question formula
+  "...", // percent_that_would_have_answered_correctly_in_an_abc_type_question formula
+  "..." // percent_that_would_have_answered_very_wrong_in_an_abc_type_question formula
 ];
 
 /**
@@ -150,22 +180,35 @@ export const combinedQuestionsSheetValueRowToCombinedQuestionEntry = (
     question_text: combinedQuestionsSheetRow[3],
     igno_index_question_id: combinedQuestionsSheetRow[4],
     auto_mapped_igno_index_question_id: combinedQuestionsSheetRow[5],
-    foreign_country_igno_question_id: combinedQuestionsSheetRow[6],
-    auto_mapped_foreign_country_igno_question_id: combinedQuestionsSheetRow[7],
-    igno_index_question: combinedQuestionsSheetRow[8],
-    igno_index_question_correct_answer: combinedQuestionsSheetRow[9],
-    foreign_country_igno_question: combinedQuestionsSheetRow[10],
-    foreign_country_igno_question_correct_answer: combinedQuestionsSheetRow[11],
-    // winning_answer: combinedQuestionsSheetRow[12], // Ignoring this column since it is confusing next to the others
-    response_count: combinedQuestionsSheetRow[12],
-    the_answer_options: combinedQuestionsSheetRow[13],
-    answers_by_percent: combinedQuestionsSheetRow[14],
-    correct_answers: combinedQuestionsSheetRow[15],
-    percent_that_answered_correctly: combinedQuestionsSheetRow[16],
-    overall_summary: combinedQuestionsSheetRow[17],
-    amount_of_answer_options: combinedQuestionsSheetRow[18],
+    igno_index_question: combinedQuestionsSheetRow[6],
+    igno_index_question_correct_answer: combinedQuestionsSheetRow[7],
+    igno_index_question_very_wrong_answer: combinedQuestionsSheetRow[8],
+    foreign_country_igno_question_id: combinedQuestionsSheetRow[9],
+    auto_mapped_foreign_country_igno_question_id: combinedQuestionsSheetRow[10],
+    foreign_country_igno_question: combinedQuestionsSheetRow[11],
+    foreign_country_igno_index_question_correct_answer:
+      combinedQuestionsSheetRow[12],
+    foreign_country_igno_index_question_very_wrong_answer:
+      combinedQuestionsSheetRow[13],
+    step5_question_id: combinedQuestionsSheetRow[14],
+    auto_mapped_step5_question_id: combinedQuestionsSheetRow[15],
+    step5_question: combinedQuestionsSheetRow[16],
+    step5_question_correct_answer: combinedQuestionsSheetRow[17],
+    step5_question_very_wrong_answer: combinedQuestionsSheetRow[18],
+    // winning_answer: combinedQuestionsSheetRow[19], // Ignoring this column since it is confusing next to the others
+    response_count: combinedQuestionsSheetRow[19],
+    the_answer_options: combinedQuestionsSheetRow[20],
+    answers_by_percent: combinedQuestionsSheetRow[21],
+    correct_answers: combinedQuestionsSheetRow[22],
+    very_wrong_answers: combinedQuestionsSheetRow[23],
+    percent_that_answered_correctly: combinedQuestionsSheetRow[24],
+    percent_that_answered_very_wrong: combinedQuestionsSheetRow[25],
+    overall_summary: combinedQuestionsSheetRow[26],
+    amount_of_answer_options: combinedQuestionsSheetRow[27],
     percent_that_would_have_answered_correctly_in_an_abc_type_question:
-      combinedQuestionsSheetRow[19]
+      combinedQuestionsSheetRow[28],
+    percent_that_would_have_answered_very_wrong_in_an_abc_type_question:
+      combinedQuestionsSheetRow[29]
   };
 };
 
@@ -179,21 +222,31 @@ export const questionEntryToCombinedQuestionsSheetValueRow = questionEntry => [
   questionEntry.question_text,
   questionEntry.igno_index_question_id,
   questionEntry.auto_mapped_igno_index_question_id,
-  questionEntry.foreign_country_igno_question_id,
-  questionEntry.auto_mapped_foreign_country_igno_question_id,
   "...", // igno_index_question formula
   "...", // igno_index_question_correct_answer formula
+  "...", // igno_index_question_very_wrong_answer formula
+  questionEntry.foreign_country_igno_question_id,
+  questionEntry.auto_mapped_foreign_country_igno_question_id,
   "...", // foreign_country_igno_question formula
-  "...", // foreign_country_igno_question_correct_answer formula
+  "...", // foreign_country_igno_index_question_correct_answer formula
+  "...", // foreign_country_igno_index_question_very_wrong_answer formula
+  questionEntry.step5_question_id,
+  questionEntry.auto_mapped_step5_question_id,
+  "...", // step5_question formula
+  "...", // step5_question_correct_answer formula
+  "...", // step5_question_very_wrong_answer formula
   // questionEntry.winning_answer, // Ignoring this column since it is confusing next to the others
   questionEntry.response_count,
   "...", // the_answer_options formula
   "...", // answers_by_percent formula
   "...", // correct_answers formula
+  "...", // very_wrong_answers formula
   "...", // percent_that_answered_correctly formula
+  "...", // percent_that_answered_very_wrong formula
   "...", // overall_summary formula
   "...", // amount_of_answer_options formula
-  "..." // percent_that_would_have_answered_correctly_in_an_abc_type_question formula
+  "...", // percent_that_would_have_answered_correctly_in_an_abc_type_question formula
+  "..." // percent_that_would_have_answered_very_wrong_in_an_abc_type_question formula
 ];
 
 /**
@@ -379,6 +432,33 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     numRows
   );
 
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Igno Index Question",
+    `=VLOOKUP(E[ROW],${importedIgnoQuestionsInfoSheetName}!$A$2:$C,3,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Correct Answer to Igno Index Question",
+    `=VLOOKUP(E[ROW],${importedIgnoQuestionsInfoSheetName}!$A$2:$D,4,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Very Wrong Answer to Igno Index Question",
+    `=VLOOKUP(E[ROW],${importedIgnoQuestionsInfoSheetName}!$A$2:$F,6,FALSE)`,
+    startRow,
+    numRows
+  );
+
   console.info(
     `Creating foreign_country_country_views_survey_batch_number+foreign_country_igno_question lookup index`
   );
@@ -456,7 +536,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
             importedIgnoQuestionsInfoEntry.foreign_country_igno_question_id
         )
         .join("; ");
-      // Also set the igno_index_question_id if not already set
+      // Also set the foreign_country_igno_question_id if not already set
       if (
         matchingImportedIgnoQuestionsInfoEntries.length === 1 &&
         combinedQuestionEntry.foreign_country_igno_question_id.trim() === ""
@@ -486,26 +566,8 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
   fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
-    "Igno Index Question",
-    `=VLOOKUP(E[ROW],${importedIgnoQuestionsInfoSheetName}!$A$2:$D,3,FALSE)`,
-    startRow,
-    numRows
-  );
-
-  fillColumnWithFormulas(
-    combinedQuestionsSheet,
-    combinedQuestionsSheetHeaders,
-    "Answer to Igno Index Question",
-    `=VLOOKUP(E[ROW],${importedIgnoQuestionsInfoSheetName}!$A$2:$D,4,FALSE)`,
-    startRow,
-    numRows
-  );
-
-  fillColumnWithFormulas(
-    combinedQuestionsSheet,
-    combinedQuestionsSheetHeaders,
     "Foreign Country Igno Question",
-    `=VLOOKUP(G[ROW],${importedIgnoQuestionsInfoSheetName}!$E$2:$H,3,FALSE)`,
+    `=VLOOKUP(J[ROW],${importedIgnoQuestionsInfoSheetName}!$G$2:$I,3,FALSE)`,
     startRow,
     numRows
   );
@@ -513,8 +575,167 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
   fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
-    "Answer to Foreign Country Igno Question",
-    `=VLOOKUP(G[ROW],${importedIgnoQuestionsInfoSheetName}!$E$2:$H,4,FALSE)`,
+    "Correct Answer to Foreign Country Igno Question",
+    `=VLOOKUP(J[ROW],${importedIgnoQuestionsInfoSheetName}!$G$2:$J,4,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Very Wrong Answer to Foreign Country Igno Question",
+    `=VLOOKUP(J[ROW],${importedIgnoQuestionsInfoSheetName}!$G$2:$L,6,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  console.info(
+    `Creating step5_study_survey_batch_number+step5_question/step5_question_translated_question lookup index`
+  );
+  const importedIgnoQuestionsInfoEntryStep5IndexMatchKey = (
+    importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry
+  ) => {
+    if (!importedIgnoQuestionsInfoEntry.step5_study_survey_batch_number) {
+      console.log(
+        "The entry did not have step5_study_survey_batch_number set",
+        {
+          importedIgnoQuestionsInfoEntry
+        }
+      );
+      throw new Error(
+        "The entry did not have step5_study_survey_batch_number set"
+      );
+    }
+
+    if (
+      importedIgnoQuestionsInfoEntry.step5_question_asking_language === "en"
+    ) {
+      if (!importedIgnoQuestionsInfoEntry.step5_question) {
+        console.log("The entry did not have step5_question set", {
+          importedIgnoQuestionsInfoEntry
+        });
+        throw new Error("The entry did not have step5_question set");
+      }
+      return `${importedIgnoQuestionsInfoEntry.step5_study_survey_batch_number.trim()}-${importedIgnoQuestionsInfoEntry.step5_question.trim()}`;
+    } else {
+      if (!importedIgnoQuestionsInfoEntry.step5_question_translated_question) {
+        console.log(
+          "The entry did not have step5_question_translated_question set (and was not asked in 'en' language)",
+          {
+            importedIgnoQuestionsInfoEntry
+          }
+        );
+        throw new Error(
+          "The entry did not have step5_question_translated_question set (and was not asked in 'en' language)"
+        );
+      }
+      return `${importedIgnoQuestionsInfoEntry.step5_study_survey_batch_number.trim()}-${importedIgnoQuestionsInfoEntry.step5_question_translated_question.trim()}`;
+    }
+  };
+  const importedIgnoQuestionsInfoEntryStep5IndexLookupIndex = groupBy(
+    importedIgnoQuestionsInfoEntries.filter(
+      (importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry) =>
+        !!importedIgnoQuestionsInfoEntry.step5_study_survey_batch_number &&
+        ((importedIgnoQuestionsInfoEntry.step5_question_asking_language ===
+          "en" &&
+          !!importedIgnoQuestionsInfoEntry.step5_question) ||
+          (importedIgnoQuestionsInfoEntry.step5_question_asking_language !==
+            "en" &&
+            !!importedIgnoQuestionsInfoEntry.step5_question_translated_question))
+    ),
+    importedIgnoQuestionsInfoEntryStep5IndexMatchKey
+  );
+
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Auto-mapped Step 5 Question ID",
+    rowNumber => {
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      if (
+        combinedQuestionEntry.survey_name === "#N/A" ||
+        combinedQuestionEntry.survey_name === "" ||
+        combinedQuestionEntry.survey_name === "..."
+      ) {
+        return `(No survey name available yet)`;
+      }
+      const { studySurveyBatchNumber } = parseSurveyName(
+        combinedQuestionEntry.survey_name
+      );
+      if (studySurveyBatchNumber === false) {
+        return `n/a`;
+      }
+      if (studySurveyBatchNumber === null) {
+        return `(No study survey batch number found in survey name "${combinedQuestionEntry.survey_name}")`;
+      }
+      const matchingImportedIgnoQuestionsInfoEntries =
+        importedIgnoQuestionsInfoEntryStep5IndexLookupIndex[
+          `${studySurveyBatchNumber}-${combinedQuestionEntry.question_text.trim()}`
+        ];
+      if (
+        !matchingImportedIgnoQuestionsInfoEntries ||
+        matchingImportedIgnoQuestionsInfoEntries.length === 0
+      ) {
+        return `(No identical questions within batch ${studySurveyBatchNumber} found)`;
+      }
+      const autoMappedId = matchingImportedIgnoQuestionsInfoEntries
+        .map(
+          (importedIgnoQuestionsInfoEntry: ImportedIgnoQuestionsInfoEntry) =>
+            importedIgnoQuestionsInfoEntry.step5_question_id
+        )
+        .join("; ");
+      // Also set the step5_question_id if not already set
+      if (
+        matchingImportedIgnoQuestionsInfoEntries.length === 1 &&
+        combinedQuestionEntry.step5_question_id.trim() === ""
+      ) {
+        combinedQuestionEntry.step5_question_id = autoMappedId;
+      }
+      return autoMappedId;
+    },
+    startRow,
+    numRows
+  );
+
+  // Write values of combinedQuestionEntry.step5_question_id which we effected above
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Step 5 Question ID",
+    rowNumber => {
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      return combinedQuestionEntry.step5_question_id;
+    },
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Step 5 Question",
+    `=VLOOKUP(O[ROW],${importedIgnoQuestionsInfoSheetName}!$M$2:$O,3,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Correct Answer to Step 5 Question",
+    `=VLOOKUP(O[ROW],${importedIgnoQuestionsInfoSheetName}!$M$2:$Q,5,FALSE)`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Very Wrong Answer to Step 5 Question",
+    `=VLOOKUP(O[ROW],${importedIgnoQuestionsInfoSheetName}!$M$2:$S,7,FALSE)`,
     startRow,
     numRows
   );
@@ -595,7 +816,16 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Correct answer(s)",
-    `=JOIN("; ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW],topline_combo!$F$2:$F = "x"))`,
+    `=JOIN("; ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW],topline_combo!$F$2:$F = 1))`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Very wrong answer(s)",
+    `=JOIN("; ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW],topline_combo!$F$2:$F = 3))`,
     startRow,
     numRows
   );
@@ -604,7 +834,16 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "% that answered correctly",
-    `=SUMIFS(topline_combo!$H$2:$H,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,"x")`,
+    `=SUMIFS(topline_combo!$H$2:$H,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,1)`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "% that answered very wrong",
+    `=SUMIFS(topline_combo!$H$2:$H,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,3)`,
     startRow,
     numRows
   );
@@ -613,11 +852,13 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "Overall Summary",
-    `=IFERROR("Response count: "&M[ROW]&"
-The answer options: "&N[ROW]&"
-Answers by percent: "&O[ROW]&"
-Correct answer(s): "&P[ROW]&"
-% that answered correctly: "&TEXT(Q[ROW], "0.0%"), "Results not processed yet")`,
+    `=IFERROR("Response count: "&T[ROW]&"
+The answer options: "&U[ROW]&"
+Answers by percent: "&V[ROW]&"
+Correct answer(s): "&W[ROW]&"
+Very wrong answer(s): "&X[ROW]&"
+% that answered correctly: "&TEXT(Y[ROW], "0.0%")&"
+% that answered very wrong: "&TEXT(Z[ROW], "0.0%"), "Results not processed yet")`,
     startRow,
     numRows
   );
@@ -647,7 +888,16 @@ Correct answer(s): "&P[ROW]&"
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "% that would have answered correctly in an abc-type question",
-    `=Q[ROW]*S[ROW]/3`,
+    `=Y[ROW]*AB[ROW]/3`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "% that would have answered very wrong in an abc-type question",
+    `=Z[ROW]*AB[ROW]/3`,
     startRow,
     numRows
   );
