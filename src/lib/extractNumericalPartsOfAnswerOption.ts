@@ -5,7 +5,7 @@
  */
 export function extractNumericalPartsOfAnswerOption(
   answerOption: string
-): Number[] {
+): number[] {
   answerOption = String(answerOption)
     .trim()
     .toLocaleLowerCase();
@@ -15,7 +15,7 @@ export function extractNumericalPartsOfAnswerOption(
   }
 
   if (isNumeric(answerOption)) {
-    return [Number(answerOption)];
+    return [parseFloat(answerOption)];
   }
 
   // If has a "-" sign somewhere not in the beginning, it may be a range and we try both sides of the range
