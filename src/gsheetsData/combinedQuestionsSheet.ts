@@ -338,7 +338,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
       }
       const matchingImportedIgnoQuestionsInfoEntries =
         importedIgnoQuestionsInfoEntryIgnoIndexLookupIndex[
-          combinedQuestionEntry.question_text.trim()
+          `${worldViewsSurveyBatchNumber}-${combinedQuestionEntry.question_text.trim()}`
         ];
       if (
         !matchingImportedIgnoQuestionsInfoEntries ||
