@@ -69,6 +69,21 @@ const testAnswerOptionMatchesFactualAnswer: Macro<any> = (
     answerOption: "20-30%",
     factualAnswer: "29.9%",
     expectedOutput: true
+  },
+  {
+    answerOption: "14 pounds",
+    factualAnswer: "14",
+    expectedOutput: true
+  },
+  {
+    answerOption: "14",
+    factualAnswer: "14 pounds",
+    expectedOutput: true
+  },
+  {
+    answerOption: "15",
+    factualAnswer: "14 pounds",
+    expectedOutput: false
   }
   /* tslint:enable:object-literal-sort-keys */
 ].forEach((testData, index) => {

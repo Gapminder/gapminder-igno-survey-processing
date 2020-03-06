@@ -1,3 +1,5 @@
+import { extractNumericalPartsOfAnswerOption } from "./extractNumericalPartsOfAnswerOption";
+
 /**
  * @hidden
  */
@@ -5,8 +7,36 @@ export function answerOptionMatchesFactualAnswer(
   answerOption: string,
   factualAnswer: string
 ): boolean {
-  answerOption = answerOption.trim();
-  factualAnswer = factualAnswer.trim();
+  answerOption = answerOption.trim().toLocaleLowerCase();
+  factualAnswer = factualAnswer.trim().toLocaleLowerCase();
+  if (answerOption === factualAnswer) {
+    return true;
+  }
+  // Support matching eg "14" to "14 pounds"
+  const numericalPartsOfAnswerOption = extractNumericalPartsOfAnswerOption(
+    answerOption
+  );
+  const numericalPartsOfFactualAnswer = extractNumericalPartsOfAnswerOption(
+    factualAnswer
+  );
+  if (
+    numericalPartsOfAnswerOption.length > 0 &&
+    numericalPartsOfFactualAnswer.length > 0
+  ) {
+    const factualAnswerNumeric = numericalPartsOfFactualAnswer[0];
+    if (numericalPartsOfAnswerOption.length === 1) {
+      const answerOptionNumeric = numericalPartsOfAnswerOption[0];
+      return factualAnswerNumeric === answerOptionNumeric;
+    }
+    if (numericalPartsOfAnswerOption.length === 2) {
+      if (
+        numericalPartsOfAnswerOption[0] <= factualAnswerNumeric &&
+        numericalPartsOfAnswerOption[1] >= factualAnswerNumeric
+      ) {
+        return true;
+      }
+    }
+  }
   // Support matching eg "34%" to "30-40%"
   if (
     factualAnswer.indexOf("%") === factualAnswer.length - 1 &&
@@ -24,5 +54,5 @@ export function answerOptionMatchesFactualAnswer(
       return true;
     }
   }
-  return answerOption === factualAnswer;
+  return false;
 }
