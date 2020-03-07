@@ -382,22 +382,34 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
         return `(No factual answer provided in input sheet)`;
       }
 
-      const autoMarkedAsCorrect = answerOptionMatchesFactualAnswer(
-        combinedToplineEntry.answer,
-        factualCorrectAnswer
+      // Find correctness of this answer option
+      const answerOptions = correspondingCombinedToplineEntries.map(
+        correspondingCombinedToplineEntry =>
+          correspondingCombinedToplineEntry.answer
       );
+      const correctAnswerOptions = answerOptions.filter($answerOption =>
+        answerOptionMatchesFactualAnswer($answerOption, factualCorrectAnswer)
+      );
+      if (correctAnswerOptions.length === 0) {
+        return `(No answer option matching the correct answer "${factualCorrectAnswer}" found)`;
+      }
 
+      let autoMarkedAsCorrect = false;
+      let autoMarkedAsWrong = false;
       let autoMarkedAsVeryWrong = false;
+      if (correctAnswerOptions.indexOf(combinedToplineEntry.answer) > -1) {
+        autoMarkedAsCorrect = true;
+      } else {
+        autoMarkedAsWrong = true;
+      }
+
+      // Determine if very wrong
       if (
         factualVeryWrongAnswer === undefined ||
         factualVeryWrongAnswer.trim() === ""
       ) {
         // Determine very wrong answer numerically if possible
         try {
-          const answerOptions = correspondingCombinedToplineEntries.map(
-            correspondingCombinedToplineEntry =>
-              correspondingCombinedToplineEntry.answer
-          );
           const answerOptionsAwayFromFactualAnswer = chosenAnswerOptionIsThisManyAnswerOptionsAwayFromFactualAnswer(
             combinedToplineEntry.answer,
             answerOptions,
@@ -423,6 +435,8 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
         ? 1
         : autoMarkedAsVeryWrong
         ? 3
+        : autoMarkedAsWrong
+        ? 2
         : "";
 
       // Update the actual x markings if no correct or very wrong answers had been marked previously, which is true
