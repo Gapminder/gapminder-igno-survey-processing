@@ -843,7 +843,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "% that answered very wrong",
-    `=SUMIFS(topline_combo!$H$2:$H,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,3)`,
+    `=IF(COUNTIFS(topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,3)=0,"n/a",SUMIFS(topline_combo!$H$2:$H,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,3))`,
     startRow,
     numRows
   );
@@ -897,7 +897,7 @@ Very wrong answer(s): "&IFERROR(X[ROW],"n/a")&"
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "% that would have answered very wrong in an abc-type question",
-    `=Z[ROW]*AB[ROW]/3`,
+    `==IF(Z[ROW]="n/a","n/a",Z[ROW]*AB[ROW]/3)`,
     startRow,
     numRows
   );
