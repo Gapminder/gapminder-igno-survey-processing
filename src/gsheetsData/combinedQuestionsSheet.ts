@@ -355,7 +355,11 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
       });
       throw new Error("The entry did not have igno_index_question set");
     }
-    return `${importedIgnoQuestionsInfoEntry.igno_index_world_views_survey_batch_number.trim()}-${importedIgnoQuestionsInfoEntry.igno_index_question.trim()}`;
+    return `${importedIgnoQuestionsInfoEntry.igno_index_world_views_survey_batch_number
+      .trim()
+      .toLowerCase()}-${importedIgnoQuestionsInfoEntry.igno_index_question
+      .trim()
+      .toLowerCase()}`;
   };
   const importedIgnoQuestionsInfoEntryIgnoIndexLookupIndex = groupBy(
     importedIgnoQuestionsInfoEntries.filter(
@@ -391,7 +395,9 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
       }
       const matchingImportedIgnoQuestionsInfoEntries =
         importedIgnoQuestionsInfoEntryIgnoIndexLookupIndex[
-          `${worldViewsSurveyBatchNumber}-${combinedQuestionEntry.question_text.trim()}`
+          `${worldViewsSurveyBatchNumber.toLowerCase()}-${combinedQuestionEntry.question_text
+            .trim()
+            .toLowerCase()}`
         ];
       if (
         !matchingImportedIgnoQuestionsInfoEntries ||
@@ -486,7 +492,11 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
         "The entry did not have foreign_country_igno_question set"
       );
     }
-    return `${importedIgnoQuestionsInfoEntry.foreign_country_country_views_survey_batch_number.trim()}-${importedIgnoQuestionsInfoEntry.foreign_country_igno_question.trim()}`;
+    return `${importedIgnoQuestionsInfoEntry.foreign_country_country_views_survey_batch_number
+      .trim()
+      .toLowerCase()}-${importedIgnoQuestionsInfoEntry.foreign_country_igno_question
+      .trim()
+      .toLowerCase()}`;
   };
   const importedIgnoQuestionsInfoEntryForeignCountryIgnoIndexLookupIndex = groupBy(
     importedIgnoQuestionsInfoEntries.filter(
@@ -522,7 +532,9 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
       }
       const matchingImportedIgnoQuestionsInfoEntries =
         importedIgnoQuestionsInfoEntryForeignCountryIgnoIndexLookupIndex[
-          `${countryViewsSurveyBatchNumber}-${combinedQuestionEntry.question_text.trim()}`
+          `${countryViewsSurveyBatchNumber.toLowerCase()}-${combinedQuestionEntry.question_text
+            .trim()
+            .toLowerCase()}`
         ];
       if (
         !matchingImportedIgnoQuestionsInfoEntries ||
@@ -617,7 +629,11 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
         });
         throw new Error("The entry did not have step5_question set");
       }
-      return `${importedIgnoQuestionsInfoEntry.step5_study_survey_batch_number.trim()}-${importedIgnoQuestionsInfoEntry.step5_question.trim()}`;
+      return `${importedIgnoQuestionsInfoEntry.step5_study_survey_batch_number
+        .trim()
+        .toLowerCase()}-${importedIgnoQuestionsInfoEntry.step5_question
+        .trim()
+        .toLowerCase()}`;
     } else {
       if (!importedIgnoQuestionsInfoEntry.step5_question_translated_question) {
         console.log(
@@ -630,7 +646,11 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
           "The entry did not have step5_question_translated_question set (and was not asked in 'en' language)"
         );
       }
-      return `${importedIgnoQuestionsInfoEntry.step5_study_survey_batch_number.trim()}-${importedIgnoQuestionsInfoEntry.step5_question_translated_question.trim()}`;
+      return `${importedIgnoQuestionsInfoEntry.step5_study_survey_batch_number
+        .trim()
+        .toLowerCase()}-${importedIgnoQuestionsInfoEntry.step5_question_translated_question
+        .trim()
+        .toLowerCase()}`;
     }
   };
   const importedIgnoQuestionsInfoEntryStep5IndexLookupIndex = groupBy(
