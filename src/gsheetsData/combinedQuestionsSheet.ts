@@ -856,7 +856,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
 The answer options: "&U[ROW]&"
 Answers by percent: "&V[ROW]&"
 Correct answer(s): "&W[ROW]&"
-Very wrong answer(s): "&X[ROW]&"
+Very wrong answer(s): "&IFERROR(X[ROW],"n/a")&"
 % that answered correctly: "&TEXT(Y[ROW], "0.0%")&"
 % that answered very wrong: "&TEXT(Z[ROW], "0.0%"), "Results not processed yet")`,
     startRow,

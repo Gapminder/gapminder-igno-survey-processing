@@ -5,11 +5,11 @@ import { extractNumericalPartsOfAnswerOption } from "./extractNumericalPartsOfAn
  * @hidden
  */
 export function chosenAnswerOptionIsThisManyAnswerOptionsAwayFromFactualAnswer(
-  chosenAnswerOptions: string,
+  chosenAnswerOption: string,
   answerOptions: string[],
   factualAnswer: string
 ): number {
-  chosenAnswerOptions = chosenAnswerOptions.trim().toLocaleLowerCase();
+  chosenAnswerOption = chosenAnswerOption.trim().toLocaleLowerCase();
   factualAnswer = factualAnswer.trim().toLocaleLowerCase();
 
   if (answerOptions.length === 0) {
@@ -20,7 +20,7 @@ export function chosenAnswerOptionIsThisManyAnswerOptionsAwayFromFactualAnswer(
     throw new Error("Only one answer option given");
   }
 
-  // Find correct answer option
+  // Find correct answer options
   const correctAnswerOptions = answerOptions.filter($answerOption =>
     answerOptionMatchesFactualAnswer($answerOption, factualAnswer)
   );
@@ -29,7 +29,7 @@ export function chosenAnswerOptionIsThisManyAnswerOptionsAwayFromFactualAnswer(
   }
 
   // If the chosen answer option is a correct answer option, return 0
-  if (correctAnswerOptions.indexOf(chosenAnswerOptions) > -1) {
+  if (correctAnswerOptions.indexOf(chosenAnswerOption) > -1) {
     return 0;
   }
 
@@ -59,7 +59,7 @@ export function chosenAnswerOptionIsThisManyAnswerOptionsAwayFromFactualAnswer(
 
   // Compare with the other arguments
   const minimumOfNumericalPartsOfChosenAnswerOption = minimumNumbericalPartOfAnswerOption(
-    extractNumericalPartsOfAnswerOption(chosenAnswerOptions)
+    extractNumericalPartsOfAnswerOption(chosenAnswerOption)
   );
 
   const minimumsOfNumericalPartsOfCorrectAnswerOptions = correctAnswerOptions

@@ -119,7 +119,7 @@ function devUpdateFormulasAndCalculatedColumns() {
       gsDashboardSurveyListingsEntry.survey_id
   ) as { [survey_id: string]: GsDashboardSurveyListingsEntry[] };
 
-  const maxRowsToUpdateInEachRound = 8000;
+  const maxRowsToUpdateInEachRound = 5000;
 
   chunk(surveyEntries, maxRowsToUpdateInEachRound).map(
     ($surveyEntries, index) => {
@@ -155,6 +155,7 @@ function devUpdateFormulasAndCalculatedColumns() {
       updateCombinedToplineSheetFormulasAndCalculatedColumns(
         combinedToplineSheet,
         $combinedToplineEntries,
+        combinedToplineEntries,
         combinedQuestionEntries,
         importedIgnoQuestionsInfoEntries,
         gsDashboardSurveyListingsEntriesBySurveyId,

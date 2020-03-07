@@ -178,11 +178,20 @@ export function fetchAndVerifyCombinedToplineSheet(
 }
 
 /**
+ * @param combinedToplineSheet
+ * @param combinedToplineEntries
+ * @param allCombinedToplineEntries Workaround when updating entries chunk by chunk, we also need access to an array of topline entries that are not arbitrarily cut off and as such may be missing answer options randomly at the cutoff points
+ * @param combinedQuestionEntries
+ * @param importedIgnoQuestionsInfoEntries
+ * @param gsDashboardSurveyListingsEntriesBySurveyId
+ * @param startRow
+ * @param numRows
  * @hidden
  */
 export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
   combinedToplineSheet,
   combinedToplineEntries: CombinedToplineEntry[],
+  allCombinedToplineEntries: CombinedToplineEntry[],
   combinedQuestionEntries: CombinedQuestionEntry[],
   importedIgnoQuestionsInfoEntries: ImportedIgnoQuestionsInfoEntry[],
   gsDashboardSurveyListingsEntriesBySurveyId: {
@@ -233,7 +242,7 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
   ) as { [k: string]: CombinedQuestionEntry[] };
 
   const combinedToplineEntriesBySurveyIdAndQuestionNumber = groupBy(
-    combinedToplineEntries,
+    allCombinedToplineEntries,
     combineSurveyIdAndQuestionNumber
   ) as { [k: string]: CombinedToplineEntry[] };
 
@@ -416,11 +425,13 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
         ? 3
         : "";
 
-      // Update the actual x markings if no correct answers had been marked previously, which is true
-      // if the correct_answers formula yields "#N/A" or if it is for a newly added row ("...")
+      // Update the actual x markings if no correct or very wrong answers had been marked previously, which is true
+      // if the corresponding formulas yields "#N/A" or if it is for a newly added row ("...")
       if (
-        correspondingCombinedQuestionEntry.correct_answers === "#N/A" ||
-        correspondingCombinedQuestionEntry.correct_answers === "..."
+        (correspondingCombinedQuestionEntry.correct_answers === "#N/A" ||
+          correspondingCombinedQuestionEntry.correct_answers === "...") &&
+        (correspondingCombinedQuestionEntry.very_wrong_answers === "#N/A" ||
+          correspondingCombinedQuestionEntry.very_wrong_answers === "...")
       ) {
         combinedToplineEntry.correctness_of_answer_option = autoMarkedCorrectness;
       }

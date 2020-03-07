@@ -248,6 +248,7 @@ function refreshSurveysAndCombinedListings() {
   updateCombinedToplineSheetFormulasAndCalculatedColumns(
     combinedToplineSheet,
     newCombinedToplineEntries,
+    newCombinedToplineEntries,
     newCombinedQuestionEntries, // updatedCombinedQuestionEntries, // Using newCombinedQuestionEntries requires that the corresponding topline and question rows are added in the same update. Using updatedCombinedQuestionEntries requires it to be updated based on the changes to newCombinedQuestionEntries made above
     importedIgnoQuestionsInfoEntries,
     gsDashboardSurveyListingsEntriesBySurveyId,
