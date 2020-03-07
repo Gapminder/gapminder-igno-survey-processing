@@ -80,6 +80,14 @@ const testExtractNumericalPartsOfAnswerOption: Macro<any> = (
     expectedOutput: [14]
   },
   {
+    answerOption: "$14",
+    expectedOutput: [14]
+  },
+  {
+    answerOption: "$14 billion",
+    expectedOutput: [14]
+  },
+  {
     answerOption: "Yes",
     expectedOutput: []
   },
@@ -90,6 +98,18 @@ const testExtractNumericalPartsOfAnswerOption: Macro<any> = (
   {
     answerOption: "20-30%",
     expectedOutput: [20, 30]
+  },
+  {
+    answerOption: "More than 500",
+    expectedOutput: [500]
+  },
+  {
+    answerOption: "Less than 500",
+    expectedOutput: [500]
+  },
+  {
+    answerOption: "Between 300 and 700",
+    expectedOutput: [300]
   }
   /* tslint:enable:object-literal-sort-keys */
 ].forEach((testData, index) => {

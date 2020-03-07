@@ -108,6 +108,12 @@ const testChosenAnswerOptionIsThisManyAnswerOptionsAwayFromFactualAnswer: Macro<
     answerOptions: ["3%", "23%", "43%"],
     factualAnswer: "3%",
     expectedOutput: 2
+  },
+  {
+    answerOption: "$50 billion",
+    answerOptions: ["$10 billion", "$30 billion", "$50 billion"],
+    factualAnswer: "$10 billion",
+    expectedOutput: 2
   }
   /* tslint:enable:object-literal-sort-keys */
 ].forEach((testData, index) => {

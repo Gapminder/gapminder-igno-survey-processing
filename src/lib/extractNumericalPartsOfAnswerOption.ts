@@ -34,15 +34,12 @@ export function extractNumericalPartsOfAnswerOption(
     }
   }
 
-  // If ends with non-numeric characters, check if the beginning is numerical ("1%", "1000€", "14 pounds" etc)
-  const nonNumericRegex = /[^\d.-]+$/;
-  if (nonNumericRegex.test(answerOption)) {
-    const answerOptionWithoutNonNumericalEnding = answerOption.replace(
-      nonNumericRegex,
-      ""
-    );
-    return isNumeric(answerOptionWithoutNonNumericalEnding)
-      ? [Number(answerOptionWithoutNonNumericalEnding)]
+  // Look for numeric contents in the string ("1%", "1000€", "14 pounds, "$1", "About 10", "$1 billion" etc)
+  const numericRegex = /(-)?\d[\d.,]*/;
+  const numericMatchResult = numericRegex.exec(answerOption);
+  if (numericMatchResult !== null) {
+    return isNumeric(numericMatchResult[0])
+      ? [Number(numericMatchResult[0])]
       : [];
   }
 
