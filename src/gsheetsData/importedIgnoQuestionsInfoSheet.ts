@@ -36,6 +36,7 @@ export const importedIgnoQuestionsInfoSheetHeaders = [
   "step5_question_translation_status",
   "step5_question_translated_question",
   "step5_question_translated_question_correct_answer",
+  "step5_question_translated_question_answer_options",
   "step5_question_translated_question_very_wrong_answer"
 ];
 
@@ -72,6 +73,7 @@ export interface ImportedIgnoQuestionsInfoEntry {
   step5_question_translation_status: any;
   step5_question_translated_question: any;
   step5_question_translated_question_correct_answer: any;
+  step5_question_translated_question_answer_options: any;
   step5_question_translated_question_very_wrong_answer: any;
 }
 
@@ -112,8 +114,10 @@ export const importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEn
     step5_question_translated_question: importedIgnoQuestionsInfoSheetRow[21],
     step5_question_translated_question_correct_answer:
       importedIgnoQuestionsInfoSheetRow[22],
+    step5_question_translated_question_answer_options:
+      importedIgnoQuestionsInfoSheetRow[23],
     step5_question_translated_question_very_wrong_answer:
-      importedIgnoQuestionsInfoSheetRow[23]
+      importedIgnoQuestionsInfoSheetRow[24]
   };
 };
 
