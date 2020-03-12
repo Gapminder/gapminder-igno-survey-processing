@@ -51,12 +51,15 @@ export const combinedQuestionsSheetHeaders = [
   "The answer options",
   "Answers by percent",
   "Correct answer(s)",
+  "Wrong answer(s)",
   "Very wrong answer(s)",
   "% that answered correctly",
+  "% that answered wrong",
   "% that answered very wrong",
   "Overall Summary",
   "Amount of answer options",
   "% that would have answered correctly in an abc-type question",
+  "% that would have answered wrong in an abc-type question",
   "% that would have answered very wrong in an abc-type question"
 ];
 
@@ -104,12 +107,15 @@ export interface CombinedQuestionEntry {
   the_answer_options: any;
   answers_by_percent: any;
   correct_answers: any;
+  wrong_answers: any;
   very_wrong_answers: any;
   percent_that_answered_correctly: any;
+  percent_that_answered_wrong: any;
   percent_that_answered_very_wrong: any;
   overall_summary: any;
   amount_of_answer_options: any;
   percent_that_would_have_answered_correctly_in_an_abc_type_question: any;
+  percent_that_would_have_answered_wrong_in_an_abc_type_question: any;
   percent_that_would_have_answered_very_wrong_in_an_abc_type_question: any;
 }
 
@@ -158,12 +164,15 @@ export const questionEntryToCombinedQuestionSheetValueRow = (
   "...", // the_answer_options formula
   "...", // answers_by_percent formula
   "...", // correct_answers formula
+  "...", // wrong_answers formula
   "...", // very_wrong_answers formula
   "...", // percent_that_answered_correctly formula
+  "...", // percent_that_answered_wrong formula
   "...", // percent_that_answered_very_wrong formula
   "...", // overall_summary formula
   "...", // amount_of_answer_options formula
   "...", // percent_that_would_have_answered_correctly_in_an_abc_type_question formula
+  "...", // percent_that_would_have_answered_wrong_in_an_abc_type_question formula
   "..." // percent_that_would_have_answered_very_wrong_in_an_abc_type_question formula
 ];
 
@@ -200,15 +209,19 @@ export const combinedQuestionsSheetValueRowToCombinedQuestionEntry = (
     the_answer_options: combinedQuestionsSheetRow[20],
     answers_by_percent: combinedQuestionsSheetRow[21],
     correct_answers: combinedQuestionsSheetRow[22],
-    very_wrong_answers: combinedQuestionsSheetRow[23],
-    percent_that_answered_correctly: combinedQuestionsSheetRow[24],
-    percent_that_answered_very_wrong: combinedQuestionsSheetRow[25],
-    overall_summary: combinedQuestionsSheetRow[26],
-    amount_of_answer_options: combinedQuestionsSheetRow[27],
+    wrong_answers: combinedQuestionsSheetRow[23],
+    very_wrong_answers: combinedQuestionsSheetRow[24],
+    percent_that_answered_correctly: combinedQuestionsSheetRow[25],
+    percent_that_answered_wrong: combinedQuestionsSheetRow[26],
+    percent_that_answered_very_wrong: combinedQuestionsSheetRow[27],
+    overall_summary: combinedQuestionsSheetRow[28],
+    amount_of_answer_options: combinedQuestionsSheetRow[29],
     percent_that_would_have_answered_correctly_in_an_abc_type_question:
-      combinedQuestionsSheetRow[28],
+      combinedQuestionsSheetRow[30],
+    percent_that_would_have_answered_wrong_in_an_abc_type_question:
+      combinedQuestionsSheetRow[31],
     percent_that_would_have_answered_very_wrong_in_an_abc_type_question:
-      combinedQuestionsSheetRow[29]
+      combinedQuestionsSheetRow[32]
   };
 };
 
@@ -240,12 +253,15 @@ export const questionEntryToCombinedQuestionsSheetValueRow = questionEntry => [
   "...", // the_answer_options formula
   "...", // answers_by_percent formula
   "...", // correct_answers formula
+  "...", // wrong_answers formula
   "...", // very_wrong_answers formula
   "...", // percent_that_answered_correctly formula
+  "...", // percent_that_answered_wrong formula
   "...", // percent_that_answered_very_wrong formula
   "...", // overall_summary formula
   "...", // amount_of_answer_options formula
   "...", // percent_that_would_have_answered_correctly_in_an_abc_type_question formula
+  "...", // percent_that_would_have_answered_wrong_in_an_abc_type_question formula
   "..." // percent_that_would_have_answered_very_wrong_in_an_abc_type_question formula
 ];
 
@@ -844,6 +860,15 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
   fillColumnWithFormulas(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
+    "Wrong answer(s)",
+    `=JOIN("; ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW],topline_combo!$F$2:$F = 2))`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
     "Very wrong answer(s)",
     `=JOIN("; ",FILTER(topline_combo!$E$2:$E,topline_combo!$A$2:$A = $A[ROW],topline_combo!$C$2:$C = $C[ROW],topline_combo!$F$2:$F = 3))`,
     startRow,
@@ -855,6 +880,15 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheetHeaders,
     "% that answered correctly",
     `=SUMIFS(topline_combo!$H$2:$H,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,1)`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "% that answered wrong",
+    `=IF(COUNTIFS(topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,2)=0,"n/a",SUMIFS(topline_combo!$H$2:$H,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,3))`,
     startRow,
     numRows
   );
@@ -913,7 +947,16 @@ Very wrong answer(s): "&IFERROR(X[ROW],"n/a")&"
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "% that would have answered correctly in an abc-type question",
-    `=Y[ROW]*AB[ROW]/3`,
+    `=Z[ROW]*$AD[ROW]/3`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithFormulas(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "% that would have answered wrong in an abc-type question",
+    `=IF(AA[ROW]="n/a","n/a",AA[ROW]*$AD[ROW]/3)`,
     startRow,
     numRows
   );
