@@ -917,7 +917,7 @@ Very wrong answer(s): "&IFERROR(X[ROW],"n/a")&"
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "% that would have answered very wrong in an abc-type question",
-    `==IF(Z[ROW]="n/a","n/a",Z[ROW]*AB[ROW]/3)`,
+    `=IF(AB[ROW]="n/a","n/a",AB[ROW]*$AD[ROW]/3)`,
     startRow,
     numRows
   );
