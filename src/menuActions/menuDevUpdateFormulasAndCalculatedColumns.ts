@@ -119,7 +119,9 @@ function devUpdateFormulasAndCalculatedColumns() {
       gsDashboardSurveyListingsEntry.survey_id
   ) as { [survey_id: string]: GsDashboardSurveyListingsEntry[] };
 
-  const maxRowsToUpdateInEachRound = 5000;
+  // Running updates in batches since attempting to setValues on too large
+  // ranges results in "Service Spreadsheets timed out while accessing document with id ..."
+  const maxRowsToUpdateInEachRound = 3000;
 
   chunk(surveyEntries, maxRowsToUpdateInEachRound).map(
     ($surveyEntries, index) => {
