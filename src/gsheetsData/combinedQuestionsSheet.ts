@@ -888,7 +888,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,
     "% that answered wrong",
-    `=IF(COUNTIFS(topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,2)=0,"n/a",SUMIFS(topline_combo!$H$2:$H,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,3))`,
+    `=IF(COUNTIFS(topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,2)=0,"n/a",SUMIFS(topline_combo!$H$2:$H,topline_combo!$A$2:$A,$A[ROW],topline_combo!$C$2:$C,$C[ROW],topline_combo!$F$2:$F,2))`,
     startRow,
     numRows
   );
