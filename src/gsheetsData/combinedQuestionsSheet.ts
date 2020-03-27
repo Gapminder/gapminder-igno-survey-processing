@@ -60,7 +60,8 @@ export const combinedQuestionsSheetHeaders = [
   "Amount of answer options",
   "% that would have answered correctly in an abc-type question",
   "% that would have answered wrong in an abc-type question",
-  "% that would have answered very wrong in an abc-type question"
+  "% that would have answered very wrong in an abc-type question",
+  "Question text included in survey"
 ];
 
 /**
@@ -117,6 +118,7 @@ export interface CombinedQuestionEntry {
   percent_that_would_have_answered_correctly_in_an_abc_type_question: any;
   percent_that_would_have_answered_wrong_in_an_abc_type_question: any;
   percent_that_would_have_answered_very_wrong_in_an_abc_type_question: any;
+  question_text_included_in_survey: any;
 }
 
 /**
@@ -173,7 +175,8 @@ export const questionEntryToCombinedQuestionSheetValueRow = (
   "...", // amount_of_answer_options formula
   "...", // percent_that_would_have_answered_correctly_in_an_abc_type_question formula
   "...", // percent_that_would_have_answered_wrong_in_an_abc_type_question formula
-  "..." // percent_that_would_have_answered_very_wrong_in_an_abc_type_question formula
+  "...", // percent_that_would_have_answered_very_wrong_in_an_abc_type_question formula
+  "..." // question_text_included_in_survey formula
 ];
 
 /**
@@ -221,7 +224,8 @@ export const combinedQuestionsSheetValueRowToCombinedQuestionEntry = (
     percent_that_would_have_answered_wrong_in_an_abc_type_question:
       combinedQuestionsSheetRow[31],
     percent_that_would_have_answered_very_wrong_in_an_abc_type_question:
-      combinedQuestionsSheetRow[32]
+      combinedQuestionsSheetRow[32],
+    question_text_included_in_survey: combinedQuestionsSheetRow[33]
   };
 };
 
@@ -262,7 +266,8 @@ export const questionEntryToCombinedQuestionsSheetValueRow = questionEntry => [
   "...", // amount_of_answer_options formula
   "...", // percent_that_would_have_answered_correctly_in_an_abc_type_question formula
   "...", // percent_that_would_have_answered_wrong_in_an_abc_type_question formula
-  "..." // percent_that_would_have_answered_very_wrong_in_an_abc_type_question formula
+  "...", // percent_that_would_have_answered_very_wrong_in_an_abc_type_question formula
+  "..." // question_text_included_in_survey formula
 ];
 
 /**
@@ -966,6 +971,19 @@ Very wrong answer(s): "&IFERROR(X[ROW],"n/a")&"
     combinedQuestionsSheetHeaders,
     "% that would have answered very wrong in an abc-type question",
     `=IF(AB[ROW]="n/a","n/a",AB[ROW]*$AD[ROW]/3)`,
+    startRow,
+    numRows
+  );
+
+  fillColumnWithValues(
+    combinedQuestionsSheet,
+    combinedQuestionsSheetHeaders,
+    "Question text included in survey",
+    rowNumber => {
+      const combinedQuestionEntry =
+        combinedQuestionEntries[rowNumber - startRow];
+      return combinedQuestionEntry.question_text;
+    },
     startRow,
     numRows
   );
