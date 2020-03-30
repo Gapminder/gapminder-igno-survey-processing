@@ -693,6 +693,8 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
     importedIgnoQuestionsInfoEntryStep5IndexMatchKey
   );
 
+  // console.log("importedIgnoQuestionsInfoEntryStep5IndexLookupIndex", importedIgnoQuestionsInfoEntryStep5IndexLookupIndex);
+
   fillColumnWithValues(
     combinedQuestionsSheet,
     combinedQuestionsSheetHeaders,

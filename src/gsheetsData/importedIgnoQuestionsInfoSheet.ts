@@ -68,7 +68,6 @@ export interface ImportedIgnoQuestionsInfoEntry {
   foreign_country_igno_index_question_very_wrong_answer: any;
   step5_question_id: any;
   step5_study_survey_batch_number: any;
-  study_original_question_and_translation: any;
   step5_question_and_translation: any;
   step5_question: any;
   step5_question_correct_answer: any;
@@ -108,22 +107,20 @@ export const importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEn
       importedIgnoQuestionsInfoSheetRow[11],
     step5_question_id: importedIgnoQuestionsInfoSheetRow[12],
     step5_study_survey_batch_number: importedIgnoQuestionsInfoSheetRow[13],
-    study_original_question_and_translation:
-      importedIgnoQuestionsInfoSheetRow[14],
-    step5_question_and_translation: importedIgnoQuestionsInfoSheetRow[15],
-    step5_question: importedIgnoQuestionsInfoSheetRow[16],
-    step5_question_correct_answer: importedIgnoQuestionsInfoSheetRow[17],
-    step5_question_answer_options: importedIgnoQuestionsInfoSheetRow[18],
-    step5_question_very_wrong_answer: importedIgnoQuestionsInfoSheetRow[19],
-    step5_question_asking_language: importedIgnoQuestionsInfoSheetRow[20],
-    step5_question_translation_status: importedIgnoQuestionsInfoSheetRow[21],
-    step5_question_translated_question: importedIgnoQuestionsInfoSheetRow[22],
+    step5_question_and_translation: importedIgnoQuestionsInfoSheetRow[14],
+    step5_question: importedIgnoQuestionsInfoSheetRow[15],
+    step5_question_correct_answer: importedIgnoQuestionsInfoSheetRow[16],
+    step5_question_answer_options: importedIgnoQuestionsInfoSheetRow[17],
+    step5_question_very_wrong_answer: importedIgnoQuestionsInfoSheetRow[18],
+    step5_question_asking_language: importedIgnoQuestionsInfoSheetRow[19],
+    step5_question_translation_status: importedIgnoQuestionsInfoSheetRow[20],
+    step5_question_translated_question: importedIgnoQuestionsInfoSheetRow[21],
     step5_question_translated_question_correct_answer:
-      importedIgnoQuestionsInfoSheetRow[23],
+      importedIgnoQuestionsInfoSheetRow[22],
     step5_question_translated_question_answer_options:
-      importedIgnoQuestionsInfoSheetRow[24],
+      importedIgnoQuestionsInfoSheetRow[23],
     step5_question_translated_question_very_wrong_answer:
-      importedIgnoQuestionsInfoSheetRow[25]
+      importedIgnoQuestionsInfoSheetRow[24]
   };
 };
 
