@@ -14,6 +14,7 @@ import {
   getSheetDataIncludingHeaderRow,
   lookupGsDashboardSurveyListing
 } from "../common";
+import { keyNormalizerForSlightlyFuzzyLookups } from "../lib/keyNormalizerForSlightlyFuzzyLookups";
 import { parseSurveyName } from "../lib/parseSurveyName";
 import Spreadsheet = GoogleAppsScript.Spreadsheet.Spreadsheet;
 import { CombinedToplineEntry } from "./combinedToplineSheet";
@@ -376,11 +377,11 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
       });
       throw new Error("The entry did not have igno_index_question set");
     }
-    return `${importedIgnoQuestionsInfoEntry.igno_index_world_views_survey_batch_number
-      .trim()
-      .toLowerCase()}-${importedIgnoQuestionsInfoEntry.igno_index_question
-      .trim()
-      .toLowerCase()}`;
+    return `${keyNormalizerForSlightlyFuzzyLookups(
+      importedIgnoQuestionsInfoEntry.igno_index_world_views_survey_batch_number
+    )}-${keyNormalizerForSlightlyFuzzyLookups(
+      importedIgnoQuestionsInfoEntry.igno_index_question
+    )}`;
   };
   const importedIgnoQuestionsInfoEntryIgnoIndexLookupIndex = groupBy(
     importedIgnoQuestionsInfoEntries.filter(
@@ -414,17 +415,18 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
       if (worldViewsSurveyBatchNumber === null) {
         return `(No world views batch number found in survey name "${combinedQuestionEntry.survey_name}")`;
       }
+      const matchKey = `${keyNormalizerForSlightlyFuzzyLookups(
+        worldViewsSurveyBatchNumber
+      )}-${keyNormalizerForSlightlyFuzzyLookups(
+        combinedQuestionEntry.question_text
+      )}`;
       const matchingImportedIgnoQuestionsInfoEntries =
-        importedIgnoQuestionsInfoEntryIgnoIndexLookupIndex[
-          `${worldViewsSurveyBatchNumber.toLowerCase()}-${combinedQuestionEntry.question_text
-            .trim()
-            .toLowerCase()}`
-        ];
+        importedIgnoQuestionsInfoEntryIgnoIndexLookupIndex[matchKey];
       if (
         !matchingImportedIgnoQuestionsInfoEntries ||
         matchingImportedIgnoQuestionsInfoEntries.length === 0
       ) {
-        return `(No identical questions within batch ${worldViewsSurveyBatchNumber} found)`;
+        return `(No identical questions within world views batch ${worldViewsSurveyBatchNumber} - matchKey: "${matchKey}")`;
       }
       const autoMappedId = matchingImportedIgnoQuestionsInfoEntries
         .map(
@@ -513,11 +515,11 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
         "The entry did not have foreign_country_igno_question set"
       );
     }
-    return `${importedIgnoQuestionsInfoEntry.foreign_country_country_views_survey_batch_number
-      .trim()
-      .toLowerCase()}-${importedIgnoQuestionsInfoEntry.foreign_country_igno_question
-      .trim()
-      .toLowerCase()}`;
+    return `${keyNormalizerForSlightlyFuzzyLookups(
+      importedIgnoQuestionsInfoEntry.foreign_country_country_views_survey_batch_number
+    )}-${keyNormalizerForSlightlyFuzzyLookups(
+      importedIgnoQuestionsInfoEntry.foreign_country_igno_question
+    )}`;
   };
   const importedIgnoQuestionsInfoEntryForeignCountryIgnoIndexLookupIndex = groupBy(
     importedIgnoQuestionsInfoEntries.filter(
@@ -551,17 +553,20 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
       if (countryViewsSurveyBatchNumber === null) {
         return `(No country views batch number found in survey name "${combinedQuestionEntry.survey_name}")`;
       }
+      const matchKey = `${keyNormalizerForSlightlyFuzzyLookups(
+        countryViewsSurveyBatchNumber
+      )}-${keyNormalizerForSlightlyFuzzyLookups(
+        combinedQuestionEntry.question_text
+      )}`;
       const matchingImportedIgnoQuestionsInfoEntries =
         importedIgnoQuestionsInfoEntryForeignCountryIgnoIndexLookupIndex[
-          `${countryViewsSurveyBatchNumber.toLowerCase()}-${combinedQuestionEntry.question_text
-            .trim()
-            .toLowerCase()}`
+          matchKey
         ];
       if (
         !matchingImportedIgnoQuestionsInfoEntries ||
         matchingImportedIgnoQuestionsInfoEntries.length === 0
       ) {
-        return `(No identical questions within batch ${countryViewsSurveyBatchNumber} found)`;
+        return `(No identical questions within country views batch ${countryViewsSurveyBatchNumber} found - matchKey: "${matchKey}")`;
       }
       const autoMappedId = matchingImportedIgnoQuestionsInfoEntries
         .map(
@@ -650,11 +655,11 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
         });
         throw new Error("The entry did not have step5_question set");
       }
-      return `${importedIgnoQuestionsInfoEntry.step5_study_survey_batch_number
-        .trim()
-        .toLowerCase()}-${importedIgnoQuestionsInfoEntry.step5_question
-        .trim()
-        .toLowerCase()}`;
+      return `${keyNormalizerForSlightlyFuzzyLookups(
+        importedIgnoQuestionsInfoEntry.step5_study_survey_batch_number
+      )}-${keyNormalizerForSlightlyFuzzyLookups(
+        importedIgnoQuestionsInfoEntry.step5_question
+      )}`;
     } else {
       if (!importedIgnoQuestionsInfoEntry.step5_question_translated_question) {
         console.log(
@@ -667,11 +672,11 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
           "The entry did not have step5_question_translated_question set (and was not asked in 'en' language)"
         );
       }
-      return `${importedIgnoQuestionsInfoEntry.step5_study_survey_batch_number
-        .trim()
-        .toLowerCase()}-${importedIgnoQuestionsInfoEntry.step5_question_translated_question
-        .trim()
-        .toLowerCase()}`;
+      return `${keyNormalizerForSlightlyFuzzyLookups(
+        importedIgnoQuestionsInfoEntry.step5_study_survey_batch_number
+      )}-${keyNormalizerForSlightlyFuzzyLookups(
+        importedIgnoQuestionsInfoEntry.step5_question_translated_question
+      )}`;
     }
   };
   const importedIgnoQuestionsInfoEntryStep5IndexLookupIndex = groupBy(
@@ -712,16 +717,18 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
         return `(No study survey batch number found in survey name "${combinedQuestionEntry.survey_name}")`;
       }
 
-      const matchKey = `${studySurveyBatchNumber.toLowerCase()}-${combinedQuestionEntry.question_text
-        .trim()
-        .toLowerCase()}`;
+      const matchKey = `${keyNormalizerForSlightlyFuzzyLookups(
+        studySurveyBatchNumber
+      )}-${keyNormalizerForSlightlyFuzzyLookups(
+        combinedQuestionEntry.question_text
+      )}`;
       const matchingImportedIgnoQuestionsInfoEntries =
         importedIgnoQuestionsInfoEntryStep5IndexLookupIndex[matchKey];
       if (
         !matchingImportedIgnoQuestionsInfoEntries ||
         matchingImportedIgnoQuestionsInfoEntries.length === 0
       ) {
-        return `(No identical questions within batch ${studySurveyBatchNumber} found)`;
+        return `(No identical questions within study surey batch ${studySurveyBatchNumber} found - matchKey: "${matchKey}")`;
       }
       const autoMappedId = matchingImportedIgnoQuestionsInfoEntries
         .map(
