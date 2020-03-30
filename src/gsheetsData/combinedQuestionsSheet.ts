@@ -426,7 +426,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
         !matchingImportedIgnoQuestionsInfoEntries ||
         matchingImportedIgnoQuestionsInfoEntries.length === 0
       ) {
-        return `(No identical questions within world views batch ${worldViewsSurveyBatchNumber} - matchKey: "${matchKey}")`;
+        return `(No questions within world views batch ${worldViewsSurveyBatchNumber} - matchKey: "${matchKey}")`;
       }
       const autoMappedId = matchingImportedIgnoQuestionsInfoEntries
         .map(
@@ -566,7 +566,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
         !matchingImportedIgnoQuestionsInfoEntries ||
         matchingImportedIgnoQuestionsInfoEntries.length === 0
       ) {
-        return `(No identical questions within country views batch ${countryViewsSurveyBatchNumber} found - matchKey: "${matchKey}")`;
+        return `(No questions within country views batch ${countryViewsSurveyBatchNumber} found - matchKey: "${matchKey}")`;
       }
       const autoMappedId = matchingImportedIgnoQuestionsInfoEntries
         .map(
@@ -730,7 +730,7 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
         !matchingImportedIgnoQuestionsInfoEntries ||
         matchingImportedIgnoQuestionsInfoEntries.length === 0
       ) {
-        return `(No identical questions within study surey batch ${studySurveyBatchNumber} found - matchKey: "${matchKey}")`;
+        return `(No questions within study survey batch ${studySurveyBatchNumber} found - matchKey: "${matchKey}")`;
       }
       const autoMappedId = matchingImportedIgnoQuestionsInfoEntries
         .map(
