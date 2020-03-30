@@ -711,10 +711,12 @@ export function updateCombinedQuestionSheetFormulasAndCalculatedColumns(
       if (studySurveyBatchNumber === null) {
         return `(No study survey batch number found in survey name "${combinedQuestionEntry.survey_name}")`;
       }
+
+      const matchKey = `${studySurveyBatchNumber.toLowerCase()}-${combinedQuestionEntry.question_text
+        .trim()
+        .toLowerCase()}`;
       const matchingImportedIgnoQuestionsInfoEntries =
-        importedIgnoQuestionsInfoEntryStep5IndexLookupIndex[
-          `${studySurveyBatchNumber}-${combinedQuestionEntry.question_text.trim()}`
-        ];
+        importedIgnoQuestionsInfoEntryStep5IndexLookupIndex[matchKey];
       if (
         !matchingImportedIgnoQuestionsInfoEntries ||
         matchingImportedIgnoQuestionsInfoEntries.length === 0
