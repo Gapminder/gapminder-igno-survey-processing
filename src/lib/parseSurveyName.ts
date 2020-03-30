@@ -16,6 +16,7 @@ export function parseSurveyName(
   const worldViewsTextFound = surveyName.indexOf("World Views ") > -1;
   const countryViewsTextFound = surveyName.indexOf("Country Views ") > -1;
   const studySurveyTextFound = surveyName.indexOf("Study Survey ") > -1;
+  const studyTextFound = surveyName.indexOf("Study ") > -1;
   let worldViewsSurveyBatchNumber: BatchNumberParseResult = worldViewsTextFound
     ? surveyName.trim().replace("World Views ", "")
     : false;
@@ -24,6 +25,8 @@ export function parseSurveyName(
     : false;
   let studySurveyBatchNumber: BatchNumberParseResult = studySurveyTextFound
     ? surveyName.trim().replace("Study Survey ", "")
+    : studyTextFound
+    ? surveyName.trim().replace("Study ", "")
     : false;
   // Some special cases
   if (countryViewsSurveyBatchNumber === "383") {
