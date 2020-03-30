@@ -10,5 +10,5 @@ export function keyNormalizerForSlightlyFuzzyLookups(
   const trimmedLowerCasedWithoutDiacritics = removeDiacritics(
     lookupKey.trim().toLowerCase()
   );
-  return trimmedLowerCasedWithoutDiacritics.replace(/[^a-z0-9 ()]/g, "");
+  return trimmedLowerCasedWithoutDiacritics.replace(/[^a-z0-9%\-.,<> ()]/g, "");
 }

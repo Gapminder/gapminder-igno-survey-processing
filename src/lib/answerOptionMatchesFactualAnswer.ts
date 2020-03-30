@@ -1,4 +1,5 @@
 import { extractNumericalPartsOfAnswerOption } from "./extractNumericalPartsOfAnswerOption";
+import { keyNormalizerForSlightlyFuzzyLookups } from "./keyNormalizerForSlightlyFuzzyLookups";
 
 /**
  * @hidden
@@ -7,8 +8,8 @@ export function answerOptionMatchesFactualAnswer(
   answerOption: string,
   factualAnswer: string
 ): boolean {
-  answerOption = answerOption.trim().toLocaleLowerCase();
-  factualAnswer = factualAnswer.trim().toLocaleLowerCase();
+  answerOption = keyNormalizerForSlightlyFuzzyLookups(answerOption);
+  factualAnswer = keyNormalizerForSlightlyFuzzyLookups(factualAnswer);
   if (answerOption === factualAnswer) {
     return true;
   }

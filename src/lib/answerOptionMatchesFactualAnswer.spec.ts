@@ -26,6 +26,26 @@ const testAnswerOptionMatchesFactualAnswer: Macro<any> = (
     expectedOutput: true
   },
   {
+    answerOption: "1%",
+    factualAnswer: "1%,",
+    expectedOutput: true
+  },
+  {
+    answerOption: "1%,",
+    factualAnswer: "1%",
+    expectedOutput: true
+  },
+  {
+    answerOption: '1%"',
+    factualAnswer: "1%",
+    expectedOutput: true
+  },
+  {
+    answerOption: "1%",
+    factualAnswer: '1%"',
+    expectedOutput: true
+  },
+  {
     answerOption: "30-40%",
     factualAnswer: "24%",
     expectedOutput: false
