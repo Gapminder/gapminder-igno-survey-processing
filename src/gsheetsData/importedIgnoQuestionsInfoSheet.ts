@@ -4,7 +4,10 @@
  */
 /* tslint:disable:object-literal-sort-keys */
 
-import { getSheetDataIncludingHeaderRow } from "../common";
+import {
+  assertCorrectLeftmostSheetColumnHeaders,
+  getSheetDataIncludingHeaderRow
+} from "../common";
 import Spreadsheet = GoogleAppsScript.Spreadsheet.Spreadsheet;
 
 /**
@@ -14,30 +17,31 @@ import Spreadsheet = GoogleAppsScript.Spreadsheet.Spreadsheet;
  * @hidden
  */
 export const importedIgnoQuestionsInfoSheetHeaders = [
-  "igno_index_question_id",
-  "igno_index_world_views_survey_batch_number",
-  "igno_index_question",
-  "igno_index_question_correct_answer",
-  "igno_index_question_answer_options",
-  "igno_index_question_very_wrong_answer",
-  "foreign_country_igno_question_id",
-  "foreign_country_country_views_survey_batch_number",
-  "foreign_country_igno_question",
-  "foreign_country_igno_index_question_correct_answer",
-  "foreign_country_igno_question_answer_options",
-  "foreign_country_igno_index_question_very_wrong_answer",
-  "step5_question_id",
-  "step5_study_survey_batch_number",
-  "step5_question",
-  "step5_question_correct_answer",
-  "step5_question_answer_options",
-  "step5_question_very_wrong_answer",
-  "step5_question_asking_language",
-  "step5_question_translation_status",
-  "step5_question_translated_question",
-  "step5_question_translated_question_correct_answer",
-  "step5_question_translated_question_answer_options",
-  "step5_question_translated_question_very_wrong_answer"
+  "ID\ncombo",
+  "WV#",
+  "Question ",
+  "Correct Answer",
+  "Answer options",
+  "Very Wrong Answer - filled out only if it can't be derived numerically",
+  "ID combo",
+  "CV#",
+  "Question ",
+  "Correct Answer",
+  "Answer options",
+  "Very Wrong Answer - filled out only if it can't be derived numerically",
+  "Step 5 Question ID",
+  "S#",
+  "Study Question (EN) + Translation",
+  "Question (EN)",
+  "Correct Answer (EN)",
+  "Answer options (EN)",
+  "Very Wrong Answer - filled out only if it can't be derived numerically (EN)",
+  "Asking Language",
+  "Translation Status",
+  "Question (translation)",
+  "Correct Answer (translation)",
+  "Answer options (translation)",
+  "Very Wrong Answer - filled out only if it can't be derived numerically (translation)"
 ];
 
 /**
@@ -65,6 +69,7 @@ export interface ImportedIgnoQuestionsInfoEntry {
   step5_question_id: any;
   step5_study_survey_batch_number: any;
   study_original_question_and_translation: any;
+  step5_question_and_translation: any;
   step5_question: any;
   step5_question_correct_answer: any;
   step5_question_answer_options: any;
@@ -105,19 +110,20 @@ export const importedIgnoQuestionsInfoSheetValueRowToImportedIgnoQuestionsInfoEn
     step5_study_survey_batch_number: importedIgnoQuestionsInfoSheetRow[13],
     study_original_question_and_translation:
       importedIgnoQuestionsInfoSheetRow[14],
-    step5_question: importedIgnoQuestionsInfoSheetRow[15],
-    step5_question_correct_answer: importedIgnoQuestionsInfoSheetRow[16],
-    step5_question_answer_options: importedIgnoQuestionsInfoSheetRow[17],
-    step5_question_very_wrong_answer: importedIgnoQuestionsInfoSheetRow[18],
-    step5_question_asking_language: importedIgnoQuestionsInfoSheetRow[19],
-    step5_question_translation_status: importedIgnoQuestionsInfoSheetRow[20],
-    step5_question_translated_question: importedIgnoQuestionsInfoSheetRow[21],
+    step5_question_and_translation: importedIgnoQuestionsInfoSheetRow[15],
+    step5_question: importedIgnoQuestionsInfoSheetRow[16],
+    step5_question_correct_answer: importedIgnoQuestionsInfoSheetRow[17],
+    step5_question_answer_options: importedIgnoQuestionsInfoSheetRow[18],
+    step5_question_very_wrong_answer: importedIgnoQuestionsInfoSheetRow[19],
+    step5_question_asking_language: importedIgnoQuestionsInfoSheetRow[20],
+    step5_question_translation_status: importedIgnoQuestionsInfoSheetRow[21],
+    step5_question_translated_question: importedIgnoQuestionsInfoSheetRow[22],
     step5_question_translated_question_correct_answer:
-      importedIgnoQuestionsInfoSheetRow[22],
-    step5_question_translated_question_answer_options:
       importedIgnoQuestionsInfoSheetRow[23],
+    step5_question_translated_question_answer_options:
+      importedIgnoQuestionsInfoSheetRow[24],
     step5_question_translated_question_very_wrong_answer:
-      importedIgnoQuestionsInfoSheetRow[24]
+      importedIgnoQuestionsInfoSheetRow[25]
   };
 };
 
@@ -139,6 +145,14 @@ export function fetchAndVerifyImportedIgnoQuestionsInfoSheet(
     importedIgnoQuestionsInfoSheet,
     importedIgnoQuestionsInfoSheetHeaders
   );
+
+  // Verify that the first headers are as expected
+  assertCorrectLeftmostSheetColumnHeaders(
+    importedIgnoQuestionsInfoSheetHeaders,
+    importedIgnoQuestionsInfoSheetName,
+    importedIgnoQuestionsInfoSheetValuesIncludingHeaderRow
+  );
+
   return {
     importedIgnoQuestionsInfoSheet,
     importedIgnoQuestionsInfoSheetValuesIncludingHeaderRow
