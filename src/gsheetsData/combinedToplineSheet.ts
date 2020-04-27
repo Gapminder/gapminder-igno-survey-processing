@@ -13,7 +13,10 @@ import {
   getSheetDataIncludingHeaderRow,
   lookupGsDashboardSurveyListing
 } from "../common";
-import { answerOptionMatchesFactualAnswer } from "../lib/answerOptionMatchesFactualAnswer";
+import {
+  answerOptionIsTheSameAsFactualAnswer,
+  answerOptionMatchesFactualAnswer
+} from "../lib/answerOptionMatchesFactualAnswer";
 import { chosenAnswerOptionIsThisManyAnswerOptionsAwayFromFactualAnswer } from "../lib/chosenAnswerOptionIsThisManyAnswerOptionsAwayFromFactualAnswer";
 import Spreadsheet = GoogleAppsScript.Spreadsheet.Spreadsheet;
 import {
@@ -387,27 +390,24 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
         correspondingCombinedToplineEntry =>
           correspondingCombinedToplineEntry.answer
       );
-      const correctAnswerOptions = answerOptions.filter($answerOption =>
-        answerOptionMatchesFactualAnswer($answerOption, factualCorrectAnswer)
-      );
-      if (correctAnswerOptions.length === 0) {
-        return `(No answer option matching the correct answer "${factualCorrectAnswer}" found)`;
-      }
 
       let autoMarkedAsCorrect = false;
       let autoMarkedAsWrong = false;
       let autoMarkedAsVeryWrong = false;
-      if (correctAnswerOptions.indexOf(combinedToplineEntry.answer) > -1) {
-        autoMarkedAsCorrect = true;
-      } else {
-        autoMarkedAsWrong = true;
-      }
+      let correctAnswerOptions;
 
-      // Determine if very wrong
+      // Determine numerically if very wrong is not specified
       if (
         factualVeryWrongAnswer === undefined ||
         factualVeryWrongAnswer.trim() === ""
       ) {
+        // Determine correct answer numerically if possible
+        correctAnswerOptions = answerOptions.filter($answerOption =>
+          answerOptionMatchesFactualAnswer($answerOption, factualCorrectAnswer)
+        );
+        if (correctAnswerOptions.length === 0) {
+          return `(No answer option numerically matching the correct answer "${factualCorrectAnswer}" found)`;
+        }
         // Determine very wrong answer numerically if possible
         try {
           const answerOptionsAwayFromFactualAnswer = chosenAnswerOptionIsThisManyAnswerOptionsAwayFromFactualAnswer(
@@ -426,10 +426,24 @@ export function updateCombinedToplineSheetFormulasAndCalculatedColumns(
           }
         }
       } else {
-        autoMarkedAsVeryWrong = answerOptionMatchesFactualAnswer(
+        correctAnswerOptions = answerOptions.filter($answerOption =>
+          answerOptionIsTheSameAsFactualAnswer(
+            $answerOption,
+            factualCorrectAnswer
+          )
+        );
+        if (correctAnswerOptions.length === 0) {
+          return `(No answer option matching the correct answer "${factualCorrectAnswer}" found)`;
+        }
+        autoMarkedAsVeryWrong = answerOptionIsTheSameAsFactualAnswer(
           combinedToplineEntry.answer,
           factualVeryWrongAnswer
         );
+      }
+      if (correctAnswerOptions.indexOf(combinedToplineEntry.answer) > -1) {
+        autoMarkedAsCorrect = true;
+      } else {
+        autoMarkedAsWrong = true;
       }
       const autoMarkedCorrectness = autoMarkedAsCorrect
         ? 1

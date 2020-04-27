@@ -8,11 +8,33 @@ export function answerOptionMatchesFactualAnswer(
   answerOption: string,
   factualAnswer: string
 ): boolean {
+  return (
+    answerOptionIsTheSameAsFactualAnswer(answerOption, factualAnswer) ||
+    answerOptionMatchesFactualAnswerNumerically(answerOption, factualAnswer)
+  );
+}
+
+/**
+ * @hidden
+ */
+export function answerOptionIsTheSameAsFactualAnswer(
+  answerOption: string,
+  factualAnswer: string
+): boolean {
   answerOption = keyNormalizerForSlightlyFuzzyLookups(answerOption);
   factualAnswer = keyNormalizerForSlightlyFuzzyLookups(factualAnswer);
   if (answerOption === factualAnswer) {
     return true;
   }
+}
+
+/**
+ * @hidden
+ */
+export function answerOptionMatchesFactualAnswerNumerically(
+  answerOption: string,
+  factualAnswer: string
+): boolean {
   // Support matching eg "14" to "14 pounds"
   const numericalPartsOfAnswerOption = extractNumericalPartsOfAnswerOption(
     answerOption
