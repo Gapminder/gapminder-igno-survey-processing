@@ -38,6 +38,12 @@ export function parseSurveyName(
   if (countryViewsSurveyBatchNumber === "385") {
     studySurveyBatchNumber = "3/c385";
   }
+  if (worldViewsSurveyBatchNumber) {
+    const n = parseInt(worldViewsSurveyBatchNumber, 10);
+    if (n > 0 && n < 81) {
+      worldViewsSurveyBatchNumber = "1-80";
+    }
+  }
   // Return nulls in case nothing was found at all
   if (
     worldViewsSurveyBatchNumber === false &&

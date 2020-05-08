@@ -86,6 +86,22 @@ const testParseSurveyName: Macro<any> = (
       countryViewsSurveyBatchNumber: false,
       studySurveyBatchNumber: "123"
     }
+  },
+  {
+    surveyName: "World Views 1",
+    expectedOutput: {
+      worldViewsSurveyBatchNumber: "1-80",
+      countryViewsSurveyBatchNumber: false,
+      studySurveyBatchNumber: false
+    }
+  },
+  {
+    surveyName: "World Views 80",
+    expectedOutput: {
+      worldViewsSurveyBatchNumber: "1-80",
+      countryViewsSurveyBatchNumber: false,
+      studySurveyBatchNumber: false
+    }
   }
   /* tslint:enable:object-literal-sort-keys */
 ].forEach((testData, index) => {
