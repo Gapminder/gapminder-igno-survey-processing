@@ -311,7 +311,7 @@ function ensureGsheetVersionsOfEachExcelFile(gsResultsFolder: Folder) {
     // Note: Trimming at the end to ensure that the converted file name does not start or end with spaces
     const targetFileName = excelFile
       .getName()
-      .replace(/.xlsx?/, "")
+      .replace(/\.xlsx?$/, "")
       .trim();
     const existingGsheetFiles = filesByMimeType[gsheetMimeType].filter(
       (gsheetFile: File) => gsheetFile.getName().trim() === targetFileName
