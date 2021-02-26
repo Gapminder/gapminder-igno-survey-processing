@@ -27,7 +27,7 @@ ___
 
 ▸ **menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames**(): *void*
 
-*Defined in [menuActions/menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames.ts:13](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.5.0/src/menuActions/menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames.ts#L13)*
+*Defined in [menuActions/menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames.ts:14](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.5.0/src/menuActions/menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames.ts#L14)*
 
 Menu item action for "Gapminder Igno Survey Process -> Extract Survey IDs from copy-pasted linked survey names"
 

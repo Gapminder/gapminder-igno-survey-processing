@@ -9,7 +9,7 @@ const testSurveyIdFromGoogleSurveysUrl: Macro<any> = (
   { url, expected }
 ) => {
   const output = surveyIdFromGoogleSurveysUrl(url);
-  t.log({ output, expected });
+  // t.log({ output, expected });
   t.deepEqual(output, expected);
 };
 
