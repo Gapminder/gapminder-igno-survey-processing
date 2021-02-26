@@ -6,6 +6,7 @@ import {
   gsDashboardSurveyListingsSheetHeaders,
   gsDashboardSurveyListingsSheetName
 } from "../gsheetsData/gsDashboardSurveyListingsSheet";
+import { surveyIdFromGoogleSurveysUrl } from "../lib/surveyIdFromGoogleSurveysUrl";
 
 /**
  * Menu item action for "Gapminder Igno Survey Process -> Extract Survey IDs from copy-pasted linked survey names"
@@ -122,8 +123,6 @@ function refreshGsDashboardSurveyListingsSheetListing(
     newUrlColumnValues.length,
     1
   );
-  const surveyIdValues = urls.map(url => [
-    url.replace("https://surveys.google.com/reporting/survey?survey=", "")
-  ]);
+  const surveyIdValues = urls.map(url => [surveyIdFromGoogleSurveysUrl(url)]);
   correspondingSurveyIdColumnValuesRange.setValues(surveyIdValues);
 }
