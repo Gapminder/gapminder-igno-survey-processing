@@ -12,6 +12,7 @@ def read_config() -> dict[str, str]:
     # Mandatory configuration
     for key in [
         "SERVICE_ACCOUNT_CREDENTIALS",
+        "SURVEY_MONKEY_API_TOKEN",
     ]:
         config[key] = os.getenv(key=key, default="")
         if config[key] == "":
