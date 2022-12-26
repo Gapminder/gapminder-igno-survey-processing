@@ -56,6 +56,14 @@ const testExtractNumericalPartsOfAnswerOption: Macro<any> = (
     expectedOutput: [1]
   },
   {
+    answerOption: "1%,",
+    expectedOutput: [1]
+  },
+  {
+    answerOption: ",1%",
+    expectedOutput: [1]
+  },
+  {
     answerOption: "-1.1",
     expectedOutput: [-1.1]
   },
