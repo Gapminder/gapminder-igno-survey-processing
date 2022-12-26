@@ -3,7 +3,7 @@ import re
 import numpy as np
 import pandas as pd
 
-from lib.utils import inv_dict
+from lib.gsheets.utils import inv_dict
 
 
 class GsheetsWorksheetData:

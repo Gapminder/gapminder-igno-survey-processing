@@ -5,6 +5,10 @@ from gspread import Spreadsheet, Worksheet, WorksheetNotFound
 from gspread_dataframe import set_with_dataframe
 
 
+def inv_dict(my_dict: dict) -> dict:
+    return {v: k for k, v in my_dict.items()}
+
+
 def spreadsheet_url(spreadsheet_id: str) -> str:
     return f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}"
 
