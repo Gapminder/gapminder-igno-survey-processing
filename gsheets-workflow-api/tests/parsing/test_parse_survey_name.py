@@ -11,7 +11,7 @@ from lib.parsing.parse_survey_name import parse_survey_name
         (
             "World Views 123",
             {
-                "world_views_survey_batch_number": "123",
+                "igno_index_world_views_survey_batch_number": "123",
                 "country_views_survey_batch_number": False,
                 "study_survey_batch_number": False,
             },
@@ -19,7 +19,7 @@ from lib.parsing.parse_survey_name import parse_survey_name
         (
             "Country Views 123",
             {
-                "world_views_survey_batch_number": False,
+                "igno_index_world_views_survey_batch_number": False,
                 "country_views_survey_batch_number": "123",
                 "study_survey_batch_number": False,
             },
@@ -27,7 +27,7 @@ from lib.parsing.parse_survey_name import parse_survey_name
         (
             "Study Survey 123",
             {
-                "world_views_survey_batch_number": False,
+                "igno_index_world_views_survey_batch_number": False,
                 "country_views_survey_batch_number": False,
                 "study_survey_batch_number": "123",
             },
@@ -35,7 +35,7 @@ from lib.parsing.parse_survey_name import parse_survey_name
         (
             "Foo 123",
             {
-                "world_views_survey_batch_number": None,
+                "igno_index_world_views_survey_batch_number": None,
                 "country_views_survey_batch_number": None,
                 "study_survey_batch_number": None,
             },
@@ -43,7 +43,7 @@ from lib.parsing.parse_survey_name import parse_survey_name
         (
             "#N/A",
             {
-                "world_views_survey_batch_number": None,
+                "igno_index_world_views_survey_batch_number": None,
                 "country_views_survey_batch_number": None,
                 "study_survey_batch_number": None,
             },
@@ -51,7 +51,7 @@ from lib.parsing.parse_survey_name import parse_survey_name
         (
             "Country Views 383",
             {
-                "world_views_survey_batch_number": False,
+                "igno_index_world_views_survey_batch_number": False,
                 "country_views_survey_batch_number": "383",
                 "study_survey_batch_number": "1/c383",
             },
@@ -59,7 +59,7 @@ from lib.parsing.parse_survey_name import parse_survey_name
         (
             "Country Views 384",
             {
-                "world_views_survey_batch_number": False,
+                "igno_index_world_views_survey_batch_number": False,
                 "country_views_survey_batch_number": "384",
                 "study_survey_batch_number": "2/c384",
             },
@@ -67,7 +67,7 @@ from lib.parsing.parse_survey_name import parse_survey_name
         (
             "Country Views 385",
             {
-                "world_views_survey_batch_number": False,
+                "igno_index_world_views_survey_batch_number": False,
                 "country_views_survey_batch_number": "385",
                 "study_survey_batch_number": "3/c385",
             },
@@ -75,7 +75,7 @@ from lib.parsing.parse_survey_name import parse_survey_name
         (
             "Study 123",
             {
-                "world_views_survey_batch_number": False,
+                "igno_index_world_views_survey_batch_number": False,
                 "country_views_survey_batch_number": False,
                 "study_survey_batch_number": "123",
             },
@@ -83,7 +83,7 @@ from lib.parsing.parse_survey_name import parse_survey_name
         (
             "World Views 1",
             {
-                "world_views_survey_batch_number": "1-80",
+                "igno_index_world_views_survey_batch_number": "1-80",
                 "country_views_survey_batch_number": False,
                 "study_survey_batch_number": False,
             },
@@ -91,7 +91,7 @@ from lib.parsing.parse_survey_name import parse_survey_name
         (
             "World Views 80",
             {
-                "world_views_survey_batch_number": "1-80",
+                "igno_index_world_views_survey_batch_number": "1-80",
                 "country_views_survey_batch_number": False,
                 "study_survey_batch_number": False,
             },

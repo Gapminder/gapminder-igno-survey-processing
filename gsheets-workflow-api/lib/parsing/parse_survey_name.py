@@ -1,27 +1,34 @@
 from typing import Dict, Union
 
+from lib.parsing.extract_numerical_parts_of_answer_option import (
+    extract_numerical_parts_of_answer_option,
+)
+
 BatchNumberParseResult = Union[str, None, bool]
 
 
 def parse_survey_name(survey_name: str) -> Dict[str, BatchNumberParseResult]:
-    world_views_text_found = "World Views " in survey_name
+    world_views_text_found = (
+        "World Views " in survey_name or "Worldviews " in survey_name
+    )
     country_views_text_found = "Country Views " in survey_name
-    study_survey_text_found = "Study Survey " in survey_name
-    study_text_found = "Study " in survey_name
+    study_survey_text_found = "Study Survey " in survey_name or "Study " in survey_name
+
+    numerical_parts_of_survey_name = extract_numerical_parts_of_answer_option(
+        survey_name
+    )
     world_views_survey_batch_number: BatchNumberParseResult = (
-        survey_name.strip().replace("World Views ", "")
-        if world_views_text_found
-        else False
+        str(int(numerical_parts_of_survey_name[0])) if world_views_text_found else False
     )
     country_views_survey_batch_number: BatchNumberParseResult = (
-        survey_name.strip().replace("Country Views ", "")
+        str(int(numerical_parts_of_survey_name[0]))
         if country_views_text_found
         else False
     )
     study_survey_batch_number: BatchNumberParseResult = (
-        survey_name.strip().replace("Study Survey ", "")
+        str(int(numerical_parts_of_survey_name[0]))
         if study_survey_text_found
-        else (survey_name.strip().replace("Study ", "") if study_text_found else False)
+        else False
     )
 
     # Some special cases
@@ -47,7 +54,7 @@ def parse_survey_name(survey_name: str) -> Dict[str, BatchNumberParseResult]:
         study_survey_batch_number = None
 
     return {
+        "igno_index_world_views_survey_batch_number": world_views_survey_batch_number,
         "country_views_survey_batch_number": country_views_survey_batch_number,
         "study_survey_batch_number": study_survey_batch_number,
-        "world_views_survey_batch_number": world_views_survey_batch_number,
     }

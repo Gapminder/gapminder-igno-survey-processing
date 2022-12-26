@@ -45,8 +45,8 @@ def chosen_answer_option_is_this_many_answer_options_away_from_factual_answer(
         raise ValueError("Answer options not all numerical")
 
     def minimum_numerical_part_of_answer_option(
-        numerical_parts_of_answer_option: List[int],
-    ) -> int:
+        numerical_parts_of_answer_option: List[float],
+    ) -> float:
         return min(numerical_parts_of_answer_option)
 
     # Order by min(numerics)

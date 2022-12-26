@@ -17,7 +17,7 @@ def is_numeric(n: Any) -> bool:
         return False
 
 
-def extract_numerical_parts_of_answer_option(answer_option: str) -> list:
+def extract_numerical_parts_of_answer_option(answer_option: str) -> list[float]:
     answer_option = key_normalizer_for_slightly_fuzzy_lookups(
         str(answer_option).strip().lower()
     )
