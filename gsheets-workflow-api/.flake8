@@ -1,5 +1,5 @@
 [flake8]
-max-line-length = 88
+max-line-length = 100
 max-complexity = 8
 # http://flake8.pycqa.org/en/2.5.5/warnings.html#warning-error-codes
 ignore =
@@ -21,4 +21,5 @@ ignore =
 per-file-ignores =
   *tests/*:D205,D400,D401,S101,S106,E501,E731
   gsheets-workflow-api/lib/*/schemas.py:E501
+  gsheets-workflow-api/lib/*/*.py:C901
   example-notebook.py:W391

@@ -2,7 +2,27 @@ import pytest
 
 from lib.parsing.extract_numerical_parts_of_answer_option import (
     extract_numerical_parts_of_answer_option,
+    is_numeric,
 )
+
+
+@pytest.mark.parametrize(
+    "n, expected_output",
+    [
+        ("1", True),
+        ("1.0", True),
+        ("1.", True),
+        ("1,0", True),
+        ("1,", True),
+        ("150,000", True),
+        ("150,000.00", True),
+        ("150,000.00%", False),
+        ("abc%", False),
+    ],
+)
+def test_is_numeric(n, expected_output):
+    output = is_numeric(n)
+    assert output == expected_output
 
 
 @pytest.mark.parametrize(
@@ -29,6 +49,7 @@ from lib.parsing.extract_numerical_parts_of_answer_option import (
         ("$14", [14]),
         ("$14 billion", [14]),
         ("About 10", [10]),
+        ("Around 150,000", [150000]),
         ("Yes", []),
         ("30-40%", [0.3, 0.4]),
         ("20-30%", [0.2, 0.3]),

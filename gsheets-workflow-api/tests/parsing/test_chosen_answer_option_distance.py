@@ -2,7 +2,7 @@ from typing import List
 
 import pytest
 
-from lib.parsing.chosen_answer_option_is_this_many_answer_options_away_from_factual_answer import (
+from lib.parsing.chosen_answer_option_distance import (
     chosen_answer_option_is_this_many_answer_options_away_from_factual_answer,
 )
 

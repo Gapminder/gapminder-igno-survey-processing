@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 from lib.parsing.answer_option_matches_factual_answer import (
     answer_option_matches_factual_answer,
@@ -9,10 +9,12 @@ from lib.parsing.extract_numerical_parts_of_answer_option import (
 
 
 def chosen_answer_option_is_this_many_answer_options_away_from_factual_answer(
-    chosen_answer_option: str, answer_options: List[str], factual_answer: str
+    chosen_answer_option_input: Union[str, int, float],
+    answer_options: List[str],
+    factual_answer_input: Union[str, int, float],
 ) -> int:
-    chosen_answer_option = chosen_answer_option.strip().lower()
-    factual_answer = factual_answer.strip().lower()
+    chosen_answer_option = str(chosen_answer_option_input).strip().lower()
+    factual_answer = str(factual_answer_input).strip().lower()
 
     if len(answer_options) == 0:
         raise ValueError("Empty answerOptions array given")
@@ -34,7 +36,7 @@ def chosen_answer_option_is_this_many_answer_options_away_from_factual_answer(
         return 0
 
     # Double-check that all answer options are numerical
-    # (either integers, floats, percentages or ranges of such
+    # (either integers, floats, percentages or ranges of such)
     numerical_parts_of_answer_options = [
         extract_numerical_parts_of_answer_option(ao) for ao in answer_options
     ]
