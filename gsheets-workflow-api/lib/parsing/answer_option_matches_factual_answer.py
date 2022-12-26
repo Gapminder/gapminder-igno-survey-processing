@@ -43,24 +43,10 @@ def answer_option_matches_factual_answer_numerically(
             answer_option_numeric = numerical_parts_of_answer_option[0]
             return factual_answer_numeric == answer_option_numeric
         if len(numerical_parts_of_answer_option) == 2:
+            # Support matching eg "34%" to "30-40%"
             if (
                 numerical_parts_of_answer_option[0] <= factual_answer_numeric
                 and numerical_parts_of_answer_option[1] >= factual_answer_numeric
             ):
                 return True
-    # Support matching eg "34%" to "30-40%"
-    if (
-        factual_answer.index("%") == len(factual_answer) - 1
-        and answer_option.index("%") == len(answer_option) - 1
-        and answer_option.index("-") > -1
-    ):
-        factual_answer_percentage = float(factual_answer.replace("%", ""))
-        answer_option_percentage_range = list(
-            map(float, answer_option.replace("%", "").split("-"))
-        )
-        if (
-            answer_option_percentage_range[0] <= factual_answer_percentage
-            and answer_option_percentage_range[1] >= factual_answer_percentage
-        ):
-            return True
     return False
