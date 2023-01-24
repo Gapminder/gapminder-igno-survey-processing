@@ -41,33 +41,51 @@ def convert_survey_details_to_gs_question_and_answer_rows(
                     f"Please unselect survey with title "
                     f'"{survey_details.title}" and try import again'
                 )
-            for choice in question.answers.choices:
-                print(f"choice {choice.id}")  # noqa T201
-                rollup_summary_for_choice = find_by_attribute(
-                    rollup.summary[0].choices, "id", choice.id
-                )
-                answered_choice_count: int = rollup_summary_for_choice.count
-                answered_fraction = answered_choice_count / answered_count
-                gs_answer = summarize_gs_answer(
+            else:
+                for choice in question.answers.choices:
+                    print(f"choice {choice.id}")  # noqa T201
+                    if not rollup.summary[0].choices:
+                        print(dumps(rollup.summary[0].dict(), indent=2))  # noqa T201
+                        raise Exception(
+                            f"Question rollup has no answer options/choices. "
+                            f"Not able to import this survey. "
+                            f"Please unselect survey with title "
+                            f'"{survey_details.title}" and try import again'
+                        )
+                    else:
+                        rollup_summary_for_choice = find_by_attribute(
+                            rollup.summary[0].choices, "id", choice.id
+                        )
+                        if not rollup_summary_for_choice:
+                            raise Exception(
+                                f"Question choice has no rollup. "
+                                f"Not able to import this survey. "
+                                f"Please unselect survey with title "
+                                f'"{survey_details.title}" and try import again'
+                            )
+                        else:
+                            answered_choice_count: int = rollup_summary_for_choice.count
+                            answered_fraction = answered_choice_count / answered_count
+                            gs_answer = summarize_gs_answer(
+                                survey_id=int(survey_id),
+                                survey_details=survey_details,
+                                question_number=question_number,
+                                question=question,
+                                choice=choice,
+                                answered_fraction=answered_fraction,
+                            )
+                            gs_answers.append(gs_answer)
+                            answered_fractions.append(answered_fraction)
+                gs_question = summarize_gs_question(
                     survey_id=int(survey_id),
                     survey_details=survey_details,
                     question_number=question_number,
                     question=question,
-                    choice=choice,
-                    answered_fraction=answered_fraction,
+                    answered_fractions=answered_fractions,
+                    answered_count=answered_count,
+                    gs_survey_results_data=gs_survey_results_data,
                 )
-                gs_answers.append(gs_answer)
-                answered_fractions.append(answered_fraction)
-            gs_question = summarize_gs_question(
-                survey_id=int(survey_id),
-                survey_details=survey_details,
-                question_number=question_number,
-                question=question,
-                answered_fractions=answered_fractions,
-                answered_count=answered_count,
-                gs_survey_results_data=gs_survey_results_data,
-            )
-            gs_questions.append(gs_question)
+                gs_questions.append(gs_question)
 
     # Auto-mark correctness
     gs_answers_before_marking_correctness = copy.deepcopy(gs_answers)

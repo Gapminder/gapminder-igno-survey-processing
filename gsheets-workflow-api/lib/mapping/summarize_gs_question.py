@@ -18,11 +18,19 @@ def summarize_gs_question(
 ) -> GsQuestionRow:
     template_gs_question = gs_survey_results_data.questions_combo.data.df.iloc[0]
 
-    the_answer_options = " - ".join(choice.text for choice in question.answers.choices)
-    answers_by_percent = " - ".join(
-        "{:.2%}".format(answered_fraction) for answered_fraction in answered_fractions
-    )
-    amount_of_answer_options = len(question.answers.choices)
+    if question.answers:
+        the_answer_options = " - ".join(
+            choice.text for choice in question.answers.choices
+        )
+        answers_by_percent = " - ".join(
+            "{:.2%}".format(answered_fraction)
+            for answered_fraction in answered_fractions
+        )
+        amount_of_answer_options = len(question.answers.choices)
+    else:
+        the_answer_options = ""
+        answers_by_percent = ""
+        amount_of_answer_options = -1
 
     gs_question_row = GsQuestionRow(
         survey_id=survey_id,
