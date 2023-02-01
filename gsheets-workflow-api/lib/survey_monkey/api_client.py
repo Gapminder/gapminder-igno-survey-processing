@@ -1,7 +1,9 @@
+import json
 from typing import Any, Dict
 
 import requests
 from pandas import json_normalize
+from pydantic import ValidationError
 
 from lib.config import read_config
 from lib.survey_monkey.question_rollup import QuestionRollup
@@ -35,9 +37,17 @@ def fetch_survey_details(survey_ids: list) -> Dict[str, Survey]:
 
         url = f"https://api.surveymonkey.com/v3/surveys/{survey_id}/details"
         response = sm_request(url)
+        response_json = response.json()
 
-        survey_details = Survey(**response.json())
-        survey_details_by_survey_id[survey_id] = survey_details
+        try:
+            survey_details = Survey(**response_json)
+            survey_details_by_survey_id[survey_id] = survey_details
+        except ValidationError as e:
+            print(  # noqa T201
+                f"ValidationError in survey with id {survey_id} and JSON:"
+            )
+            print(json.dumps(response_json, indent=2))  # noqa T201
+            raise e
 
     return survey_details_by_survey_id
 

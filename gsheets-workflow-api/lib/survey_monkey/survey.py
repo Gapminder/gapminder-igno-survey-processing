@@ -12,8 +12,8 @@ class ButtonsText(BaseModel):
 
 class RequiredItem(BaseModel):
     text: str
-    type: str
-    amount: str
+    type: Optional[str]
+    amount: Optional[str]
 
 
 class ValidationItem(BaseModel):

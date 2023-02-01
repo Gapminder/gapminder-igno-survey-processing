@@ -116,7 +116,7 @@ unlisted_survey_details_by_survey_id = fetch_survey_details(unlisted_survey_ids)
 survey_rows_to_add = []
 for index, survey_listing in unlisted_surveys_df.iterrows():
     print(index, survey_listing["title"])
-    survey = unlisted_survey_details_by_survey_id[survey["id"]]
+    survey = unlisted_survey_details_by_survey_id[int(survey.id)]
     survey_row = {
         "survey_id": survey_listing["id"],
         "survey_name": survey_listing["title"],
@@ -138,8 +138,8 @@ surveys_worksheet_editor.data.df
 surveys_to_import_data_for = surveys_worksheet_editor.data.df[surveys_worksheet_editor.data.df["results_ready_for_import"].fillna(False).astype(bool) & ~surveys_worksheet_editor.data.df["results_imported"].fillna(False).astype(bool)]
 
 if len(surveys_to_import_data_for) == 0:
-    print("No surveys to import data for")
     survey_details_by_survey_id = None
+    raise Exception("No surveys to import data for")
 else:
     survey_ids = surveys_to_import_data_for["survey_id"].tolist()
     print(survey_ids)
