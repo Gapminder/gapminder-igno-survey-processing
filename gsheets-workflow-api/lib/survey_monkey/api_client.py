@@ -1,12 +1,14 @@
 import json
-from typing import Any, Dict
+from typing import Any, Dict, List, Type, TypeVar
 
 import requests
 from pandas import json_normalize
 from pydantic import ValidationError
 
 from lib.config import read_config
+from lib.survey_monkey.api_response_wrapper import GenericApiResponse
 from lib.survey_monkey.question_rollup import QuestionRollup
+from lib.survey_monkey.response import Answer, Response
 from lib.survey_monkey.survey import Survey
 
 
@@ -69,3 +71,44 @@ def fetch_question_rollups_by_question_id(
             question_rollups_by_question_id[rollup.id] = rollup
 
     return question_rollups_by_question_id
+
+
+def fetch_submitted_answers_by_question_id(
+    survey_details_by_survey_id: Dict[str, Survey],
+) -> Dict[str, List[List[Answer]]]:
+    submitted_answers_by_question_id: Dict[str, List[List[Answer]]] = {}
+    for survey_id, survey in survey_details_by_survey_id.items():
+
+        url = f"https://api.surveymonkey.com/v3/surveys/{survey_id}/responses/bulk?per_page=100"
+        responses: List[Response] = paginate_through_all_response_pages(url, Response)
+
+        for response in responses:
+            for response_page in response.pages:
+                for question in response_page.questions:
+                    if question.id in submitted_answers_by_question_id:
+                        submitted_answers_by_question_id[question.id].append(
+                            question.answers
+                        )
+                    else:
+                        submitted_answers_by_question_id[question.id] = [
+                            question.answers
+                        ]
+
+    return submitted_answers_by_question_id
+
+
+T = TypeVar("T")
+
+
+def paginate_through_all_response_pages(url: str, model: Type[T]) -> List[T]:
+    all_items: List[T] = []
+    still_more_to_fetch = True
+    while still_more_to_fetch:
+        api_response: GenericApiResponse = GenericApiResponse(**sm_request(url).json())
+        for item in api_response.data:
+            all_items.append(model(**item))
+        if api_response.links.next:
+            url = api_response.links.next
+        else:
+            still_more_to_fetch = False
+    return all_items

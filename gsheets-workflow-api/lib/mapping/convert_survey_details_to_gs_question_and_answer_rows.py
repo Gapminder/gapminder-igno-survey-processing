@@ -1,7 +1,6 @@
 import copy
-import typing
 from json import dumps
-from typing import Tuple
+from typing import Dict, List, Tuple
 
 from lib.find_by_attribute import find_by_attribute
 from lib.gs_combined.schemas import GsAnswerRow, GsQuestionRow, GsSurveyResultsData
@@ -9,6 +8,7 @@ from lib.mapping.auto_mark_correctness import auto_mark_correctness
 from lib.mapping.summarize_gs_answer import summarize_gs_answer
 from lib.mapping.summarize_gs_question import summarize_gs_question
 from lib.survey_monkey.question_rollup import QuestionRollup
+from lib.survey_monkey.response import Answer
 from lib.survey_monkey.survey import Question, Survey
 
 
@@ -17,6 +17,7 @@ def convert_survey_question_info_to_gs_question_and_answers(
     question_number: int,
     question: Question,
     rollup: QuestionRollup,
+    submitted_answers: List[List[Answer]],
     gs_survey_results_data: GsSurveyResultsData,
 ) -> Tuple[GsQuestionRow, list[GsAnswerRow]]:
     gs_answers = []
@@ -25,6 +26,8 @@ def convert_survey_question_info_to_gs_question_and_answers(
     if not question.answers:
         print("question", dumps(question.dict(), indent=2))  # noqa T201
         print("rollup", dumps(rollup.dict(), indent=2))  # noqa T201
+        print("submitted_answers", submitted_answers)  # noqa T201
+        # TODO: take submitted_answers into account
         raise Exception(
             f"Question has no predefined answer options. "
             f"Not able to import this survey. "
@@ -80,7 +83,8 @@ def convert_survey_question_info_to_gs_question_and_answers(
 
 def convert_survey_details_to_gs_question_and_answer_rows(
     survey_details: Survey,
-    question_rollups_by_question_id: typing.Dict[str, QuestionRollup],
+    question_rollups_by_question_id: Dict[str, QuestionRollup],
+    submitted_answers_by_question_id: Dict[str, List[List[Answer]]],
     gs_survey_results_data: GsSurveyResultsData,
 ) -> Tuple[list[GsQuestionRow], list[GsAnswerRow]]:
     """Convert survey monkey data to rows that are to be imported in gs_combined."""
@@ -99,6 +103,7 @@ def convert_survey_details_to_gs_question_and_answer_rows(
             )
             question_number = question_number + 1
             rollup = question_rollups_by_question_id[question.id]
+            submitted_answers = submitted_answers_by_question_id[question.id]
             (
                 gs_question,
                 gs_answers,
@@ -107,6 +112,7 @@ def convert_survey_details_to_gs_question_and_answer_rows(
                 question_number=question_number,
                 question=question,
                 rollup=rollup,
+                submitted_answers=submitted_answers,
                 gs_survey_results_data=gs_survey_results_data,
             )
             all_gs_answers = all_gs_answers + gs_answers

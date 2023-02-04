@@ -152,11 +152,22 @@ question_rollups_by_question_id = fetch_question_rollups_by_question_id(survey_d
 question_rollups_by_question_id
 
 # +
+from lib.survey_monkey.api_client import fetch_submitted_answers_by_question_id
+
+submitted_answers_by_question_id = fetch_submitted_answers_by_question_id(survey_details_by_survey_id)
+submitted_answers_by_question_id
+
+# +
 import pandas as pd
 from lib.mapping.convert_survey_details_to_gs_question_and_answer_rows import convert_survey_details_to_gs_question_and_answer_rows
 from lib.gs_combined.schemas import GsSurveyResultsData
 
-def import_gs_question_and_answer_rows(surveys_to_import_data_for: pd.DataFrame, gs_survey_results_data: GsSurveyResultsData):
+def import_gs_question_and_answer_rows(
+    surveys_to_import_data_for: pd.DataFrame,
+    gs_survey_results_data: GsSurveyResultsData,
+    question_rollups_by_question_id: Dict[str, QuestionRollup],
+    submitted_answers_by_question_id: Dict[str, List[List[Answer]]],
+):
     all_gs_questions = []
     all_gs_answers = []
     for index, survey_row in surveys_to_import_data_for.iterrows():
@@ -166,6 +177,7 @@ def import_gs_question_and_answer_rows(surveys_to_import_data_for: pd.DataFrame,
             gs_questions, gs_answers = convert_survey_details_to_gs_question_and_answer_rows(
                 survey_details, 
                 question_rollups_by_question_id,
+                submitted_answers_by_question_id,
                 gs_survey_results_data,
             )
             #print(index)
@@ -178,7 +190,12 @@ def import_gs_question_and_answer_rows(surveys_to_import_data_for: pd.DataFrame,
         all_gs_answers = all_gs_answers + gs_answers
     return all_gs_questions, all_gs_answers
 
-gs_questions, gs_answers = import_gs_question_and_answer_rows(surveys_to_import_data_for, gs_survey_results_data)
+gs_questions, gs_answers = import_gs_question_and_answer_rows(
+    surveys_to_import_data_for,
+    gs_survey_results_data,
+    question_rollups_by_question_id,
+    submitted_answers_by_question_id,
+)
 # gs_questions, gs_answers
 
 # +
