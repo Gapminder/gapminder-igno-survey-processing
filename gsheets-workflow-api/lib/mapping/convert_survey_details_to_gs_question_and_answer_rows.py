@@ -1,12 +1,13 @@
 import copy
-from json import dumps
 from typing import Dict, List, Tuple
 
 from lib.find_by_attribute import find_by_attribute
 from lib.gs_combined.schemas import GsAnswerRow, GsQuestionRow, GsSurveyResultsData
+from lib.mapping.abcify_question import abcify_question
 from lib.mapping.auto_mark_correctness import auto_mark_correctness
 from lib.mapping.summarize_gs_answer import summarize_gs_answer
 from lib.mapping.summarize_gs_question import summarize_gs_question
+from lib.mapping.utils import print_question_import_details
 from lib.survey_monkey.question_rollup import QuestionRollup
 from lib.survey_monkey.response import Answer
 from lib.survey_monkey.survey import Question, Survey
@@ -23,62 +24,59 @@ def convert_survey_question_info_to_gs_question_and_answers(
     gs_answers = []
     answered_count = rollup.summary[0].answered
     answered_fractions = []
+    survey_title = survey_details.title
+    question, rollup = abcify_question(question, rollup, submitted_answers)
     if not question.answers:
-        print("question", dumps(question.dict(), indent=2))  # noqa T201
-        print("rollup", dumps(rollup.dict(), indent=2))  # noqa T201
-        print("submitted_answers", submitted_answers)  # noqa T201
-        # TODO: take submitted_answers into account
+        print_question_import_details(question, rollup, submitted_answers)
         raise Exception(
             f"Question has no predefined answer options. "
             f"Not able to import this survey. "
             f"Please unselect survey with title "
-            f'"{survey_details.title}" and try import again'
+            f'"{survey_title}" and try import again'
         )
-    else:
-        for choice in question.answers.choices:
-            print(f"choice {choice.id}")  # noqa T201
-            if not rollup.summary[0].choices:
-                print(dumps(rollup.summary[0].dict(), indent=2))  # noqa T201
-                raise Exception(
-                    f"Question rollup has no answer options/choices. "
-                    f"Not able to import this survey. "
-                    f"Please unselect survey with title "
-                    f'"{survey_details.title}" and try import again'
-                )
-            else:
-                rollup_summary_for_choice = find_by_attribute(
-                    rollup.summary[0].choices, "id", choice.id
-                )
-                if not rollup_summary_for_choice:
-                    raise Exception(
-                        f"Question choice has no rollup. "
-                        f"Not able to import this survey. "
-                        f"Please unselect survey with title "
-                        f'"{survey_details.title}" and try import again'
-                    )
-                else:
-                    answered_choice_count: int = rollup_summary_for_choice.count
-                    answered_fraction = answered_choice_count / answered_count
-                    gs_answer = summarize_gs_answer(
-                        survey_id=int(survey_details.id),
-                        survey_details=survey_details,
-                        question_number=question_number,
-                        question=question,
-                        choice=choice,
-                        answered_fraction=answered_fraction,
-                    )
-                    gs_answers.append(gs_answer)
-                    answered_fractions.append(answered_fraction)
-        gs_question = summarize_gs_question(
-            survey_id=int(survey_details.id),
-            survey_details=survey_details,
-            question_number=question_number,
-            question=question,
-            answered_fractions=answered_fractions,
-            answered_count=answered_count,
-            gs_survey_results_data=gs_survey_results_data,
+    if not rollup.summary[0].choices:
+        print_question_import_details(question, rollup, submitted_answers)
+        raise Exception(
+            f"Question rollup has no answer options/choices. "
+            f"Not able to import this survey. "
+            f"Please unselect survey with title "
+            f'"{survey_title}" and try import again'
         )
-        return gs_question, gs_answers
+    for choice in question.answers.choices:
+        rollup_summary_for_choice = find_by_attribute(
+            rollup.summary[0].choices, "id", choice.id
+        )
+        if not rollup_summary_for_choice:
+            print_question_import_details(question, rollup, submitted_answers)
+            raise Exception(
+                f"Question choice has no rollup. "
+                f"Not able to import this survey. "
+                f"Please unselect survey with title "
+                f'"{survey_title}" and try import again'
+            )
+        else:
+            answered_choice_count: int = rollup_summary_for_choice.count
+            answered_fraction = answered_choice_count / answered_count
+            gs_answer = summarize_gs_answer(
+                survey_id=int(survey_details.id),
+                survey_details=survey_details,
+                question_number=question_number,
+                question=question,
+                choice=choice,
+                answered_fraction=answered_fraction,
+            )
+            gs_answers.append(gs_answer)
+            answered_fractions.append(answered_fraction)
+    gs_question = summarize_gs_question(
+        survey_id=int(survey_details.id),
+        survey_details=survey_details,
+        question_number=question_number,
+        question=question,
+        answered_fractions=answered_fractions,
+        answered_count=answered_count,
+        gs_survey_results_data=gs_survey_results_data,
+    )
+    return gs_question, gs_answers
 
 
 def convert_survey_details_to_gs_question_and_answer_rows(
