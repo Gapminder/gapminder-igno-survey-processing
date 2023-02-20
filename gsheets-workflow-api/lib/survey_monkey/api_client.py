@@ -20,14 +20,20 @@ def sm_request(url: str) -> Any:
         "Authorization": f'bearer {config["SURVEY_MONKEY_API_TOKEN"]}',
     }
 
-    return requests.request("GET", url, headers=headers, data=None)
+    response = requests.request("GET", url, headers=headers, data=None)
+    parsed_response = response.json()
+
+    if "error" in parsed_response:
+        raise Exception(f"SurveyMonkey API Error Response: {response}")
+
+    return parsed_response
 
 
 def fetch_surveys() -> Any:
     url = "https://api.surveymonkey.com/v3/surveys"
-    response = sm_request(url)
+    surveys_response = sm_request(url)
 
-    sm_surveys_df = json_normalize(response.json()["data"]).sort_values(by="title")
+    sm_surveys_df = json_normalize(surveys_response["data"]).sort_values(by="title")
     return sm_surveys_df
 
 
@@ -38,16 +44,15 @@ def fetch_survey_details(survey_ids: list) -> Dict[str, Survey]:
 
         url = f"https://api.surveymonkey.com/v3/surveys/{survey_id}/details"
         response = sm_request(url)
-        response_json = response.json()
 
         try:
-            survey_details = Survey(**response_json)
+            survey_details = Survey(**response)
             survey_details_by_survey_id[survey_id] = survey_details
         except ValidationError as e:
             print(  # noqa T201
                 f"ValidationError in survey with id {survey_id} and JSON:"
             )
-            print(json.dumps(response_json, indent=2))  # noqa T201
+            print(json.dumps(response, indent=2))  # noqa T201
             raise e
 
     return survey_details_by_survey_id
@@ -65,7 +70,7 @@ def fetch_question_rollups_by_question_id(
             f"https://api.surveymonkey.com/v3/surveys/{survey_id}/rollups?per_page=100"
         )
         response = sm_request(url)
-        for rollup_payload in response.json()["data"]:
+        for rollup_payload in response["data"]:
             rollup = QuestionRollup(**rollup_payload)
             question_rollups_by_question_id[rollup.id] = rollup
 
@@ -103,7 +108,7 @@ def paginate_through_all_response_pages(url: str, model: Type[T]) -> List[T]:
     all_items: List[T] = []
     still_more_to_fetch = True
     while still_more_to_fetch:
-        api_response: GenericApiResponse = GenericApiResponse(**sm_request(url).json())
+        api_response: GenericApiResponse = GenericApiResponse(**sm_request(url))
         for item in api_response.data:
             all_items.append(model(**item))
         if api_response.links.next:
