@@ -25,8 +25,13 @@ class ValidationItem(BaseModel):
     sum_text: str
 
 
+class Image(BaseModel):
+    url: str
+
+
 class Heading(BaseModel):
-    heading: str
+    heading: Optional[str] = None
+    image: Optional[Image] = None
 
 
 class QuizOptions(BaseModel):
@@ -64,16 +69,16 @@ class CustomOptions(BaseModel):
 
 class DisplayOptions(BaseModel):
     show_display_number: bool
-    display_type: str
-    display_subtype: str
-    left_label_id: str
-    left_label: str
-    right_label_id: str
-    right_label: str
-    middle_label_id: Any
-    middle_label: str
-    custom_options: CustomOptions
-    file_upload_labels: Dict[str, Any]
+    display_type: Optional[str] = None
+    display_subtype: Optional[str] = None
+    left_label_id: Optional[str] = None
+    left_label: Optional[str] = None
+    right_label_id: Optional[str] = None
+    right_label: Optional[str] = None
+    middle_label_id: Optional[Any] = None
+    middle_label: Optional[str] = None
+    custom_options: Optional[CustomOptions] = None
+    file_upload_labels: Optional[Dict[str, Any]] = None
 
 
 class Question(BaseModel):
