@@ -31,6 +31,17 @@ all_survey_details_by_survey_id = fetch_survey_details(sm_surveys_df['id'].to_li
 
 all_survey_details_by_survey_id
 
+question_details_by_question_id = {}
+for question_id, survey_details in all_survey_details_by_survey_id.items():
+    for page in survey_details.pages:
+        print(f"page {page.id}")  # noqa T201
+        for question in page.questions:
+            print(  # noqa T201
+                f'question {question.id} "{question.headings[0].heading}"'
+            )
+            question_details_by_question_id[question.id] = question
+question_details_by_question_id
+
 # +
 from dataclasses import asdict
 import json
@@ -54,6 +65,38 @@ for id, question_rollup in all_question_rollups_by_question_id.items():
     all_question_rollups.append(question_rollup.dict())
 
 print(json.dumps(all_question_rollups))
+
+# +
+from lib.survey_monkey.api_client import fetch_submitted_answers_by_question_id
+
+all_submitted_answers_by_question_id = fetch_submitted_answers_by_question_id(all_survey_details_by_survey_id)
+all_submitted_answers_by_question_id
+# -
+
+pd.set_option('display.max_rows', 1000)
+pd.set_option('display.max_colwidth', 1000)
+
+# find questions with answers that lack choices in rollup
+choicify_question_test_cases_by_family = {
+    'single_choice': [],
+    'open_ended': [],
+    'matrix': [],
+}
+for question_id, submitted_answers in all_submitted_answers_by_question_id.items():
+    rollup = all_question_rollups_by_question_id[question_id]
+    question = question_details_by_question_id[question_id]
+    choicify_question_test_cases_by_family[rollup.family].append([question, rollup, submitted_answers])
+choicify_question_test_cases_by_family['open_ended']
+
+# +
+from lib.mapping.choicify_question import choicify_question
+
+for test_case in choicify_question_test_cases_by_family['open_ended']:
+    [question, rollup, submitted_answers] = test_case
+    print("========")
+    print(question.headings[0].heading)
+    actual = choicify_question(question, rollup, submitted_answers)
+    print(actual)
 # -
 
 from lib.authorized_clients import get_service_account_authorized_clients
@@ -159,8 +202,11 @@ submitted_answers_by_question_id
 
 # +
 import pandas as pd
+from typing import Dict, List
 from lib.mapping.convert_survey_details_to_gs_question_and_answer_rows import convert_survey_details_to_gs_question_and_answer_rows
 from lib.gs_combined.schemas import GsSurveyResultsData
+from lib.survey_monkey.question_rollup import QuestionRollup
+from lib.survey_monkey.response import Answer
 
 def import_gs_question_and_answer_rows(
     surveys_to_import_data_for: pd.DataFrame,

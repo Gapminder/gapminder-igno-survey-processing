@@ -3,8 +3,8 @@ from typing import Dict, List, Tuple
 
 from lib.find_by_attribute import find_by_attribute
 from lib.gs_combined.schemas import GsAnswerRow, GsQuestionRow, GsSurveyResultsData
-from lib.mapping.abcify_question import abcify_question
 from lib.mapping.auto_mark_correctness import auto_mark_correctness
+from lib.mapping.choicify_question import choicify_question
 from lib.mapping.summarize_gs_answer import summarize_gs_answer
 from lib.mapping.summarize_gs_question import summarize_gs_question
 from lib.mapping.utils import print_question_import_details
@@ -25,7 +25,7 @@ def convert_survey_question_info_to_gs_question_and_answers(
     answered_count = rollup.summary[0].answered
     answered_fractions = []
     survey_title = survey_details.title
-    question, rollup = abcify_question(question, rollup, submitted_answers)
+    question, rollup = choicify_question(question, rollup, submitted_answers)
     if not question.answers:
         print_question_import_details(question, rollup, submitted_answers)
         raise Exception(

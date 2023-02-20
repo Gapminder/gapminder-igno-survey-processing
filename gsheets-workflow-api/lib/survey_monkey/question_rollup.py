@@ -11,7 +11,7 @@ class Stats(BaseModel):
     std: float
 
 
-class Choice(BaseModel):
+class ChoiceSummary(BaseModel):
     id: str
     count: int
 
@@ -21,14 +21,14 @@ class Row(BaseModel):
     stats: Stats
     max: int
     total: int
-    choices: List[Choice]
+    choices: List[ChoiceSummary]
 
 
 class SummaryItem(BaseModel):
     answered: int
     skipped: int
     stats: Optional[Stats] = None
-    choices: Optional[List[Choice]] = None
+    choices: Optional[List[ChoiceSummary]] = None
     rows: Optional[List[Row]] = None
     text: Optional[int] = None
 
