@@ -17,7 +17,7 @@ def summarize_gs_answer(
         question_text=question.headings[0].heading,
         answer=choice.text,
         correctness_of_answer_option="",  # manually filled after import
-        auto_marked_correctness_of_answer="",  # filled below
+        auto_marked_correctness_of_answer="",  # filled later during import
         answer_by_percent="{:.2%}".format(answered_fraction),
         metadata="",
         weighted_by="",

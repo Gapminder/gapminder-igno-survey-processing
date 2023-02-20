@@ -15,13 +15,12 @@ from lib.survey_monkey.survey import Survey
 def sm_request(url: str) -> Any:
     config = read_config()
 
-    payload: dict = {}
     headers = {
         "Content-Type": "application/json",
         "Authorization": f'bearer {config["SURVEY_MONKEY_API_TOKEN"]}',
     }
 
-    return requests.request("GET", url, headers=headers, data=payload)
+    return requests.request("GET", url, headers=headers, data=None)
 
 
 def fetch_surveys() -> Any:
