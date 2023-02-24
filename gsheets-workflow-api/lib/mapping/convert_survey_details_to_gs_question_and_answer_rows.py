@@ -13,6 +13,10 @@ from lib.survey_monkey.response import Answer
 from lib.survey_monkey.survey import Question, Survey
 
 
+class UnsupportedQuestionException(Exception):
+    pass
+
+
 def convert_survey_question_info_to_gs_question_and_answers(
     survey_details: Survey,
     question_number: int,
@@ -28,7 +32,7 @@ def convert_survey_question_info_to_gs_question_and_answers(
     question, rollup = choicify_question(question, rollup, submitted_answers)
     if not question.answers:
         print_question_import_details(question, rollup, submitted_answers)
-        raise Exception(
+        raise UnsupportedQuestionException(
             f"Question has no predefined answer options. "
             f"Not able to import this survey. "
             f"Please unselect survey with title "
@@ -36,7 +40,7 @@ def convert_survey_question_info_to_gs_question_and_answers(
         )
     if not rollup.summary[0].choices:
         print_question_import_details(question, rollup, submitted_answers)
-        raise Exception(
+        raise UnsupportedQuestionException(
             f"Question rollup has no answer options/choices. "
             f"Not able to import this survey. "
             f"Please unselect survey with title "
@@ -48,7 +52,7 @@ def convert_survey_question_info_to_gs_question_and_answers(
         )
         if not rollup_summary_for_choice:
             print_question_import_details(question, rollup, submitted_answers)
-            raise Exception(
+            raise UnsupportedQuestionException(
                 f"Question choice has no rollup. "
                 f"Not able to import this survey. "
                 f"Please unselect survey with title "
@@ -102,19 +106,26 @@ def convert_survey_details_to_gs_question_and_answer_rows(
             question_number = question_number + 1
             rollup = question_rollups_by_question_id[question.id]
             submitted_answers = submitted_answers_by_question_id[question.id]
-            (
-                gs_question,
-                gs_answers,
-            ) = convert_survey_question_info_to_gs_question_and_answers(
-                survey_details=survey_details,
-                question_number=question_number,
-                question=question,
-                rollup=rollup,
-                submitted_answers=submitted_answers,
-                gs_survey_results_data=gs_survey_results_data,
-            )
-            all_gs_answers = all_gs_answers + gs_answers
-            all_gs_questions.append(gs_question)
+            try:
+                (
+                    gs_question,
+                    gs_answers,
+                ) = convert_survey_question_info_to_gs_question_and_answers(
+                    survey_details=survey_details,
+                    question_number=question_number,
+                    question=question,
+                    rollup=rollup,
+                    submitted_answers=submitted_answers,
+                    gs_survey_results_data=gs_survey_results_data,
+                )
+                all_gs_answers = all_gs_answers + gs_answers
+                all_gs_questions.append(gs_question)
+            except UnsupportedQuestionException as e:
+                print(  # noqa T201
+                    f"WARNING: Ignoring question with id {question.id} "
+                    f"since it has an unsupported format. Error:",
+                    e,
+                )
 
     # Auto-mark correctness
     gs_answers_before_marking_correctness = copy.deepcopy(all_gs_answers)
