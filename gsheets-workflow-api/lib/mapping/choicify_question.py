@@ -67,6 +67,14 @@ def choicify_slider_question(
         s, NUMBER_OF_SIMULATED_CHOICES, slider_min, slider_max
     )
 
+    # Handle percentage sliders
+    if (
+        original_question.display_options
+        and original_question.display_options.left_label
+        and original_question.display_options.left_label.endswith("%")
+    ):
+        divided_into_brackets_df["label"] = divided_into_brackets_df["label"] + "%"
+
     # Inject the corresponding choices as if this was a multiple choice question
     question: Question = original_question.copy()
     choices: List[Choice] = []
