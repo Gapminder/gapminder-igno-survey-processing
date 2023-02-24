@@ -171,9 +171,12 @@ for index, survey_listing in unlisted_surveys_df.iterrows():
     }
     survey_rows_to_add.append(survey_row)
 
-for survey_row in sorted(survey_rows_to_add, key=lambda d: d["survey_date"]):
-    surveys_worksheet_editor.append_row(survey_row)
+survey_rows_to_add_df = pd.DataFrame(sorted(survey_rows_to_add, key=lambda d: d["survey_date"]))
+survey_rows_to_add_df
 # -
+
+if len(survey_rows_to_add_df) > 0:
+    surveys_worksheet_editor.append_data(survey_rows_to_add_df)
 
 surveys_worksheet_editor.data.df
 
@@ -274,29 +277,35 @@ unlisted_questions_df
 
 unlisted_answers_df = get_non_existing_rows_df(gs_answers_df, gs_survey_results_data.topline_combo.data.df, "survey_question_id")
 unlisted_answers_df
+
+if len(unlisted_questions_df) > 0:
+    gs_survey_results_data.questions_combo.append_data(unlisted_questions_df)
+if len(unlisted_answers_df) > 0:
+    gs_survey_results_data.topline_combo.append_data(unlisted_answers_df)
+
+# -
+# ## To preview the import results in a dev gsheet first
+
 # +
 from lib.gs_combined.schemas import attributes_to_columns_maps
 from lib.gsheets.gsheets_worksheet_editor import GsheetsWorksheetEditor
 
 gs_combined_dev_spreadsheet = authorized_clients.gc.open_by_key(
-        "1Q6LG8SNLOLWFBeV0iEdN10cXTNyXJBerFJhYsdZ90uw"
+        "1eafCGVMj2lUx-Q_FnrbttnZYUgRXcbVoudTRsqGHNY8"
     )
 
-debug_gs_questions_df_editor = GsheetsWorksheetEditor(sh=gs_combined_dev_spreadsheet, worksheet_name="debug-gs_questions_df", header_row_number=0, attributes_to_columns_map=attributes_to_columns_maps["gs_combined"]["questions_combo"])
-debug_gs_answers_df_editor = GsheetsWorksheetEditor(sh=gs_combined_dev_spreadsheet, worksheet_name="debug-gs_answers_df", header_row_number=0, attributes_to_columns_map=attributes_to_columns_maps["gs_combined"]["topline_combo"])
-
-debug_gs_questions_df_editor.replace_data(gs_questions_df)
-debug_gs_answers_df_editor.replace_data(gs_answers_df)
+#debug_gs_questions_df_editor = GsheetsWorksheetEditor(sh=gs_combined_dev_spreadsheet, worksheet_name="debug-gs_questions_df", header_row_number=0, attributes_to_columns_map=attributes_to_columns_maps["gs_combined"]["questions_combo"])
+#debug_gs_answers_df_editor = GsheetsWorksheetEditor(sh=gs_combined_dev_spreadsheet, worksheet_name="debug-gs_answers_df", header_row_number=0, attributes_to_columns_map=attributes_to_columns_maps["gs_combined"]["topline_combo"])
 # -
 
-# TODO: appends rows med nya questions och answer rader för dessa surveys
-if False:
-    gs_answer_rows_to_add = asdict(gs_answer) for gs_answer in gs_answers
-    for gs_row in gs_answer_rows_to_add:
-        debug_gs_answers_df_editor.append_row(gs_row)
+debug_questions_combo_editor = GsheetsWorksheetEditor(sh=gs_combined_dev_spreadsheet, worksheet_name="questions_combo", header_row_number=0, attributes_to_columns_map=attributes_to_columns_maps["gs_combined"]["questions_combo"])
+debug_topline_combo_editor = GsheetsWorksheetEditor(sh=gs_combined_dev_spreadsheet, worksheet_name="topline_combo", header_row_number=0, attributes_to_columns_map=attributes_to_columns_maps["gs_combined"]["topline_combo"])
 
-# +
-# TODO: markerar att surveys är importerade
-# -
+# restore the dev sheet to the state of prod
+debug_questions_combo_editor.replace_data(gs_survey_results_data.questions_combo.data.df)
+
+debug_questions_combo_editor.append_data(unlisted_questions_df)
+
+debug_topline_combo_editor.append_data(unlisted_answers_df)
 
 

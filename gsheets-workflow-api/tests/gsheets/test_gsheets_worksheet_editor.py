@@ -54,6 +54,15 @@ def test_gsheets_worksheet_editor(
     editor.remove_row(editor.data.df.index[-1])
     assert editor.data.df.index[-1] == len(new_df) - 1
 
+    append_df = pd.DataFrame(
+        [
+            {"Foo": "=C$2:C2", "zar": "Bat", "bool": False},
+            {"Foo": "=C$2:C3", "zar": "House", "bool": False},
+        ]
+    )
+    editor.append_data(append_df)
+    assert editor.data.df.index[-1] == len(new_df) + len(append_df) - 1
+
     # Verify that the mock object's get_worksheet() method was called
     # mock_spreadsheet.assert_called_with()
     # mock_spreadsheet.return_value.get_worksheet.assert_called_with()
