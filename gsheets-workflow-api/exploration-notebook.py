@@ -22,6 +22,9 @@ from lib.survey_monkey.api_client import fetch_surveys
 
 sm_surveys_df = fetch_surveys()
 sm_surveys_df
+# -
+
+# ## Fetch all info about all surveys + misc
 
 # +
 from lib.survey_monkey.api_client import fetch_survey_details
@@ -73,6 +76,7 @@ all_submitted_answers_by_question_id = fetch_submitted_answers_by_question_id(al
 all_submitted_answers_by_question_id
 # -
 
+import pandas as pd
 pd.set_option('display.max_rows', 1000)
 pd.set_option('display.max_colwidth', 1000)
 
@@ -90,14 +94,18 @@ choicify_question_test_cases_by_family['open_ended']
 
 # +
 from lib.mapping.choicify_question import choicify_question
+from lib.mapping.utils import print_question_import_details
 
 for test_case in choicify_question_test_cases_by_family['open_ended']:
     [question, rollup, submitted_answers] = test_case
     print("========")
     print(question.headings[0].heading)
+    print_question_import_details(question, rollup, submitted_answers)
     actual = choicify_question(question, rollup, submitted_answers)
     print(actual)
 # -
+
+# ## The actual import routine to be cloudified
 
 from lib.authorized_clients import get_service_account_authorized_clients
 authorized_clients = get_service_account_authorized_clients()
@@ -245,7 +253,7 @@ gs_questions, gs_answers = import_gs_question_and_answer_rows(
     question_rollups_by_question_id,
     submitted_answers_by_question_id,
 )
-# gs_questions, gs_answers
+#gs_questions, gs_answers
 
 # +
 # "Overview"
