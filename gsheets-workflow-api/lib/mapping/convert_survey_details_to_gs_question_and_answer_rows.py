@@ -113,7 +113,11 @@ def convert_survey_details_to_gs_question_and_answer_rows(
             )
             question_number = question_number + 1
             rollup = question_rollups_by_question_id[question.id]
-            submitted_answers = submitted_answers_by_question_id[question.id]
+            submitted_answers = (
+                submitted_answers_by_question_id[question.id]
+                if question.id in submitted_answers_by_question_id
+                else []
+            )
             try:
                 (
                     gs_question,
