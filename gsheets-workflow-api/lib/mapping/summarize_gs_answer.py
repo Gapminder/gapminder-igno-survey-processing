@@ -27,6 +27,8 @@ def summarize_gs_answer(
         correctness_of_answer_option="",  # manually filled after import
         auto_marked_correctness_of_answer="",  # filled later during import
         answer_by_percent="{:.2%}".format(answered_fraction),
+        correct_answer_at_time_of_import="",  # filled later during import
+        very_wrong_answer_at_time_of_import="",  # filled later during import
         metadata="",
         weighted_by="",
     )

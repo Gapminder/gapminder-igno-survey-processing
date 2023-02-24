@@ -18,7 +18,7 @@ def determine_auto_marked_correctness(
     gs_answers: list[GsAnswerRow],
     gs_questions: list[GsQuestionRow],
     gs_survey_results_data: GsSurveyResultsData,
-) -> tuple[str, list[GsAnswerRow]]:
+) -> tuple[str, str, str, list[GsAnswerRow]]:
     def match_question(q: GsQuestionRow) -> bool:
         return (
             q.survey_id is not None
@@ -207,7 +207,12 @@ def determine_auto_marked_correctness(
         else ""
     )
 
-    return auto_marked_correctness, corresponding_gs_answers
+    return (
+        auto_marked_correctness,
+        factual_correct_answer,
+        factual_very_wrong_answer,
+        corresponding_gs_answers,
+    )
 
 
 def auto_mark_correctness(
@@ -219,6 +224,8 @@ def auto_mark_correctness(
     try:
         (
             auto_marked_correctness,
+            factual_correct_answer,
+            factual_very_wrong_answer,
             corresponding_gs_answers,
         ) = determine_auto_marked_correctness(
             gs_answer=gs_answer,
@@ -241,6 +248,10 @@ def auto_mark_correctness(
         )
         if len(non_empty_answers) == 0:
             gs_answer.correctness_of_answer_option = auto_marked_correctness
+            gs_answer.correct_answer_at_time_of_import = str(factual_correct_answer)
+            gs_answer.very_wrong_answer_at_time_of_import = str(
+                factual_very_wrong_answer
+            )
 
     except ValueError as e:
         gs_answer.auto_marked_correctness_of_answer = str(e)

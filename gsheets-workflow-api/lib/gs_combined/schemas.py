@@ -57,6 +57,8 @@ class GsAnswerRow:
     correctness_of_answer_option: str
     auto_marked_correctness_of_answer: str
     answer_by_percent: str
+    correct_answer_at_time_of_import: str
+    very_wrong_answer_at_time_of_import: str
     metadata: str
     weighted_by: str
 
@@ -135,6 +137,8 @@ attributes_to_columns_maps = {
             "correctness_of_answer_option": "Correctness of answer option",
             "auto_marked_correctness_of_answer": "Auto-marked correctness of answers",
             "answer_by_percent": "Answer by percent",
+            "correct_answer_at_time_of_import": "Correct answer at time of import",
+            "very_wrong_answer_at_time_of_import": "Very wrong answer at time of import",
             "metadata": "Metadata",
             "weighted_by": "Weighted by",
         },
