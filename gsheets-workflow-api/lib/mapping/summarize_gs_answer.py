@@ -13,6 +13,7 @@ def summarize_gs_answer(
     gs_answer_row = GsAnswerRow(
         survey_id=survey_id,
         survey_name=survey_details.title,
+        survey_question_id=question.id,
         question_number=question_number,
         question_text=question.headings[0].heading,
         answer=choice.text,

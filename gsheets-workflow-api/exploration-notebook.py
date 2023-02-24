@@ -258,6 +258,22 @@ from dataclasses import asdict
 gs_answers_df = pd.DataFrame(asdict(gs_answer) for gs_answer in gs_answers)
 gs_answers_df
 
+
+# -
+
+# check which questions are already imported
+def get_non_existing_rows_df(new_df, existing_df, unique_id_attribute):
+    new_df['_merge_id'] = new_df[unique_id_attribute].astype(str)
+    existing_df['_merge_id'] = existing_df[unique_id_attribute].astype(str)
+    merged_df = pd.merge(new_df, existing_df, on=['_merge_id'], how='outer', indicator=True, suffixes=('', '_existing'))
+    return merged_df.loc[merged_df['_merge'] == 'left_only', new_df.columns].drop(columns=['_merge_id'])
+
+
+unlisted_questions_df = get_non_existing_rows_df(gs_questions_df, gs_survey_results_data.questions_combo.data.df, "survey_question_id")
+unlisted_questions_df
+
+unlisted_answers_df = get_non_existing_rows_df(gs_answers_df, gs_survey_results_data.topline_combo.data.df, "survey_question_id")
+unlisted_answers_df
 # +
 from lib.gs_combined.schemas import attributes_to_columns_maps
 from lib.gsheets.gsheets_worksheet_editor import GsheetsWorksheetEditor

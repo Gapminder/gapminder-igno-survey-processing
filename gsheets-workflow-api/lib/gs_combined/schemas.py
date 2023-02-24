@@ -11,6 +11,7 @@ combined_topline_sheet_name = "topline_combo"
 class GsQuestionRow:
     survey_id: int
     survey_name: str
+    survey_question_id: str
     question_number: int
     question_text: str
     igno_index_question_id: str
@@ -49,6 +50,7 @@ class GsQuestionRow:
 class GsAnswerRow:
     survey_id: int
     survey_name: str
+    survey_question_id: str
     question_number: int
     question_text: str
     answer: str
@@ -89,6 +91,7 @@ attributes_to_columns_maps = {
         "questions_combo": {
             "survey_id": "Survey ID",
             "survey_name": "Survey Name",
+            "survey_question_id": "Survey Question ID",
             "question_number": "Question number",
             "question_text": "Question text",
             "igno_index_question_id": "Igno Index Question ID",
@@ -125,6 +128,7 @@ attributes_to_columns_maps = {
         "topline_combo": {
             "survey_id": "Survey ID",
             "survey_name": "Survey Name",
+            "survey_question_id": "Survey Question ID",
             "question_number": "Question number",
             "question_text": "Question text",
             "answer": "Answer",
