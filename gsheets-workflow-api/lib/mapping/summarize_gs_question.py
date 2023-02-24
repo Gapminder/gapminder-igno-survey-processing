@@ -32,12 +32,19 @@ def summarize_gs_question(
         answers_by_percent = ""
         amount_of_answer_options = -1
 
+    question_text = (
+        question.headings[0].heading
+        if question.headings[0].heading
+        else "(Image)"
+        if question.headings[0].image
+        else ""
+    )
     gs_question_row = GsQuestionRow(
         survey_id=survey_id,
         survey_name=survey_details.title,
         survey_question_id=question.id,
         question_number=question_number,
-        question_text=question.headings[0].heading,
+        question_text=question_text,
         igno_index_question_id="",
         auto_mapped_igno_index_question_id="",  # Mapped below
         igno_index_question=template_gs_question["igno_index_question"],
@@ -91,7 +98,7 @@ def summarize_gs_question(
         percent_that_would_have_answered_very_wrong_in_an_abc_type_question=template_gs_question[
             "percent_that_would_have_answered_very_wrong_in_an_abc_type_question"
         ],
-        question_text_included_in_survey=question.headings[0].heading,
+        question_text_included_in_survey=question_text,
     )
 
     map_igno_index_question_id(

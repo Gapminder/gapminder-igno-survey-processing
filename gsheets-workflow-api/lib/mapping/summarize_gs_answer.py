@@ -10,12 +10,19 @@ def summarize_gs_answer(
     choice: Choice,
     answered_fraction: float,
 ) -> GsAnswerRow:
+    question_text = (
+        question.headings[0].heading
+        if question.headings[0].heading
+        else "(Image)"
+        if question.headings[0].image
+        else ""
+    )
     gs_answer_row = GsAnswerRow(
         survey_id=survey_id,
         survey_name=survey_details.title,
         survey_question_id=question.id,
         question_number=question_number,
-        question_text=question.headings[0].heading,
+        question_text=question_text,
         answer=choice.text,
         correctness_of_answer_option="",  # manually filled after import
         auto_marked_correctness_of_answer="",  # filled later during import

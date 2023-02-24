@@ -30,6 +30,14 @@ def convert_survey_question_info_to_gs_question_and_answers(
     answered_fractions = []
     survey_title = survey_details.title
     question, rollup = choicify_question(question, rollup, submitted_answers)
+    if not question.headings[0].heading:
+        print_question_import_details(question, rollup, submitted_answers)
+        raise UnsupportedQuestionException(
+            f"Question has no text heading. "
+            f"Not able to import this survey. "
+            f"Please unselect survey with title "
+            f'"{survey_title}" and try import again'
+        )
     if not question.answers:
         print_question_import_details(question, rollup, submitted_answers)
         raise UnsupportedQuestionException(
