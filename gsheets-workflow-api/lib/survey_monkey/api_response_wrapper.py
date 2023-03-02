@@ -6,7 +6,7 @@ T = TypeVar("T")
 
 
 class Links(BaseModel):
-    self: str
+    self: Optional[str]
     next: Optional[str]
     last: Optional[str]
 

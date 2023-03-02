@@ -108,11 +108,19 @@ def paginate_through_all_response_pages(url: str, model: Type[T]) -> List[T]:
     all_items: List[T] = []
     still_more_to_fetch = True
     while still_more_to_fetch:
-        api_response: GenericApiResponse = GenericApiResponse(**sm_request(url))
-        for item in api_response.data:
-            all_items.append(model(**item))
-        if api_response.links.next:
-            url = api_response.links.next
-        else:
-            still_more_to_fetch = False
+        response = sm_request(url)
+        try:
+            api_response: GenericApiResponse = GenericApiResponse(**response)
+            if api_response.total == 0:
+                return all_items
+            for item in api_response.data:
+                all_items.append(model(**item))
+            if api_response.links.next:
+                url = api_response.links.next
+            else:
+                still_more_to_fetch = False
+        except ValidationError as e:
+            print(f"ValidationError in response from {url} with JSON:")  # noqa T201
+            print(json.dumps(response, indent=2))  # noqa T201
+            raise e
     return all_items
