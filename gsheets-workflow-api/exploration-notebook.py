@@ -131,14 +131,25 @@ pass
 
 display(gs_survey_results_data.imported_igno_questions_info.data.df.columns)
 display(gs_survey_results_data.imported_igno_questions_info.data.df)
+# -
 
-# +
 from lib.gs_combined.spreadsheet import read_surveys_listing
 surveys_worksheet_editor = read_surveys_listing(gs_combined_spreadsheet)
-#print("surveys_worksheet_editor.data.df")
-#display(surveys_worksheet_editor.data.df)
+print("surveys_worksheet_editor.data.df")
+display(surveys_worksheet_editor.data.df)
 
-# appends rows med nya surveys som hittats i survey monkey, ifall inte redan appended till surveys sheet
+# Use DEV spreadsheet during development
+if False:
+    gs_combined_dev_spreadsheet = authorized_clients.gc.open_by_key(
+        "1eafCGVMj2lUx-Q_FnrbttnZYUgRXcbVoudTRsqGHNY8"
+    )
+    gs_survey_results_data = read_gs_survey_results_data(gs_combined_dev_spreadsheet)
+    surveys_worksheet_editor = read_surveys_listing(gs_combined_dev_spreadsheet)
+    display(surveys_worksheet_editor.data.df)
+
+
+# +
+# appends rows with new surveys in survey monkey, if not already in the surveys sheet
 
 def get_unlisted_surveys_df(sm_surveys_df, existing_df):
     sm_surveys_df = sm_surveys_df.copy()
@@ -146,13 +157,12 @@ def get_unlisted_surveys_df(sm_surveys_df, existing_df):
     sm_surveys_df["id"] = sm_surveys_df["id"].astype(str)
     existing_df["survey_id"] = existing_df["survey_id"].astype(str)
     merged_df = existing_df.merge(sm_surveys_df, how="outer", right_on="id", left_on="survey_id", indicator=True)
-    unlisted_surveys_df = merged_df[merged_df["_merge"] == "right_only"]
+    unlisted_surveys_df = merged_df[merged_df["_merge"] == "right_only"].copy()
     unlisted_surveys_df["id"] = unlisted_surveys_df["id"].astype(int)
-    print("unlisted_surveys_df")
-    display(unlisted_surveys_df)
     return unlisted_surveys_df
 
 unlisted_surveys_df = get_unlisted_surveys_df(sm_surveys_df, surveys_worksheet_editor.data.df)
+unlisted_surveys_df
 # -
 
 unlisted_survey_ids = unlisted_surveys_df["id"].tolist()
@@ -164,10 +174,12 @@ from lib.survey_monkey.api_client import fetch_survey_details
 unlisted_survey_details_by_survey_id = fetch_survey_details(unlisted_survey_ids)
 
 # +
+import pandas as pd
+
 survey_rows_to_add = []
 for index, survey_listing in unlisted_surveys_df.iterrows():
     print(index, survey_listing["title"])
-    survey = unlisted_survey_details_by_survey_id[int(survey.id)]
+    survey = unlisted_survey_details_by_survey_id[int(survey_listing["id"])]
     survey_row = {
         "survey_id": survey_listing["id"],
         "survey_name": survey_listing["title"],
@@ -185,135 +197,30 @@ survey_rows_to_add_df
 
 if len(survey_rows_to_add_df) > 0:
     surveys_worksheet_editor.append_data(survey_rows_to_add_df)
-
-surveys_worksheet_editor.data.df
-
-# +
-surveys_to_import_data_for = surveys_worksheet_editor.data.df[surveys_worksheet_editor.data.df["results_ready_for_import"].fillna(False).astype(bool) & ~surveys_worksheet_editor.data.df["results_imported"].fillna(False).astype(bool)]
-
-if len(surveys_to_import_data_for) == 0:
-    survey_details_by_survey_id = None
-    raise Exception("No surveys to import data for")
-else:
-    survey_ids = surveys_to_import_data_for["survey_id"].tolist()
-    print(survey_ids)
-    survey_details_by_survey_id = fetch_survey_details(survey_ids)
+    survey_rows_to_add_df = []
 
 # +
-from lib.survey_monkey.api_client import fetch_question_rollups_by_question_id
+from lib.import_mechanics.prepare_import_of_gs_question_and_answer_rows import prepare_import_of_gs_question_and_answer_rows
 
-question_rollups_by_question_id = fetch_question_rollups_by_question_id(survey_details_by_survey_id)
-question_rollups_by_question_id
-
-# +
-from lib.survey_monkey.api_client import fetch_submitted_answers_by_question_id
-
-submitted_answers_by_question_id = fetch_submitted_answers_by_question_id(survey_details_by_survey_id)
-submitted_answers_by_question_id
+surveys_to_import_data_for, survey_details_by_survey_id, question_rollups_by_question_id, submitted_answers_by_question_id = prepare_import_of_gs_question_and_answer_rows(
+    surveys_worksheet_editor
+)
 
 # +
-import pandas as pd
-from typing import Dict, List
-from lib.mapping.convert_survey_details_to_gs_question_and_answer_rows import convert_survey_details_to_gs_question_and_answer_rows
-from lib.gs_combined.schemas import GsSurveyResultsData
-from lib.survey_monkey.question_rollup import QuestionRollup
-from lib.survey_monkey.response import Answer
+from lib.import_mechanics.import_gs_question_and_answer_rows import import_gs_question_and_answer_rows
 
-def import_gs_question_and_answer_rows(
-    surveys_to_import_data_for: pd.DataFrame,
-    gs_survey_results_data: GsSurveyResultsData,
-    question_rollups_by_question_id: Dict[str, QuestionRollup],
-    submitted_answers_by_question_id: Dict[str, List[List[Answer]]],
-):
-    all_gs_questions = []
-    all_gs_answers = []
-    for index, survey_row in surveys_to_import_data_for.iterrows():
-        try:
-            survey_id = survey_row["survey_id"]
-            survey_details = survey_details_by_survey_id[survey_id]
-            gs_questions, gs_answers = convert_survey_details_to_gs_question_and_answer_rows(
-                survey_details, 
-                question_rollups_by_question_id,
-                submitted_answers_by_question_id,
-                gs_survey_results_data,
-            )
-            #print(index)
-            #display(gs_questions)
-            #display(gs_answers)
-        except Exception as error:
-            print("error", type(error), error)
-            raise error
-        all_gs_questions = all_gs_questions + gs_questions
-        all_gs_answers = all_gs_answers + gs_answers
-    return all_gs_questions, all_gs_answers
-
-gs_questions, gs_answers = import_gs_question_and_answer_rows(
+gs_questions, gs_answers, surveys_fully_imported_df = import_gs_question_and_answer_rows(
     surveys_to_import_data_for,
     gs_survey_results_data,
+    survey_details_by_survey_id,
     question_rollups_by_question_id,
     submitted_answers_by_question_id,
+    surveys_worksheet_editor,
 )
-#gs_questions, gs_answers
 
-# +
-# "Overview"
-from dataclasses import asdict
+print(f"Found {len(gs_questions)} supported question rows and {len(gs_answers)} answer rows in the selected surveys")
 
-gs_questions_df = pd.DataFrame(asdict(gs_question) for gs_question in gs_questions)
-gs_questions_df
-
-# +
-# "Topline"
-from dataclasses import asdict
-
-gs_answers_df = pd.DataFrame(asdict(gs_answer) for gs_answer in gs_answers)
-gs_answers_df
-
-
+surveys_fully_imported_df
 # -
-
-# check which questions are already imported
-def get_non_existing_rows_df(new_df, existing_df, unique_id_attribute):
-    new_df['_merge_id'] = new_df[unique_id_attribute].astype(str)
-    existing_df['_merge_id'] = existing_df[unique_id_attribute].astype(str)
-    merged_df = pd.merge(new_df, existing_df, on=['_merge_id'], how='outer', indicator=True, suffixes=('', '_existing'))
-    return merged_df.loc[merged_df['_merge'] == 'left_only', new_df.columns].drop(columns=['_merge_id'])
-
-
-unlisted_questions_df = get_non_existing_rows_df(gs_questions_df, gs_survey_results_data.questions_combo.data.df, "survey_question_id")
-unlisted_questions_df
-
-unlisted_answers_df = get_non_existing_rows_df(gs_answers_df, gs_survey_results_data.topline_combo.data.df, "survey_question_id")
-unlisted_answers_df
-
-if len(unlisted_questions_df) > 0:
-    gs_survey_results_data.questions_combo.append_data(unlisted_questions_df)
-if len(unlisted_answers_df) > 0:
-    gs_survey_results_data.topline_combo.append_data(unlisted_answers_df)
-
-# -
-# ## To preview the import results in a dev gsheet first
-
-# +
-from lib.gs_combined.schemas import attributes_to_columns_maps
-from lib.gsheets.gsheets_worksheet_editor import GsheetsWorksheetEditor
-
-gs_combined_dev_spreadsheet = authorized_clients.gc.open_by_key(
-        "1eafCGVMj2lUx-Q_FnrbttnZYUgRXcbVoudTRsqGHNY8"
-    )
-
-#debug_gs_questions_df_editor = GsheetsWorksheetEditor(sh=gs_combined_dev_spreadsheet, worksheet_name="debug-gs_questions_df", header_row_number=0, attributes_to_columns_map=attributes_to_columns_maps["gs_combined"]["questions_combo"])
-#debug_gs_answers_df_editor = GsheetsWorksheetEditor(sh=gs_combined_dev_spreadsheet, worksheet_name="debug-gs_answers_df", header_row_number=0, attributes_to_columns_map=attributes_to_columns_maps["gs_combined"]["topline_combo"])
-# -
-
-debug_questions_combo_editor = GsheetsWorksheetEditor(sh=gs_combined_dev_spreadsheet, worksheet_name="questions_combo", header_row_number=0, attributes_to_columns_map=attributes_to_columns_maps["gs_combined"]["questions_combo"])
-debug_topline_combo_editor = GsheetsWorksheetEditor(sh=gs_combined_dev_spreadsheet, worksheet_name="topline_combo", header_row_number=0, attributes_to_columns_map=attributes_to_columns_maps["gs_combined"]["topline_combo"])
-
-# restore the dev sheet to the state of prod
-debug_questions_combo_editor.replace_data(gs_survey_results_data.questions_combo.data.df)
-
-debug_questions_combo_editor.append_data(unlisted_questions_df)
-
-debug_topline_combo_editor.append_data(unlisted_answers_df)
 
 

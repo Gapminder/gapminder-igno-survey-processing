@@ -88,7 +88,7 @@ attributes_to_columns_maps = {
             "rows_in_questions_combo": "Number of rows in questions_combo",
             "rows_in_topline_combo": "Number of rows in topline_combo",
             "import_timestamp": "Import timestamp",
-            "import_errors": "Errors during import",
+            "import_notes": "Import notes",
         },
         "questions_combo": {
             "survey_id": "Survey ID",

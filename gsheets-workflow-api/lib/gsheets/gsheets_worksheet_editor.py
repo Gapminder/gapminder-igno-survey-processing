@@ -1,6 +1,9 @@
+from typing import Any, Dict, Union
+
 import gspread_dataframe
 import pandas as pd
 from gspread import Spreadsheet, Worksheet
+from gspread.utils import rowcol_to_a1
 
 from lib.gsheets.gsheets_worksheet_data import GsheetsWorksheetData
 from lib.gsheets.utils import get_worksheet
@@ -88,3 +91,38 @@ class GsheetsWorksheetEditor:
             row=self.worksheet.row_count + 1,
             include_column_header=False,
         )
+        # Gspread does not update the row count after a resize, so we must re-create the worksheet
+        self.worksheet = get_worksheet(self.sh, self.worksheet_name)
+
+    def update_a_cell(
+        self,
+        df_row_index: int,
+        df_column_name: str,
+        value: Any,
+        batch: bool = False,
+        only_if_empty: bool = False,
+    ) -> Union[bool, Dict[str, Any]]:
+
+        # check the existing value
+        existing_value = self.data.df.at[df_row_index, df_column_name]
+
+        if only_if_empty:
+            empty = pd.isna(existing_value) or existing_value == ""
+            if not empty:
+                return False
+
+        # create the update request
+        row_number = df_row_index + self.data.header_row_number + 2
+        column_number = self.data.df.columns.get_loc(df_column_name) + 1
+
+        gs_range = rowcol_to_a1(row_number, column_number)
+        if batch:
+            return {"range": gs_range, "values": [[value]]}
+        self.worksheet.update_acell(gs_range, value)
+
+        # update the df as well so that it is up to date
+        # TODO: find a way to support this properly in batch mode
+        if not batch:
+            self.data.df.at[df_row_index, df_column_name] = value
+
+        return True
