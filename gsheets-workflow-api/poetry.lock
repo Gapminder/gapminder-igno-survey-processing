@@ -815,15 +815,19 @@ description = "Read/write gspread worksheets using pandas DataFrames"
 category = "main"
 optional = false
 python-versions = "*"
-files = [
-    {file = "gspread-dataframe-3.3.0.tar.gz", hash = "sha256:8c15f3af8e3b9801f33dd544aa06fe35f0b069414f78791231b44c8da469e708"},
-    {file = "gspread_dataframe-3.3.0-py2.py3-none-any.whl", hash = "sha256:6fdbe3586db1c12820e85b867d2241b34e6c5afff47450bd4b1e92134ce0dbe8"},
-]
+files = []
+develop = false
 
 [package.dependencies]
 gspread = ">=3.0.0"
 pandas = ">=0.24.0"
 six = ">=1.12.0"
+
+[package.source]
+type = "git"
+url = "https://github.com/robin900/gspread-dataframe.git"
+reference = "HEAD"
+resolved_reference = "2c7a22a692c68917b16dbf328cf3e5772edc2ab7"
 
 [[package]]
 name = "gunicorn"
@@ -3134,4 +3138,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.10"
-content-hash = "966d2a2a157e77a33aec572d15d08a57a0d6221be7f72acd5eab94963225d12b"
+content-hash = "dda0a849e72be2f8a8bf9b7fc9fd86591b5a5da142ba8605712a487d985cf011"

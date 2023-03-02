@@ -24,7 +24,7 @@ python-dotenv = "^0.20.0"
 
 # for gsheets import/export
 gspread = "^5.1.1"
-gspread-dataframe = "^3.2.2"
+gspread-dataframe = {git = "https://github.com/robin900/gspread-dataframe.git"}
 
 # for gdrive API consumption
 google-auth = "^2.6.6"
