@@ -105,14 +105,13 @@ for test_case in choicify_question_test_cases_by_family['open_ended']:
     print(actual)
 # -
 
-# ## The actual import routine to be cloudified
+# ## refresh_surveys_and_combined_listings
 
 from lib.authorized_clients import get_service_account_authorized_clients
 authorized_clients = get_service_account_authorized_clients()
 
 # +
 from lib.config import read_config
-from lib.gs_combined.spreadsheet import get_gs_combined_spreadsheet
 
 config = read_config()
 gs_combined_spreadsheet_id = config["GS_COMBINED_SPREADSHEET_ID"]
@@ -121,103 +120,12 @@ gs_combined_spreadsheet_id = config["GS_COMBINED_SPREADSHEET_ID"]
 if False:
     gs_combined_spreadsheet_id = "1eafCGVMj2lUx-Q_FnrbttnZYUgRXcbVoudTRsqGHNY8"
 
-gs_combined_spreadsheet = get_gs_combined_spreadsheet(authorized_clients, gs_combined_spreadsheet_id)
-
 # +
-from lib.gs_combined.spreadsheet import read_gs_survey_results_data
+# %%time
 
-gs_survey_results_data = read_gs_survey_results_data(gs_combined_spreadsheet)
+from lib.import_mechanics.refresh_surveys_and_combined_listings import refresh_surveys_and_combined_listings
 
-"""
-# TODO: maybe later not have to use importrange
-"1bu_mQmytQkC8CUOwqzNJq4D_3nZiyHD0OTJvhaCcyuE"
-#q_qID
-"16pvka0dPw7_VR-hkOHOHqLeslDedfRFBU1WRY3kjym8"
-#q_qID
-"https://docs.google.com/spreadsheets/d/1B5nagphoKodR-lwCFsC9AvrnOylAK7Cj4apLuLW2RLw/edit"
-#study_qID
-"""
-pass
-
-display(gs_survey_results_data.imported_igno_questions_info.data.df.columns)
-display(gs_survey_results_data.imported_igno_questions_info.data.df)
-# -
-
-from lib.gs_combined.spreadsheet import read_surveys_listing
-surveys_worksheet_editor = read_surveys_listing(gs_combined_spreadsheet)
-print("surveys_worksheet_editor.data.df")
-display(surveys_worksheet_editor.data.df)
-
-# +
-from lib.import_mechanics.utils import get_non_existing_rows_df
-
-# appends rows with new surveys in survey monkey, if not already in the surveys sheet
-sm_surveys_df["survey_id"] = sm_surveys_df["id"]
-unlisted_surveys_df = get_non_existing_rows_df(
-    sm_surveys_df,
-    surveys_worksheet_editor.data.df,
-    "survey_id",
-)
-unlisted_surveys_df
-# -
-
-unlisted_survey_ids = unlisted_surveys_df["id"].tolist()
-unlisted_survey_ids
-
-# +
-from lib.survey_monkey.api_client import fetch_survey_details
-
-unlisted_survey_details_by_survey_id = fetch_survey_details(unlisted_survey_ids)
-
-# +
-import pandas as pd
-
-survey_rows_to_add = []
-for index, survey_listing in unlisted_surveys_df.iterrows():
-    print(index, survey_listing["title"])
-    survey = unlisted_survey_details_by_survey_id[int(survey_listing["id"])]
-    survey_row = {
-        "survey_id": survey_listing["id"],
-        "survey_name": survey_listing["title"],
-        "link_to_results": survey_listing["href"],
-        "sample_size": survey.response_count,
-        "survey_date": survey.date_created,
-        "rows_in_questions_combo": '=IF(J[[CURRENT_ROW]]="","",COUNTIF(questions_combo!$A$2:$A, J[[CURRENT_ROW]]))',
-        "rows_in_topline_combo": '=IF(J[[CURRENT_ROW]]="","",COUNTIF(topline_combo!$A$2:$A, J[[CURRENT_ROW]]))',
-    }
-    survey_rows_to_add.append(survey_row)
-
-survey_rows_to_add_df = pd.DataFrame(sorted(survey_rows_to_add, key=lambda d: d["survey_date"]))
-survey_rows_to_add_df
-# -
-
-if len(survey_rows_to_add_df) > 0:
-    surveys_worksheet_editor.append_data(survey_rows_to_add_df)
-    survey_rows_to_add_df = []
-
-# +
-from lib.import_mechanics.prepare_import_of_gs_question_and_answer_rows import prepare_import_of_gs_question_and_answer_rows
-
-surveys_to_import_data_for, survey_details_by_survey_id, question_rollups_by_question_id, submitted_answers_by_question_id = prepare_import_of_gs_question_and_answer_rows(
-    surveys_worksheet_editor
-)
-surveys_to_import_data_for
-
-# +
-from lib.import_mechanics.import_gs_question_and_answer_rows import import_gs_question_and_answer_rows
-
-gs_questions, gs_answers, surveys_fully_imported_df = import_gs_question_and_answer_rows(
-    surveys_to_import_data_for,
-    gs_survey_results_data,
-    survey_details_by_survey_id,
-    question_rollups_by_question_id,
-    submitted_answers_by_question_id,
-    surveys_worksheet_editor,
-)
-
-print(f"Found {len(gs_questions)} supported question rows and {len(gs_answers)} answer rows in the selected surveys")
-
-surveys_fully_imported_df
+refresh_surveys_and_combined_listings(authorized_clients, gs_combined_spreadsheet_id)
 # -
 
 
