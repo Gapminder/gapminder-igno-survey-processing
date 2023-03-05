@@ -1,15 +1,15 @@
 from gspread import Spreadsheet
 
-from lib.config import read_config
 from lib.gdrive.auth import AuthorizedClients
 from lib.gs_combined.schemas import GsSurveyResultsData, attributes_to_columns_maps
 from lib.gsheets.gsheets_worksheet_editor import GsheetsWorksheetEditor
 
 
-def get_gs_combined_spreadsheet(authorized_clients: AuthorizedClients) -> Spreadsheet:
-    config = read_config()
+def get_gs_combined_spreadsheet(
+    authorized_clients: AuthorizedClients, gs_combined_spreadsheet_id: str
+) -> Spreadsheet:
     gs_combined_spreadsheet = authorized_clients.gc.open_by_key(
-        config["GS_COMBINED_SPREADSHEET_ID"]
+        gs_combined_spreadsheet_id
     )
     return gs_combined_spreadsheet
 

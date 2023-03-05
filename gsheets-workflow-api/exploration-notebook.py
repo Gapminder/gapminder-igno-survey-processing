@@ -110,8 +110,18 @@ for test_case in choicify_question_test_cases_by_family['open_ended']:
 from lib.authorized_clients import get_service_account_authorized_clients
 authorized_clients = get_service_account_authorized_clients()
 
+# +
+from lib.config import read_config
 from lib.gs_combined.spreadsheet import get_gs_combined_spreadsheet
-gs_combined_spreadsheet = get_gs_combined_spreadsheet(authorized_clients)
+
+config = read_config()
+gs_combined_spreadsheet_id = config["GS_COMBINED_SPREADSHEET_ID"]
+
+# Use DEV spreadsheet during development
+if False:
+    gs_combined_spreadsheet_id = "1eafCGVMj2lUx-Q_FnrbttnZYUgRXcbVoudTRsqGHNY8"
+
+gs_combined_spreadsheet = get_gs_combined_spreadsheet(authorized_clients, gs_combined_spreadsheet_id)
 
 # +
 from lib.gs_combined.spreadsheet import read_gs_survey_results_data
@@ -138,30 +148,16 @@ surveys_worksheet_editor = read_surveys_listing(gs_combined_spreadsheet)
 print("surveys_worksheet_editor.data.df")
 display(surveys_worksheet_editor.data.df)
 
-# Use DEV spreadsheet during development
-if False:
-    gs_combined_dev_spreadsheet = authorized_clients.gc.open_by_key(
-        "1eafCGVMj2lUx-Q_FnrbttnZYUgRXcbVoudTRsqGHNY8"
-    )
-    gs_survey_results_data = read_gs_survey_results_data(gs_combined_dev_spreadsheet)
-    surveys_worksheet_editor = read_surveys_listing(gs_combined_dev_spreadsheet)
-    display(surveys_worksheet_editor.data.df)
-
-
 # +
+from lib.import_mechanics.utils import get_non_existing_rows_df
+
 # appends rows with new surveys in survey monkey, if not already in the surveys sheet
-
-def get_unlisted_surveys_df(sm_surveys_df, existing_df):
-    sm_surveys_df = sm_surveys_df.copy()
-    existing_df = existing_df.copy()
-    sm_surveys_df["id"] = sm_surveys_df["id"].astype(str)
-    existing_df["survey_id"] = existing_df["survey_id"].astype(str)
-    merged_df = existing_df.merge(sm_surveys_df, how="outer", right_on="id", left_on="survey_id", indicator=True)
-    unlisted_surveys_df = merged_df[merged_df["_merge"] == "right_only"].copy()
-    unlisted_surveys_df["id"] = unlisted_surveys_df["id"].astype(int)
-    return unlisted_surveys_df
-
-unlisted_surveys_df = get_unlisted_surveys_df(sm_surveys_df, surveys_worksheet_editor.data.df)
+sm_surveys_df["survey_id"] = sm_surveys_df["id"]
+unlisted_surveys_df = get_non_existing_rows_df(
+    sm_surveys_df,
+    surveys_worksheet_editor.data.df,
+    "survey_id",
+)
 unlisted_surveys_df
 # -
 
@@ -205,6 +201,7 @@ from lib.import_mechanics.prepare_import_of_gs_question_and_answer_rows import p
 surveys_to_import_data_for, survey_details_by_survey_id, question_rollups_by_question_id, submitted_answers_by_question_id = prepare_import_of_gs_question_and_answer_rows(
     surveys_worksheet_editor
 )
+surveys_to_import_data_for
 
 # +
 from lib.import_mechanics.import_gs_question_and_answer_rows import import_gs_question_and_answer_rows

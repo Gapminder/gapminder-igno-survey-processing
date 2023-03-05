@@ -1,12 +1,22 @@
+from typing import Any
+
 import pandas as pd
+
+from lib.parsing.extract_numerical_parts_of_answer_option import is_numeric
+
+
+def stringify_id(id: Any) -> str:
+    if is_numeric(id):
+        return str(int(id))
+    return str(id)
 
 
 def get_non_existing_rows_df(
     new_df: pd.DataFrame, existing_df: pd.DataFrame, unique_id_attribute: str
 ) -> pd.DataFrame:
-    new_df["_merge_id"] = new_df[unique_id_attribute].dropna().astype(int).astype(str)
+    new_df["_merge_id"] = new_df[unique_id_attribute].dropna().apply(stringify_id)
     existing_df["_merge_id"] = (
-        existing_df[unique_id_attribute].dropna().astype(int).astype(str)
+        existing_df[unique_id_attribute].dropna().apply(stringify_id)
     )
     merged_df = pd.merge(
         new_df,
