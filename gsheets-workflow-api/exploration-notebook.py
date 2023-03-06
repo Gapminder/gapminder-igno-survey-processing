@@ -116,9 +116,8 @@ from lib.config import read_config
 config = read_config()
 gs_combined_spreadsheet_id = config["GS_COMBINED_SPREADSHEET_ID"]
 
-# Use DEV spreadsheet during development
-if False:
-    gs_combined_spreadsheet_id = "1eafCGVMj2lUx-Q_FnrbttnZYUgRXcbVoudTRsqGHNY8"
+# Uncomment to use DEV spreadsheet during development
+#gs_combined_spreadsheet_id = config["GS_COMBINED_SPREADSHEET_ID"]
 
 # +
 # %%time
