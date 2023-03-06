@@ -12,14 +12,6 @@ poetry install
 
 This sets up a local Python environment with all the relevant dependencies, including the Development Tools listed further down in this readme.
 
-Initialize the local configuration file:
-
-```shell
-cp .env.example .env
-```
-
-Configure the environment variables in `.env` as per the configuration section below.
-
 The remaining commands in this readme assume you have activated the local Python environment by running:
 
 ```
@@ -34,7 +26,31 @@ Now install the Git hooks that will make it harder to accidentally commit incorr
 pre-commit install
 ```
 
-## Configuration
+## Cloud Configuration
+
+For the GCP project that will be used for deployment:
+
+1. Use the [GCP API Dashboard](https://console.cloud.google.com/apis/dashboard) to enable the Google APIs necessary for the add-on:
+- Google Sheets API
+- Google Drive API
+- Secret Manager API
+- Cloud Functions API
+
+2. Configure the OAuth consent screen: [https://console.cloud.google.com/apis/credentials/consent](). The current GCP Oauth assets (logo) was created using [this Figma project](https://www.figma.com/file/m7vuUFRdMkrTwnO1whFfi7/Google-Marketplace-assets?node-id=0%3A1&t=dgKGpR2Tdz7wsVAS-0).
+
+3. In the Apps Script editor for the deployed Google Apps Script, go to Project Settings -> Google Cloud Platform (GCP) Project and Change Project to the relevant project.
+
+Note: The above has already been configured for the production GCP project, but instructions are supplied here to be able to set up a new project, e.g. for testing purposes or similar.
+
+## Local Configuration
+
+Initialize the local configuration file:
+
+```shell
+cp .env.example .env
+```
+
+Configure the environment variables in `.env` as per the configuration sections below.
 
 ### For deploying to production
 
