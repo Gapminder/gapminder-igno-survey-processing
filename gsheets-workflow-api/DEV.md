@@ -62,7 +62,7 @@ Configure the environment variables in `.env` as per the configuration sections 
 
 The deployed cloud functions will use the access credentials of the current user and operate on the spreadsheet that is currently opened. During local development, we have neither active credentials or an open spreadsheet, so the following additional configuration is necessary:
 
-- `SERVICE_ACCOUNT_CREDENTIALS` - Service account credentials, base64-encoded, native to the above GCP project.
+- `SERVICE_ACCOUNT_CREDENTIALS` - Service account credentials, base64-encoded, native to the above GCP project (see below for instructions on how to obtain these)
 - `GS_COMBINED_SPREADSHEET_ID` - Spreadsheet ID of the production GS Combined Spreadsheet (Note: the service account needs access to this spreadsheet)
 - `GS_DEV_COMBINED_SPREADSHEET_ID` - Spreadsheet ID of a development copy of the GS Combined Spreadsheet (Note: the service account needs access to this spreadsheet)
 

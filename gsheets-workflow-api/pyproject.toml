@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "gapminder-igno-survey-processing-gsheets-workflow-api"
 version = "0.1.0"
-description = "Secured API endpoints that enables the Google Spreadsheet automation workflows"
+description = "Secured API endpoints that enables the Google Spreadsheet survey automation workflows"
 authors = ["Gapminder Foundation <info@gapminder.org>"]
 readme = "README.md"
 classifiers = [
