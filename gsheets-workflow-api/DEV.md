@@ -38,6 +38,8 @@ pre-commit install
 
 ### For deploying to production
 
+- `GCP_PROJECT` - GCP project id to use for development and deployment.
+- `GCP_REGION` - GCP region to use for development and deployment.
 - `SURVEY_MONKEY_API_TOKEN` - A Survey Monkey app's Access Token, providing access to the surveys to import
 
 ### For local development
@@ -95,17 +97,51 @@ pytest tests/test_lib_import_statement.py
 
 ### Testing cloud functions locally
 
-To test a function locally, run one of:
+To test the refresh_surveys_and_combined_listings cloud function locally, run:
 
 ```shell
 functions-framework --target "refresh_surveys_and_combined_listings" --debug
 ```
 
-Then run:
+Then invoke it:
 
 ```shell
-curl -v http://0.0.0.0:8080/
+curl -v --location --request POST 'http://0.0.0.0:8080/' \
+--header 'accept: application/json' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "accessToken": "foo",
+  "spreadsheetId": "bar"
+}'
 ```
+
+Note that this makes little sense unless you already have snooped an active user access token from somewhere, but if you do, it is a good way to check if a code change has the desired effect before deploying it to production.
+
+## Deploy
+
+> **_NOTE:_** You need to be logged in and your GCP user account needs at least the `Cloud Functions Developer`, `Service Account User` and `Logs Viewer` roles to be able to create, deploy and debug the cloud functions.
+
+Additionally, at least once (and everytime the secrets change), a project admin (with at least the `Project IAM Admin` and `Secrets Manager Admin` roles) needs to set the necessary secrets and give cloud functions read-access to those secrets:
+
+```shell
+source .env
+echo -n "$SURVEY_MONKEY_API_TOKEN" | gcloud secrets create survey-monkey-api-token --data-file=- --replication-policy automatic --project $GCP_PROJECT
+gcloud projects add-iam-policy-binding $GCP_PROJECT --member="serviceAccount:$GCP_PROJECT@appspot.gserviceaccount.com" --role='roles/secretmanager.secretAccessor'
+```
+
+To deploy:
+
+```shell
+poe deploy
+```
+
+To troubleshoot the functionality of the cloud functions, check the logs at:
+
+```shell
+poe logs
+```
+
+Note that environment variables for the GCP cloud function needs to be configured as per the configuration section above.
 
 ### Developing gapminder-igno-survey-processing-gsheets-workflow-api using a notebook environment
 

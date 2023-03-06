@@ -56,6 +56,12 @@ test = ["pytest", "lint"]
 pytest = "pytest --cov=lib --verbose tests/"
 lint = "pre-commit run --all-files"
 install_kernel = "python -m ipykernel install --user --name gapminder-igno-survey-processing-gsheets-workflow-api"
+deploy = { shell = """
+echo Deploying GCP Cloud Functions in project $GCP_PROJECT
+poetry export --without-hashes --format=requirements.txt | grep -v '@ file://' > requirements.txt
+gcloud functions deploy "refresh_surveys_and_combined_listings" --memory 1gb --runtime python39 --set-secrets "SURVEY_MONKEY_API_TOKEN=survey-monkey-api-token:latest" --trigger-http --project=$GCP_PROJECT --region=$GCP_REGION --verbosity=info
+""" }
+logs = "gcloud functions logs read \"refresh_surveys_and_combined_listings\" --project $GCP_PROJECT --region $GCP_REGION"
 
 [tool.poe]
 envfile = ".env"
