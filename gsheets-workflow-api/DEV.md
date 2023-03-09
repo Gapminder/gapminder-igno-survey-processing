@@ -35,12 +35,14 @@ For the GCP project that will be used for deployment:
 - Google Drive API
 - Secret Manager API
 - Cloud Functions API
+- Cloud Build API
+- IAM Service Account Credentials API
 
 2. Configure the OAuth consent screen: [https://console.cloud.google.com/apis/credentials/consent](). The current GCP Oauth assets (logo) was created using [this Figma project](https://www.figma.com/file/m7vuUFRdMkrTwnO1whFfi7/Google-Marketplace-assets?node-id=0%3A1&t=dgKGpR2Tdz7wsVAS-0).
 
-3. In the Apps Script editor for the deployed Google Apps Script, go to Project Settings -> Google Cloud Platform (GCP) Project and Change Project to the relevant project.
+3. In the Apps Script editor for the deployed Google Apps Script (the spreadsheet to which [../gsheets-addon]() is deployed), go to Project Settings -> Google Cloud Platform (GCP) Project and Change Project to the relevant project.
 
-Note: The above has already been configured for the production GCP project, but instructions are supplied here to be able to set up a new project, e.g. for testing purposes or similar.
+Note: The above has already been configured for our production GCP project, but instructions are supplied here to be able to set up a new project, e.g. for testing purposes or similar.
 
 ## Local Configuration
 
@@ -54,8 +56,8 @@ Configure the environment variables in `.env` as per the configuration sections 
 
 ### For deploying to production
 
-- `GCP_PROJECT` - GCP project id to use for development and deployment.
-- `GCP_REGION` - GCP region to use for development and deployment.
+- `GCP_PROJECT` - GCP project id to use for deployment.
+- `GCP_REGION` - GCP region to use for deployment.
 - `SURVEY_MONKEY_API_TOKEN` - A Survey Monkey app's Access Token, providing access to the surveys to import
 
 ### For local development
