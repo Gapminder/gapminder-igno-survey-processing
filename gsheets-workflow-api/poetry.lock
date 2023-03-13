@@ -825,7 +825,7 @@ six = ">=1.12.0"
 
 [package.source]
 type = "git"
-url = "https://github.com/robin900/gspread-dataframe.git"
+url = "https://github.com/robin900/gspread-dataframe.git#main"
 reference = "HEAD"
 resolved_reference = "2c7a22a692c68917b16dbf328cf3e5772edc2ab7"
 
@@ -3138,4 +3138,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.10"
-content-hash = "dda0a849e72be2f8a8bf9b7fc9fd86591b5a5da142ba8605712a487d985cf011"
+content-hash = "9a2aa82d3e4e38c005f8e25a22fcd9de30d23a062d8b2740a38619130c946b28"
