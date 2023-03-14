@@ -3,35 +3,55 @@
 
 ## Index
 
+### Classes
+
+* [AlreadyRunningException](classes/alreadyrunningexception.md)
+* [UrlFetchAppFetchException](classes/urlfetchappfetchexception.md)
+
 ### Functions
 
-* [menuDevUpdateFormulasAndCalculatedColumns](README.md#menudevupdateformulasandcalculatedcolumns)
-* [menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames](README.md#menuextractsurveyidsfromcopypastedlinkedsurveynames)
+* [errorHandlingFetch](README.md#const-errorhandlingfetch)
+* [invokeGcpCloudFunction](README.md#invokegcpcloudfunction)
 * [menuRefreshSurveysAndCombinedListings](README.md#menurefreshsurveysandcombinedlistings)
+* [mutex](README.md#mutex)
+* [refreshSurveysAndCombinedListingsCloudFunction](README.md#refreshsurveysandcombinedlistingscloudfunction)
 
 ## Functions
 
-###  menuDevUpdateFormulasAndCalculatedColumns
+### `Const` errorHandlingFetch
 
-▸ **menuDevUpdateFormulasAndCalculatedColumns**(): *void*
+▸ **errorHandlingFetch**(`url`: string, `params?`: URLFetchRequestOptions): *HTTPResponse*
 
-*Defined in [menuActions/menuDevUpdateFormulasAndCalculatedColumns.ts:31](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.5.0/src/menuActions/menuDevUpdateFormulasAndCalculatedColumns.ts#L31)*
+Defined in src/lib/errorHandlingFetch.ts:25
 
-Menu item action for "Gapminder Igno Survey Process -> (For developer use only) Update formulas and calculated columns"
+To get exceptions thrown when requests fail
 
-**Returns:** *void*
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`url` | string |
+`params?` | URLFetchRequestOptions |
+
+**Returns:** *HTTPResponse*
 
 ___
 
-###  menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames
+###  invokeGcpCloudFunction
 
-▸ **menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames**(): *void*
+▸ **invokeGcpCloudFunction**(`gcpRegion`: string, `gcpProject`: string, `cloudFunction`: string): *string*
 
-*Defined in [menuActions/menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames.ts:14](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.5.0/src/menuActions/menuExtractSurveyIdsFromCopyPastedLinkedSurveyNames.ts#L14)*
+Defined in src/lib/invokeGcpCloudFunction.ts:3
 
-Menu item action for "Gapminder Igno Survey Process -> Extract Survey IDs from copy-pasted linked survey names"
+**Parameters:**
 
-**Returns:** *void*
+Name | Type |
+------ | ------ |
+`gcpRegion` | string |
+`gcpProject` | string |
+`cloudFunction` | string |
+
+**Returns:** *string*
 
 ___
 
@@ -39,7 +59,7 @@ ___
 
 ▸ **menuRefreshSurveysAndCombinedListings**(): *void*
 
-*Defined in [menuActions/menuRefreshSurveysAndCombinedListings.ts:43](https://github.com/Gapminder/gapminder-igno-survey-process-scripts/blob/v0.5.0/src/menuActions/menuRefreshSurveysAndCombinedListings.ts#L43)*
+*Defined in [src/menuActions/menuRefreshSurveysAndCombinedListings.ts:26](https://github.com/Gapminder/gapminder-igno-survey-processing/blob/v0.6.0/gsheets-addon/src/menuActions/menuRefreshSurveysAndCombinedListings.ts#L26)*
 
 Menu item action for "Gapminder Igno Survey Process -> Refresh surveys and combined topline listings"
 
@@ -48,3 +68,37 @@ Notes:
 - Verifies that the first headers of the `surveys` and `topline_combo` worksheets are as expected
 
 **Returns:** *void*
+
+___
+
+###  mutex
+
+▸ **mutex**<**T**, **R**>(`functionReference`: string, `callable`: T, `lockDurationInSeconds`: number): *R*
+
+Defined in src/lib/mutex.ts:16
+
+**Type parameters:**
+
+▪ **T**: *CallableFunction*
+
+▪ **R**
+
+**Parameters:**
+
+Name | Type |
+------ | ------ |
+`functionReference` | string |
+`callable` | T |
+`lockDurationInSeconds` | number |
+
+**Returns:** *R*
+
+___
+
+###  refreshSurveysAndCombinedListingsCloudFunction
+
+▸ **refreshSurveysAndCombinedListingsCloudFunction**(): *string*
+
+*Defined in [src/menuActions/menuRefreshSurveysAndCombinedListings.ts:4](https://github.com/Gapminder/gapminder-igno-survey-processing/blob/v0.6.0/gsheets-addon/src/menuActions/menuRefreshSurveysAndCombinedListings.ts#L4)*
+
+**Returns:** *string*
