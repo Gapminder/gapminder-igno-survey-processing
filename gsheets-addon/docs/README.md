@@ -22,7 +22,7 @@
 
 ▸ **errorHandlingFetch**(`url`: string, `params?`: URLFetchRequestOptions): *HTTPResponse*
 
-Defined in src/lib/errorHandlingFetch.ts:25
+*Defined in [src/lib/errorHandlingFetch.ts:25](https://github.com/Gapminder/gapminder-igno-survey-processing/blob/v0.6.0/gsheets-addon/src/lib/errorHandlingFetch.ts#L25)*
 
 To get exceptions thrown when requests fail
 
@@ -41,7 +41,7 @@ ___
 
 ▸ **invokeGcpCloudFunction**(`gcpRegion`: string, `gcpProject`: string, `cloudFunction`: string): *string*
 
-Defined in src/lib/invokeGcpCloudFunction.ts:3
+*Defined in [src/lib/invokeGcpCloudFunction.ts:3](https://github.com/Gapminder/gapminder-igno-survey-processing/blob/v0.6.0/gsheets-addon/src/lib/invokeGcpCloudFunction.ts#L3)*
 
 **Parameters:**
 
@@ -75,7 +75,7 @@ ___
 
 ▸ **mutex**<**T**, **R**>(`functionReference`: string, `callable`: T, `lockDurationInSeconds`: number): *R*
 
-Defined in src/lib/mutex.ts:16
+*Defined in [src/lib/mutex.ts:16](https://github.com/Gapminder/gapminder-igno-survey-processing/blob/v0.6.0/gsheets-addon/src/lib/mutex.ts#L16)*
 
 **Type parameters:**
 

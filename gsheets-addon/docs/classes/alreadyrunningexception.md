@@ -28,7 +28,7 @@
 
 \+ **new AlreadyRunningException**(`functionReference`: string, `lockDurationInSeconds`: number): *[AlreadyRunningException](alreadyrunningexception.md)*
 
-Defined in src/lib/mutex.ts:5
+*Defined in [src/lib/mutex.ts:5](https://github.com/Gapminder/gapminder-igno-survey-processing/blob/v0.6.0/gsheets-addon/src/lib/mutex.ts#L5)*
 
 **Parameters:**
 
@@ -45,7 +45,7 @@ Name | Type |
 
 • **functionReference**: *string*
 
-Defined in src/lib/mutex.ts:4
+*Defined in [src/lib/mutex.ts:4](https://github.com/Gapminder/gapminder-igno-survey-processing/blob/v0.6.0/gsheets-addon/src/lib/mutex.ts#L4)*
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 • **lockDurationInSeconds**: *number*
 
-Defined in src/lib/mutex.ts:5
+*Defined in [src/lib/mutex.ts:5](https://github.com/Gapminder/gapminder-igno-survey-processing/blob/v0.6.0/gsheets-addon/src/lib/mutex.ts#L5)*
 
 ___
 
@@ -73,7 +73,7 @@ ___
 
 *Overrides void*
 
-Defined in src/lib/mutex.ts:2
+*Defined in [src/lib/mutex.ts:2](https://github.com/Gapminder/gapminder-igno-survey-processing/blob/v0.6.0/gsheets-addon/src/lib/mutex.ts#L2)*
 
 ___
 

@@ -28,7 +28,7 @@
 
 \+ **new UrlFetchAppFetchException**(`url?`: string, `response?`: HTTPResponse): *[UrlFetchAppFetchException](urlfetchappfetchexception.md)*
 
-Defined in src/lib/errorHandlingFetch.ts:10
+*Defined in [src/lib/errorHandlingFetch.ts:10](https://github.com/Gapminder/gapminder-igno-survey-processing/blob/v0.6.0/gsheets-addon/src/lib/errorHandlingFetch.ts#L10)*
 
 **Parameters:**
 
@@ -57,7 +57,7 @@ ___
 
 *Overrides void*
 
-Defined in src/lib/errorHandlingFetch.ts:6
+*Defined in [src/lib/errorHandlingFetch.ts:6](https://github.com/Gapminder/gapminder-igno-survey-processing/blob/v0.6.0/gsheets-addon/src/lib/errorHandlingFetch.ts#L6)*
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 • **response**: *HTTPResponse*
 
-Defined in src/lib/errorHandlingFetch.ts:10
+*Defined in [src/lib/errorHandlingFetch.ts:10](https://github.com/Gapminder/gapminder-igno-survey-processing/blob/v0.6.0/gsheets-addon/src/lib/errorHandlingFetch.ts#L10)*
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 • **url**: *string*
 
-Defined in src/lib/errorHandlingFetch.ts:8
+*Defined in [src/lib/errorHandlingFetch.ts:8](https://github.com/Gapminder/gapminder-igno-survey-processing/blob/v0.6.0/gsheets-addon/src/lib/errorHandlingFetch.ts#L8)*
 
 ___
 
