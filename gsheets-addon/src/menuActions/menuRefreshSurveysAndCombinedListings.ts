@@ -33,7 +33,7 @@ export function menuRefreshSurveysAndCombinedListings() {
     >(
       "refreshSurveysAndCombinedListingsCloudFunction",
       refreshSurveysAndCombinedListingsCloudFunction,
-      60 * 3
+      60 * 9 + 15 // 9 minutes cloud function timeout + some padding
     );
 
     if (results) {
