@@ -26,6 +26,33 @@ Now install the Git hooks that will make it harder to accidentally commit incorr
 pre-commit install
 ```
 
+## Local Configuration
+
+Initialize the local configuration file:
+
+```shell
+cp .env.example .env
+```
+
+Configure the environment variables in `.env` as per the configuration sections below.
+
+### For deploying to production
+
+- `GCP_PROJECT` - GCP project id to use for deployment.
+- `GCP_REGION` - GCP region to use for deployment.
+
+### For running in production
+
+- `SURVEY_MONKEY_API_TOKEN` - A Survey Monkey app's Access Token, providing access to the surveys to import
+
+### For local development
+
+The deployed cloud functions will use the access credentials of the current user and operate on the spreadsheet that is currently opened. During local development, we have neither active credentials or an open spreadsheet, so the following additional configuration is necessary:
+
+- `SERVICE_ACCOUNT_CREDENTIALS` - Service account credentials, base64-encoded, native to the above GCP project (see below for instructions on how to obtain these)
+- `GS_COMBINED_SPREADSHEET_ID` - Spreadsheet ID of the production GS Combined Spreadsheet (Note: the service account needs access to this spreadsheet)
+- `GS_DEV_COMBINED_SPREADSHEET_ID` - Spreadsheet ID of a development copy of the GS Combined Spreadsheet (Note: the service account needs access to this spreadsheet)
+
 ## Cloud Configuration
 
 For the GCP project that will be used for deployment:
@@ -42,31 +69,18 @@ For the GCP project that will be used for deployment:
 
 3. In the Apps Script editor for the deployed Google Apps Script (the spreadsheet to which [../gsheets-addon]() is deployed), go to Project Settings -> Google Cloud Platform (GCP) Project and Change Project to the relevant project.
 
-Note: The above has already been configured for our production GCP project, but instructions are supplied here to be able to set up a new project, e.g. for testing purposes or similar.
-
-## Local Configuration
-
-Initialize the local configuration file:
+4. Give all users of the gapminder.org domain permission to invoke the cloud function:
 
 ```shell
-cp .env.example .env
+source .env
+gcloud functions add-iam-policy-binding refresh_surveys_and_combined_listings \
+--project $GCP_PROJECT \
+--region $GCP_REGION \
+--member="domain:gapminder.org" \
+--role=roles/cloudfunctions.invoker
 ```
 
-Configure the environment variables in `.env` as per the configuration sections below.
-
-### For deploying to production
-
-- `GCP_PROJECT` - GCP project id to use for deployment.
-- `GCP_REGION` - GCP region to use for deployment.
-- `SURVEY_MONKEY_API_TOKEN` - A Survey Monkey app's Access Token, providing access to the surveys to import
-
-### For local development
-
-The deployed cloud functions will use the access credentials of the current user and operate on the spreadsheet that is currently opened. During local development, we have neither active credentials or an open spreadsheet, so the following additional configuration is necessary:
-
-- `SERVICE_ACCOUNT_CREDENTIALS` - Service account credentials, base64-encoded, native to the above GCP project (see below for instructions on how to obtain these)
-- `GS_COMBINED_SPREADSHEET_ID` - Spreadsheet ID of the production GS Combined Spreadsheet (Note: the service account needs access to this spreadsheet)
-- `GS_DEV_COMBINED_SPREADSHEET_ID` - Spreadsheet ID of a development copy of the GS Combined Spreadsheet (Note: the service account needs access to this spreadsheet)
+Note: The above has already been configured for our production GCP project, but instructions are supplied here to be able to set up a new project, e.g. for testing purposes or similar.
 
 ### Obtaining service account credentials, base64-encoded
 
