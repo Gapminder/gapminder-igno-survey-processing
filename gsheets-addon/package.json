@@ -1,6 +1,6 @@
 {
   "name": "gapminder-igno-survey-process-scripts",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Gapminder Igno Survey Process Scripts for specific Google Spreadsheets",
   "main": "src/index.js",
   "dependencies": {
@@ -19,7 +19,7 @@
     "@babel/plugin-transform-property-literals": "^7.2.0",
     "@babel/preset-env": "^7.2.3",
     "@google/clasp": "^2.0.0",
-    "@types/google-apps-script": "0.0.35",
+    "@types/google-apps-script": "^1.0.57",
     "@types/node": "^10.12.18",
     "ava": "^2.4.0",
     "babel-loader": "^8.0.5",
@@ -51,7 +51,7 @@
     "docs": "typedoc --theme markdown --excludeExternals --externalPattern \"**/node_modules/**\" --mode file --ignoreCompilerErrors --out docs --gitRevision v$npm_package_version --readme none --hideBreadcrumbs --name \"Gapminder Igno Survey Process Scripts\" src",
     "format": "prettier \"src/**/*.ts\" --write",
     "lint": "tslint -t verbose --fix --project .",
-    "push": "cp .clasp.tpl.json .clasp.json && clasp setting scriptId \"1Om9ff0iaCnshdrQ2XMNXHz-pW-2PST3TXGsNSbyLvCMFsyzH6V6TX5Y1\" && clasp push",
+    "push": "cp .clasp.tpl.json .clasp.json && clasp setting scriptId \"1cSPibRhDFqjj6r9vkw5A_DbBJDcT-blpb3TF29bkrLJTbnHJdLzKdIMk\" && clasp push",
     "push:prod": "cp .clasp.tpl.json .clasp.json && clasp setting scriptId \"1N19ztz9YFWpqybkijCs38YHSp2vX0I11P3VXXbDk8Iad_SQI1GxQLCAA\" && clasp push",
     "watch": "watch 'npm run build && npm run push' src/",
     "test": "npm run format && npm run test:ava && npm run build && npm run docs && npm run lint",

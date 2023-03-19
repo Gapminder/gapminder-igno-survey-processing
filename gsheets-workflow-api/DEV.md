@@ -12,14 +12,6 @@ poetry install
 
 This sets up a local Python environment with all the relevant dependencies, including the Development Tools listed further down in this readme.
 
-Initialize the local configuration file:
-
-```shell
-cp .env.example .env
-```
-
-Configure the environment variables in `.env` as per the configuration section below.
-
 The remaining commands in this readme assume you have activated the local Python environment by running:
 
 ```
@@ -34,9 +26,22 @@ Now install the Git hooks that will make it harder to accidentally commit incorr
 pre-commit install
 ```
 
-## Configuration
+## Local Configuration
+
+Initialize the local configuration file:
+
+```shell
+cp .env.example .env
+```
+
+Configure the environment variables in `.env` as per the configuration sections below.
 
 ### For deploying to production
+
+- `GCP_PROJECT` - GCP project id to use for deployment.
+- `GCP_REGION` - GCP region to use for deployment.
+
+### For running in production
 
 - `SURVEY_MONKEY_API_TOKEN` - A Survey Monkey app's Access Token, providing access to the surveys to import
 
@@ -44,9 +49,38 @@ pre-commit install
 
 The deployed cloud functions will use the access credentials of the current user and operate on the spreadsheet that is currently opened. During local development, we have neither active credentials or an open spreadsheet, so the following additional configuration is necessary:
 
-- `SERVICE_ACCOUNT_CREDENTIALS` - Service account credentials, base64-encoded, native to the above GCP project.
+- `SERVICE_ACCOUNT_CREDENTIALS` - Service account credentials, base64-encoded, native to the above GCP project (see below for instructions on how to obtain these)
 - `GS_COMBINED_SPREADSHEET_ID` - Spreadsheet ID of the production GS Combined Spreadsheet (Note: the service account needs access to this spreadsheet)
 - `GS_DEV_COMBINED_SPREADSHEET_ID` - Spreadsheet ID of a development copy of the GS Combined Spreadsheet (Note: the service account needs access to this spreadsheet)
+
+## Cloud Configuration
+
+For the GCP project that will be used for deployment:
+
+1. Use the [GCP API Dashboard](https://console.cloud.google.com/apis/dashboard) to enable the Google APIs necessary for the add-on:
+- Google Sheets API
+- Google Drive API
+- Secret Manager API
+- Cloud Functions API
+- Cloud Build API
+- IAM Service Account Credentials API
+
+2. Configure the OAuth consent screen: [https://console.cloud.google.com/apis/credentials/consent](). The current GCP Oauth assets (logo) was created using [this Figma project](https://www.figma.com/file/m7vuUFRdMkrTwnO1whFfi7/Google-Marketplace-assets?node-id=0%3A1&t=dgKGpR2Tdz7wsVAS-0).
+
+3. In the Apps Script editor for the deployed Google Apps Script (the spreadsheet to which [../gsheets-addon]() is deployed), go to Project Settings -> Google Cloud Platform (GCP) Project and Change Project to the relevant project.
+
+4. Give all users of the gapminder.org domain permission to invoke the cloud function:
+
+```shell
+source .env
+gcloud functions add-iam-policy-binding refresh_surveys_and_combined_listings \
+--project $GCP_PROJECT \
+--region $GCP_REGION \
+--member="domain:gapminder.org" \
+--role=roles/cloudfunctions.invoker
+```
+
+Note: The above has already been configured for our production GCP project, but instructions are supplied here to be able to set up a new project, e.g. for testing purposes or similar.
 
 ### Obtaining service account credentials, base64-encoded
 
@@ -95,17 +129,51 @@ pytest tests/test_lib_import_statement.py
 
 ### Testing cloud functions locally
 
-To test a function locally, run one of:
+To test the refresh_surveys_and_combined_listings cloud function locally, run:
 
 ```shell
 functions-framework --target "refresh_surveys_and_combined_listings" --debug
 ```
 
-Then run:
+Then invoke it:
 
 ```shell
-curl -v http://0.0.0.0:8080/
+curl -v --location --request POST 'http://0.0.0.0:8080/' \
+--header 'accept: application/json' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "accessToken": "foo",
+  "spreadsheetId": "bar"
+}'
 ```
+
+Note that this makes little sense unless you already have snooped an active user access token from somewhere, but if you do, it is a good way to check if a code change has the desired effect before deploying it to production.
+
+## Deploy
+
+> **_NOTE:_** You need to be logged in and your GCP user account needs at least the `Cloud Functions Developer`, `Service Account User` and `Logs Viewer` roles to be able to create, deploy and debug the cloud functions.
+
+Additionally, at least once (and everytime the secrets change), a project admin (with at least the `Project IAM Admin` and `Secrets Manager Admin` roles) needs to set the necessary secrets and give cloud functions read-access to those secrets:
+
+```shell
+source .env
+echo -n "$SURVEY_MONKEY_API_TOKEN" | gcloud secrets create survey-monkey-api-token --data-file=- --replication-policy automatic --project $GCP_PROJECT
+gcloud projects add-iam-policy-binding $GCP_PROJECT --member="serviceAccount:$GCP_PROJECT@appspot.gserviceaccount.com" --role='roles/secretmanager.secretAccessor'
+```
+
+To deploy:
+
+```shell
+poe deploy
+```
+
+To troubleshoot the functionality of the cloud functions, check the logs at:
+
+```shell
+poe logs
+```
+
+Note that environment variables for the GCP cloud function needs to be configured as per the configuration section above.
 
 ### Developing gapminder-igno-survey-processing-gsheets-workflow-api using a notebook environment
 
