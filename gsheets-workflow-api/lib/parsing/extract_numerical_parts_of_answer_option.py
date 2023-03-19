@@ -8,7 +8,7 @@ from lib.parsing.key_normalizer_for_slightly_fuzzy_lookups import (
 
 def is_numeric(n: Any) -> bool:
     # support commas, like parseFloat in js does
-    sanitized_n = n.replace(",", "")
+    sanitized_n = str(n).replace(",", "")
     # print("sanitized_n", sanitized_n)
     try:
         float(sanitized_n)

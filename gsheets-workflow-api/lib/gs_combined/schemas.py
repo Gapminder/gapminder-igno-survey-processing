@@ -11,6 +11,7 @@ combined_topline_sheet_name = "topline_combo"
 class GsQuestionRow:
     survey_id: int
     survey_name: str
+    survey_question_id: str
     question_number: int
     question_text: str
     igno_index_question_id: str
@@ -49,12 +50,15 @@ class GsQuestionRow:
 class GsAnswerRow:
     survey_id: int
     survey_name: str
+    survey_question_id: str
     question_number: int
     question_text: str
     answer: str
     correctness_of_answer_option: str
     auto_marked_correctness_of_answer: str
     answer_by_percent: str
+    correct_answer_at_time_of_import: str
+    very_wrong_answer_at_time_of_import: str
     metadata: str
     weighted_by: str
 
@@ -84,11 +88,12 @@ attributes_to_columns_maps = {
             "rows_in_questions_combo": "Number of rows in questions_combo",
             "rows_in_topline_combo": "Number of rows in topline_combo",
             "import_timestamp": "Import timestamp",
-            "import_errors": "Errors during import",
+            "import_notes": "Import notes",
         },
         "questions_combo": {
             "survey_id": "Survey ID",
             "survey_name": "Survey Name",
+            "survey_question_id": "Survey Question ID",
             "question_number": "Question number",
             "question_text": "Question text",
             "igno_index_question_id": "Igno Index Question ID",
@@ -125,12 +130,15 @@ attributes_to_columns_maps = {
         "topline_combo": {
             "survey_id": "Survey ID",
             "survey_name": "Survey Name",
+            "survey_question_id": "Survey Question ID",
             "question_number": "Question number",
             "question_text": "Question text",
             "answer": "Answer",
             "correctness_of_answer_option": "Correctness of answer option",
             "auto_marked_correctness_of_answer": "Auto-marked correctness of answers",
             "answer_by_percent": "Answer by percent",
+            "correct_answer_at_time_of_import": "Correct answer at time of import",
+            "very_wrong_answer_at_time_of_import": "Very wrong answer at time of import",
             "metadata": "Metadata",
             "weighted_by": "Weighted by",
         },

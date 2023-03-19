@@ -1,11 +1,12 @@
+from typing import Any, Dict, Union
+
 import gspread_dataframe
-import numpy as np
 import pandas as pd
 from gspread import Spreadsheet, Worksheet
+from gspread.utils import rowcol_to_a1
 
 from lib.gsheets.gsheets_worksheet_data import GsheetsWorksheetData
 from lib.gsheets.utils import get_worksheet
-from lib.utils import convert_df_cells_to_strings_with_max_length
 
 
 class GsheetsWorksheetEditor:
@@ -66,31 +67,62 @@ class GsheetsWorksheetEditor:
 
     def append_row(self, row: dict) -> None:
         df_with_row = pd.DataFrame([row])
-        # display(df_with_row)
-        new_df = pd.concat([self.data.df, df_with_row], ignore_index=True)
-        # self.replace_data(new_df) <-- alt to below
-        self.data.df = new_df
-        export_df = convert_df_cells_to_strings_with_max_length(
-            self.data.export().fillna(""), 1024
-        )
-        last_row_values_exported = export_df.iloc[-1, :].values.tolist()
-        # print("last_row_values_exported", last_row_values_exported)
-        serializable_values = []
-        for value in last_row_values_exported:
-            if type(value) == np.bool_:
-                value = bool(value)
-            serializable_values.append(value)
-        self.worksheet.append_row(
-            values=serializable_values, value_input_option="USER_ENTERED"
-        )
+        self.append_data(df_with_row)
 
     def remove_row(self, df_row_index: int) -> None:
         start_index = df_row_index + self.data.header_row_number + 2
-        self.worksheet.delete_rows(start_index, end_index=None)
+        self.worksheet.delete_rows(start_index)  # , end_index=None
         self.data.df = self.data.df.drop([df_row_index])
 
     def replace_data(self, df: pd.DataFrame) -> None:
         self.data.df = df
+        export_df = self.data.export()
+        gspread_dataframe.set_with_dataframe(self.worksheet, export_df, resize=True)
+
+    def append_data(self, df: pd.DataFrame) -> None:
+        new_df = pd.concat([self.data.df, df], ignore_index=True)
+        self.data.df = new_df
+        export_df = self.data.export()
+        appended_rows_export_df = export_df.tail(len(df))
         gspread_dataframe.set_with_dataframe(
-            self.worksheet, self.data.export(), resize=True
+            self.worksheet,
+            appended_rows_export_df,
+            resize=False,
+            row=self.worksheet.row_count + 1,
+            include_column_header=False,
         )
+        # Gspread does not update the row count after a resize, so we must re-create the worksheet
+        self.worksheet = get_worksheet(self.sh, self.worksheet_name)
+
+    def update_a_cell(
+        self,
+        df_row_index: int,
+        df_column_name: str,
+        value: Any,
+        batch: bool = False,
+        only_if_empty: bool = False,
+    ) -> Union[bool, Dict[str, Any]]:
+
+        # check the existing value
+        existing_value = self.data.df.at[df_row_index, df_column_name]
+
+        if only_if_empty:
+            empty = pd.isna(existing_value) or existing_value == ""
+            if not empty:
+                return False
+
+        # create the update request
+        row_number = df_row_index + self.data.header_row_number + 2
+        column_number = self.data.df.columns.get_loc(df_column_name) + 1
+
+        gs_range = rowcol_to_a1(row_number, column_number)
+        if batch:
+            return {"range": gs_range, "values": [[value]]}
+        self.worksheet.update_acell(gs_range, value)
+
+        # update the df as well so that it is up to date
+        # TODO: find a way to support this properly in batch mode
+        if not batch:
+            self.data.df.at[df_row_index, df_column_name] = value
+
+        return True
