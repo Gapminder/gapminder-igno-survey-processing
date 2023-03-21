@@ -181,7 +181,7 @@ Run the following to install a Jupyter kernel and opening the example Jupyter no
 
 ```
 poe install_kernel
-jupyter-notebook exploration-notebook.py
+jupyter-notebook notebooks/exploration-notebook.py
 ```
 
 After selecting the `gapminder-igno-survey-processing-gsheets-workflow-api` kernel in Jupyter you should be able to import files from `lib`, e.g.:
