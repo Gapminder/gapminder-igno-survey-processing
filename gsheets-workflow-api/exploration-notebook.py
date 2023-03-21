@@ -24,6 +24,27 @@ sm_surveys_df = fetch_surveys()
 sm_surveys_df
 # -
 
+# ## refresh_surveys_and_combined_listings
+
+from lib.authorized_clients import get_service_account_authorized_clients
+authorized_clients = get_service_account_authorized_clients()
+
+# +
+from lib.config import read_config
+
+config = read_config()
+gs_combined_spreadsheet_id = config["GS_COMBINED_SPREADSHEET_ID"]
+
+# Uncomment to use DEV spreadsheet during development
+#gs_combined_spreadsheet_id = config["GS_COMBINED_SPREADSHEET_ID"]
+
+# +
+# %%time
+
+from lib.import_mechanics.refresh_surveys_and_combined_listings import refresh_surveys_and_combined_listings
+
+refresh_surveys_and_combined_listings(authorized_clients, gs_combined_spreadsheet_id)
+# -
 # ## Fetch all info about all surveys + misc
 
 # +
@@ -105,26 +126,5 @@ for test_case in choicify_question_test_cases_by_family['open_ended']:
     print(actual)
 # -
 
-# ## refresh_surveys_and_combined_listings
-
-from lib.authorized_clients import get_service_account_authorized_clients
-authorized_clients = get_service_account_authorized_clients()
-
-# +
-from lib.config import read_config
-
-config = read_config()
-gs_combined_spreadsheet_id = config["GS_COMBINED_SPREADSHEET_ID"]
-
-# Uncomment to use DEV spreadsheet during development
-#gs_combined_spreadsheet_id = config["GS_COMBINED_SPREADSHEET_ID"]
-
-# +
-# %%time
-
-from lib.import_mechanics.refresh_surveys_and_combined_listings import refresh_surveys_and_combined_listings
-
-refresh_surveys_and_combined_listings(authorized_clients, gs_combined_spreadsheet_id)
-# -
 
 
