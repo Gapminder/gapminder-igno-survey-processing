@@ -5,6 +5,7 @@ import requests
 from pandas import json_normalize
 from pydantic import ValidationError
 
+from lib.app_singleton import app_logger
 from lib.config import read_config
 from lib.survey_monkey.api_response_wrapper import GenericApiResponse
 from lib.survey_monkey.question_rollup import QuestionRollup
@@ -49,10 +50,11 @@ def fetch_survey_details(survey_ids: list) -> Dict[str, Survey]:
             survey_details = Survey(**response)
             survey_details_by_survey_id[survey_id] = survey_details
         except ValidationError as e:
-            print(  # noqa T201
-                f"ValidationError in survey with id {survey_id} and JSON:"
+            app_logger.warning(
+                "ValidationError in survey with id {survey_id}",
+                {"survey_id": survey_id},
             )
-            print(json.dumps(response, indent=2))  # noqa T201
+            app_logger.info(json.dumps(response, indent=2))
             raise e
 
     return survey_details_by_survey_id
@@ -64,7 +66,7 @@ def fetch_question_rollups_by_question_id(
     question_rollups_by_question_id: Dict[str, QuestionRollup] = {}
 
     for survey_id, survey in survey_details_by_survey_id.items():
-        # print(survey_id)
+        # app_logger.debug(survey_id)
 
         url = (
             f"https://api.surveymonkey.com/v3/surveys/{survey_id}/rollups?per_page=100"
@@ -120,7 +122,7 @@ def paginate_through_all_response_pages(url: str, model: Type[T]) -> List[T]:
             else:
                 still_more_to_fetch = False
         except ValidationError as e:
-            print(f"ValidationError in response from {url} with JSON:")  # noqa T201
-            print(json.dumps(response, indent=2))  # noqa T201
+            app_logger.warning("ValidationError in response from {url}", {"url": url})
+            app_logger.info(json.dumps(response, indent=2))
             raise e
     return all_items

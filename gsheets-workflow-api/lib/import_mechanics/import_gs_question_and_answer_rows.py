@@ -6,6 +6,7 @@ from typing import Dict, List, Tuple
 
 import pandas as pd
 
+from lib.app_singleton import app_logger
 from lib.gs_combined.schemas import GsAnswerRow, GsQuestionRow, GsSurveyResultsData
 from lib.gsheets.gsheets_worksheet_editor import GsheetsWorksheetEditor
 from lib.import_mechanics.utils import get_non_existing_rows_df
@@ -65,23 +66,23 @@ def import_gs_question_and_answer_rows(
             # Append previously non-imported questions and
             # their answers to the respective spreadsheets
             if len(unlisted_gs_questions_df) > 0:
-                print(  # noqa T201
-                    f"Adding {len(unlisted_gs_questions_df)} yet "
-                    f"unlisted questions to the spreadsheet"
+                app_logger.info(
+                    "Adding {count} yet " "unlisted questions to the spreadsheet",
+                    {"count": len(unlisted_gs_questions_df)},
                 )
                 gs_survey_results_data.questions_combo.append_data(
                     unlisted_gs_questions_df
                 )
             else:
-                print(f"No unlisted questions to add to the spreadsheet")  # noqa T201
+                app_logger.info("No unlisted questions to add to the spreadsheet")
             if len(unlisted_gs_answers_df) > 0:
-                print(  # noqa T201
-                    f"Adding {len(unlisted_gs_answers_df)} yet "
-                    f"unlisted answers to the spreadsheet"
+                app_logger.info(
+                    "Adding {count} yet " "unlisted answers to the spreadsheet",
+                    {"count": len(unlisted_gs_answers_df)},
                 )
                 gs_survey_results_data.topline_combo.append_data(unlisted_gs_answers_df)
             else:
-                print(f"No unlisted answers to add to the spreadsheet")  # noqa T201
+                app_logger.info("No unlisted answers to add to the spreadsheet")
 
             # Update import status
             if len(ignored_questions) == 0:

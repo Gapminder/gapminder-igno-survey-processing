@@ -17,6 +17,11 @@
 # %reload_ext autoreload
 # %autoreload 2
 
+import logging
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+logging.debug("test")
+
 # +
 from lib.survey_monkey.api_client import fetch_surveys
 
