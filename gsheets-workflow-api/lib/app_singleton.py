@@ -1,3 +1,3 @@
-import logging
+import bracelogger
 
-app_logger = logging.getLogger()
+app_logger = bracelogger.get_logger()
