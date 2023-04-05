@@ -41,7 +41,9 @@ config = read_config()
 gs_combined_spreadsheet_id = config["GS_COMBINED_SPREADSHEET_ID"]
 
 # Uncomment to use DEV spreadsheet during development
-#gs_combined_spreadsheet_id = config["GS_COMBINED_SPREADSHEET_ID"]
+# gs_combined_spreadsheet_id = config["GS_DEV_COMBINED_SPREADSHEET_ID"]
+
+gs_combined_spreadsheet_id
 
 # +
 # %%time
