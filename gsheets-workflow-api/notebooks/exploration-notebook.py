@@ -17,10 +17,14 @@
 # %reload_ext autoreload
 # %autoreload 2
 
+# +
+# Required to see logging messages when executing the notebook
 import logging
-logger = logging.getLogger()
+from lib.app_singleton import AppSingleton
+
+logger = AppSingleton().get_logger()
 logger.setLevel(logging.DEBUG)
-logging.debug("test")
+logger.debug("test")
 
 # +
 from lib.survey_monkey.api_client import fetch_surveys
@@ -52,6 +56,11 @@ from lib.import_mechanics.refresh_surveys_and_combined_listings import refresh_s
 
 refresh_surveys_and_combined_listings(authorized_clients, gs_combined_spreadsheet_id)
 # -
+log_messages = AppSingleton().get_log_messages()
+print(log_messages)
+
+AppSingleton().reset_log_buffer()
+
 # ## Fetch all info about all surveys + misc
 
 # +
