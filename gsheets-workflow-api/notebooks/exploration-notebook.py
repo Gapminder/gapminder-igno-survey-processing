@@ -22,9 +22,9 @@
 import logging
 from lib.app_singleton import AppSingleton
 
-logger = AppSingleton().get_logger()
-logger.setLevel(logging.DEBUG)
-logger.debug("test")
+app_logger = AppSingleton().get_logger()
+app_logger.setLevel(logging.DEBUG)
+app_logger.debug("test")
 
 # +
 from lib.survey_monkey.api_client import fetch_surveys
@@ -135,11 +135,11 @@ from lib.mapping.utils import print_question_import_details
 
 for test_case in choicify_question_test_cases_by_family['open_ended']:
     [question, rollup, submitted_answers] = test_case
-    print("========")
-    print(question.headings[0].heading)
+    app_logger.debug("========")
+    app_logger.debug(question.headings[0].heading)
     print_question_import_details(question, rollup, submitted_answers)
     actual = choicify_question(question, rollup, submitted_answers)
-    print(actual)
+    app_logger.debug(actual)
 # -
 
 
