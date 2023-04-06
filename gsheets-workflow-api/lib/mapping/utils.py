@@ -18,5 +18,5 @@ def print_question_import_details(
     app_logger.debug("rollup: {rollup}", {"rollup": dumps(rollup.dict(), indent=2)})
     app_logger.debug(
         "submitted_answers: {submitted_answers}",
-        {"submitted_answers": dumps(submitted_answers, indent=2)},
+        {"submitted_answers": submitted_answers},
     )
