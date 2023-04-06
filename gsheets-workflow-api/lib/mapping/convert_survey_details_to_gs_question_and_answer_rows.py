@@ -120,9 +120,13 @@ def convert_survey_details_to_gs_question_and_answer_rows(
             except UnsupportedQuestionException as e:
                 ignored_questions.append(question)
                 app_logger.warning(
-                    "WARNING: Ignoring question with id {question_id} "
+                    "Ignoring question with id {question_id}, heading '{question_heading}'"
                     "since it has an unsupported format. Error: {error}",
-                    {"question_id": question.id, "error": e},
+                    {
+                        "question_id": question.id,
+                        "question_heading": question.headings[0].heading,
+                        "error": e,
+                    },
                 )
                 # print_question_import_details(question, rollup, submitted_answers)
 
