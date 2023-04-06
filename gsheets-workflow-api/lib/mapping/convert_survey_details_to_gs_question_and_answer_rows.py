@@ -1,4 +1,5 @@
 import copy
+from json import dumps
 from typing import Dict, List, Tuple
 
 from lib.app_singleton import app_logger
@@ -120,11 +121,13 @@ def convert_survey_details_to_gs_question_and_answer_rows(
             except UnsupportedQuestionException as e:
                 ignored_questions.append(question)
                 app_logger.warning(
-                    "Ignoring question with id {question_id}, heading '{question_heading}'"
+                    'Ignoring question with id {question_id}, headings "{question_headings}" '
                     "since it has an unsupported format. Error: {error}",
                     {
                         "question_id": question.id,
-                        "question_heading": question.headings[0].heading,
+                        "question_headings": dumps(
+                            question.headings[0].dict(), indent=2
+                        ),
                         "error": e,
                     },
                 )
