@@ -135,6 +135,7 @@ def import_gs_question_and_answer_rows(
                 "import_notes",
                 error_string,
             )
+            app_logger.debug(error_string)
     surveys_fully_imported_df = surveys_to_import_data_for[
         surveys_to_import_data_for["survey_was_fully_imported"]
     ]
