@@ -1,5 +1,6 @@
 import pandas as pd
 
+from lib.app_singleton import app_logger
 from lib.gdrive.auth import AuthorizedClients
 from lib.gs_combined.spreadsheet import (
     get_gs_combined_spreadsheet,
@@ -43,7 +44,7 @@ def refresh_surveys_and_combined_listings(
 
     survey_rows_to_add = []
     for index, survey_listing in unlisted_surveys_df.iterrows():
-        print(index, survey_listing["title"])  # noqa T201
+        app_logger.debug(index, survey_listing["title"])
         survey = unlisted_survey_details_by_survey_id[survey_listing["id"]]
         survey_row = {
             "survey_id": survey_listing["id"],
@@ -85,9 +86,10 @@ def refresh_surveys_and_combined_listings(
         surveys_worksheet_editor,
     )
 
-    print(  # noqa T201
-        f"Found {len(gs_questions)} supported question rows "
-        f"and {len(gs_answers)} answer rows in the selected surveys"
+    app_logger.info(
+        "Found {question_count} supported question rows "
+        "and {answer_count} answer rows in the selected surveys",
+        {"question_count": len(gs_questions), "answer_count": len(gs_answers)},
     )
 
     pass

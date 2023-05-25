@@ -1,6 +1,8 @@
 import copy
+from json import dumps
 from typing import Dict, List, Tuple
 
+from lib.app_singleton import app_logger
 from lib.find_by_attribute import find_by_attribute
 from lib.gs_combined.schemas import GsAnswerRow, GsQuestionRow, GsSurveyResultsData
 from lib.mapping.auto_mark_correctness import auto_mark_correctness
@@ -80,15 +82,20 @@ def convert_survey_details_to_gs_question_and_answer_rows(
     all_gs_answers: list[GsAnswerRow] = []
     survey_id = survey_details.id
     question_number = 0
-    print(  # noqa T201
-        f'survey with id "{survey_id}" and title "{survey_details.title}"'
+    app_logger.info(
+        'survey with id "{survey_id}" and title "{survey_title}"',
+        {"survey_id": survey_id, "survey_title": survey_details.title},
     )
     ignored_questions: list[Question] = []
     for page in survey_details.pages:
-        print(f"page {page.id}")  # noqa T201
+        app_logger.info("page {page_id}", {"page_id": page.id})
         for question in page.questions:
-            print(  # noqa T201
-                f'question {question.id} "{question.headings[0].heading}"'
+            app_logger.info(
+                'question {question_id} "{question_heading}"',
+                {
+                    "question_id": question.id,
+                    "question_heading": question.headings[0].heading,
+                },
             )
             question_number = question_number + 1
             rollup = question_rollups_by_question_id[question.id]
@@ -113,10 +120,16 @@ def convert_survey_details_to_gs_question_and_answer_rows(
                 all_gs_questions.append(gs_question)
             except UnsupportedQuestionException as e:
                 ignored_questions.append(question)
-                print(  # noqa T201
-                    f"WARNING: Ignoring question with id {question.id} "
-                    f"since it has an unsupported format. Error:",
-                    e,
+                app_logger.warning(
+                    'Ignoring question with id {question_id}, headings "{question_headings}" '
+                    "since it has an unsupported format. Error: {error}",
+                    {
+                        "question_id": question.id,
+                        "question_headings": dumps(
+                            question.headings[0].dict(), indent=2
+                        ),
+                        "error": e,
+                    },
                 )
                 # print_question_import_details(question, rollup, submitted_answers)
 

@@ -1,5 +1,5 @@
 files: ^gsheets-workflow-api/
-exclude: ^gsheets-workflow-api/exploration-notebook.py
+exclude: ^gsheets-workflow-api/notebooks/exploration-notebook.py
 repos:
   # python import sorting - will amend files
   - repo: https://github.com/pre-commit/mirrors-isort

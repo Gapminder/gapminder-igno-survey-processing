@@ -153,12 +153,19 @@ Note that this makes little sense unless you already have snooped an active user
 
 > **_NOTE:_** You need to be logged in and your GCP user account needs at least the `Cloud Functions Developer`, `Service Account User` and `Logs Viewer` roles to be able to create, deploy and debug the cloud functions.
 
-Additionally, at least once (and everytime the secrets change), a project admin (with at least the `Project IAM Admin` and `Secrets Manager Admin` roles) needs to set the necessary secrets and give cloud functions read-access to those secrets:
+Additionally, at least once, a project admin (with at least the `Project IAM Admin` and `Secrets Manager Admin` roles) needs to set the necessary secrets and give cloud functions read-access to those secrets:
 
 ```shell
 source .env
 echo -n "$SURVEY_MONKEY_API_TOKEN" | gcloud secrets create survey-monkey-api-token --data-file=- --replication-policy automatic --project $GCP_PROJECT
 gcloud projects add-iam-policy-binding $GCP_PROJECT --member="serviceAccount:$GCP_PROJECT@appspot.gserviceaccount.com" --role='roles/secretmanager.secretAccessor'
+```
+
+Then, everytime existing secrets change:
+
+```shell
+source .env
+echo -n "$SURVEY_MONKEY_API_TOKEN" | gcloud secrets versions add survey-monkey-api-token --data-file=- --project $GCP_PROJECT
 ```
 
 To deploy:
@@ -181,7 +188,7 @@ Run the following to install a Jupyter kernel and opening the example Jupyter no
 
 ```
 poe install_kernel
-jupyter-notebook exploration-notebook.py
+jupyter-notebook notebooks/exploration-notebook.py
 ```
 
 After selecting the `gapminder-igno-survey-processing-gsheets-workflow-api` kernel in Jupyter you should be able to import files from `lib`, e.g.:

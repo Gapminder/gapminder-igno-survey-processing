@@ -4,6 +4,8 @@ import pandas as pd
 from gspread import Spreadsheet, Worksheet, WorksheetNotFound
 from gspread_dataframe import set_with_dataframe
 
+from lib.app_singleton import app_logger
+
 
 def inv_dict(my_dict: dict) -> dict:
     return {v: k for k, v in my_dict.items()}
@@ -26,16 +28,24 @@ def get_worksheet(
 ) -> Worksheet:
     try:
         worksheet = sh.worksheet(worksheet_name)
-        print(  # noqa T201
-            f'Retrieved worksheet "{worksheet_name}" from '
-            f"spreadsheet with URL: {spreadsheet_url(sh.id)}"
+        app_logger.info(
+            'Retrieved worksheet "{worksheet_name}" from '
+            "spreadsheet with URL: {spreadsheet_url}",
+            {
+                "worksheet_name": worksheet_name,
+                "spreadsheet_url": spreadsheet_url(sh.id),
+            },
         )
     except WorksheetNotFound as e:
         if create_if_not_exists:
             worksheet = sh.add_worksheet(title=worksheet_name, rows=1, cols=1)
-            print(  # noqa T201
-                f'Added worksheet "{worksheet_name}" to '
-                f"spreadsheet with URL: {spreadsheet_url(sh.id)}"
+            app_logger.info(
+                'Added worksheet "{worksheet_name}" to '
+                "spreadsheet with URL: {spreadsheet_url}",
+                {
+                    "worksheet_name": worksheet_name,
+                    "spreadsheet_url": spreadsheet_url(sh.id),
+                },
             )
         else:
             raise e

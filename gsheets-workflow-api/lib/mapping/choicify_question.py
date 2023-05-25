@@ -99,7 +99,9 @@ def choicify_slider_question(
         choice_id = f"{original_question.id}:{row_index}"
         choice_summary: ChoiceSummary = ChoiceSummary(
             id=choice_id,
-            count=bracket["answer_counts"],
+            count=bracket["answer_counts"]
+            if not pd.isna(bracket["answer_counts"])
+            else 0,
         )
         choice_summaries.append(choice_summary)
     summary_item.choices = choice_summaries
