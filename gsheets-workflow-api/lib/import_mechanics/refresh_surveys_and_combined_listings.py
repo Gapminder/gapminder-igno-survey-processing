@@ -1,6 +1,7 @@
 import pandas as pd
 
 from lib.app_singleton import app_logger
+from lib.config import read_config
 from lib.gdrive.auth import AuthorizedClients
 from lib.gs_combined.spreadsheet import (
     get_gs_combined_spreadsheet,
@@ -20,8 +21,25 @@ from lib.survey_monkey.api_client import fetch_survey_details, fetch_surveys
 def refresh_surveys_and_combined_listings(
     authorized_clients: AuthorizedClients, gs_combined_spreadsheet_id: str
 ) -> None:
+    # run for multiple apps
+    config = read_config()
 
-    sm_surveys_df = fetch_surveys()
+    tokens = config["SURVEY_MONKEY_API_TOKEN"].split(";")
+
+    for token in tokens:
+        refresh_surveys_and_combined_listings_from_one_app(
+            authorized_clients, gs_combined_spreadsheet_id, token
+        )
+
+    pass
+
+
+def refresh_surveys_and_combined_listings_from_one_app(
+    authorized_clients: AuthorizedClients,
+    gs_combined_spreadsheet_id: str,
+    app_api_token: str,
+) -> None:
+    sm_surveys_df = fetch_surveys(app_api_token)
 
     gs_combined_spreadsheet = get_gs_combined_spreadsheet(
         authorized_clients, gs_combined_spreadsheet_id
@@ -39,8 +57,9 @@ def refresh_surveys_and_combined_listings(
     )
 
     unlisted_survey_ids = unlisted_surveys_df["id"].tolist()
-
-    unlisted_survey_details_by_survey_id = fetch_survey_details(unlisted_survey_ids)
+    unlisted_survey_details_by_survey_id = fetch_survey_details(
+        unlisted_survey_ids, app_api_token
+    )
 
     survey_rows_to_add = []
     for index, survey_listing in unlisted_surveys_df.iterrows():
@@ -71,7 +90,9 @@ def refresh_surveys_and_combined_listings(
         survey_details_by_survey_id,
         question_rollups_by_question_id,
         submitted_answers_by_question_id,
-    ) = prepare_import_of_gs_question_and_answer_rows(surveys_worksheet_editor)
+    ) = prepare_import_of_gs_question_and_answer_rows(
+        surveys_worksheet_editor, app_api_token
+    )
 
     (
         gs_questions,

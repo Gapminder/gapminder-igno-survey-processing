@@ -14,7 +14,7 @@ from lib.survey_monkey.survey import Survey
 
 
 def prepare_import_of_gs_question_and_answer_rows(
-    surveys_worksheet_editor: GsheetsWorksheetEditor,
+    surveys_worksheet_editor: GsheetsWorksheetEditor, app_api_token: str
 ) -> Tuple[
     pd.DataFrame,
     Dict[str, Survey],
@@ -36,12 +36,12 @@ def prepare_import_of_gs_question_and_answer_rows(
     survey_ids = surveys_to_import_data_for["survey_id"].tolist()
 
     # Do all SurveyMonkey API calls up front
-    survey_details_by_survey_id = fetch_survey_details(survey_ids)
+    survey_details_by_survey_id = fetch_survey_details(survey_ids, app_api_token)
     question_rollups_by_question_id = fetch_question_rollups_by_question_id(
-        survey_details_by_survey_id
+        survey_details_by_survey_id, app_api_token
     )
     submitted_answers_by_question_id = fetch_submitted_answers_by_question_id(
-        survey_details_by_survey_id
+        survey_details_by_survey_id, app_api_token
     )
 
     return (
