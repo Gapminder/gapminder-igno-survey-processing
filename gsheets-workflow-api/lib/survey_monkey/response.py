@@ -9,11 +9,11 @@ class CustomValue(BaseModel):
 
 
 class Contact(BaseModel):
-    custom_value: CustomValue
+    custom_value: Optional[CustomValue]
 
 
 class Metadata(BaseModel):
-    contact: Contact
+    contact: Optional[Contact]
 
 
 class Answer(BaseModel):
