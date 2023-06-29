@@ -30,9 +30,7 @@ def prepare_import_of_gs_question_and_answer_rows(
     app_surveys_ids = app_surveys["id"].tolist()
     surveys_to_import_data_for = surveys_worksheet_editor.data.df[
         # surveys in this app...
-        surveys_worksheet_editor.data.df["survey_id"]
-        .astype(str)
-        .isin(app_surveys_ids)
+        surveys_worksheet_editor.data.df["survey_id"].astype(str).isin(app_surveys_ids)
         # and ready for import...
         & surveys_worksheet_editor.data.df["results_ready_for_import"]
         .fillna(False)

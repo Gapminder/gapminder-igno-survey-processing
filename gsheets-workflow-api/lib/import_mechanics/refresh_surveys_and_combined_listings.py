@@ -12,8 +12,8 @@ from lib.import_mechanics.import_gs_question_and_answer_rows import (
     import_gs_question_and_answer_rows,
 )
 from lib.import_mechanics.prepare_import_of_gs_question_and_answer_rows import (
-    prepare_import_of_gs_question_and_answer_rows,
     NoNewSurveys,
+    prepare_import_of_gs_question_and_answer_rows,
 )
 from lib.import_mechanics.utils import get_non_existing_rows_df
 from lib.survey_monkey.api_client import fetch_survey_details, fetch_surveys
@@ -96,7 +96,8 @@ def refresh_surveys_and_combined_listings_from_one_app(
             surveys_worksheet_editor, app_api_token
         )
     except NoNewSurveys:
-        app_logger.info(f"No new surveys to import from this app: {app_api_token[:3]}...")
+        msg = f"No new surveys to import from this app: {app_api_token[:3]}..."
+        app_logger.info(msg)
         return
 
     (
