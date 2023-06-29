@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.14.4
+#       jupytext_version: 1.14.6
 #   kernelspec:
 #     display_name: gapminder-igno-survey-processing-gsheets-workflow-api
 #     language: python
@@ -27,9 +27,18 @@ app_logger.setLevel(logging.DEBUG)
 app_logger.debug("test")
 
 # +
+from lib.config import read_config
+
+config = read_config()
+# -
+
+api_tokens = config['SURVEY_MONKEY_API_TOKEN'].split(';')
+api_token = api_tokens[0]
+
+# +
 from lib.survey_monkey.api_client import fetch_surveys
 
-sm_surveys_df = fetch_surveys()
+sm_surveys_df = fetch_surveys(api_token)
 sm_surveys_df
 # -
 
@@ -42,10 +51,10 @@ authorized_clients = get_service_account_authorized_clients()
 from lib.config import read_config
 
 config = read_config()
-gs_combined_spreadsheet_id = config["GS_COMBINED_SPREADSHEET_ID"]
+# gs_combined_spreadsheet_id = config["GS_COMBINED_SPREADSHEET_ID"]
 
 # Uncomment to use DEV spreadsheet during development
-# gs_combined_spreadsheet_id = config["GS_DEV_COMBINED_SPREADSHEET_ID"]
+gs_combined_spreadsheet_id = config["GS_DEV_COMBINED_SPREADSHEET_ID"]
 
 gs_combined_spreadsheet_id
 
@@ -66,7 +75,7 @@ AppSingleton().reset_log_buffer()
 # +
 from lib.survey_monkey.api_client import fetch_survey_details
 
-all_survey_details_by_survey_id = fetch_survey_details(sm_surveys_df['id'].to_list())
+all_survey_details_by_survey_id = fetch_survey_details(sm_surveys_df['id'].to_list(), api_token)
 # -
 
 all_survey_details_by_survey_id
@@ -95,7 +104,7 @@ print(json.dumps(all_survey_details))
 # +
 from lib.survey_monkey.api_client import fetch_question_rollups_by_question_id
 
-all_question_rollups_by_question_id = fetch_question_rollups_by_question_id(all_survey_details_by_survey_id)
+all_question_rollups_by_question_id = fetch_question_rollups_by_question_id(all_survey_details_by_survey_id, api_token)
 all_question_rollups_by_question_id
 
 # +
@@ -109,7 +118,7 @@ print(json.dumps(all_question_rollups))
 # +
 from lib.survey_monkey.api_client import fetch_submitted_answers_by_question_id
 
-all_submitted_answers_by_question_id = fetch_submitted_answers_by_question_id(all_survey_details_by_survey_id)
+all_submitted_answers_by_question_id = fetch_submitted_answers_by_question_id(all_survey_details_by_survey_id, api_token)
 all_submitted_answers_by_question_id
 # -
 
