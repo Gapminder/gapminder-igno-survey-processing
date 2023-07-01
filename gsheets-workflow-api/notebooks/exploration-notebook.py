@@ -32,8 +32,13 @@ from lib.config import read_config
 config = read_config()
 # -
 
+# We can import data from multiple survey monkey apps. In this case we should use ";" to
+# separate API tokens.
 api_tokens = config['SURVEY_MONKEY_API_TOKEN'].split(';')
-api_token = api_tokens[0]
+# In the below cells, when we need api_token as function parameter, it means that we only use one API token.
+api_token = api_tokens[0]  # First one
+# api_token = api_tokens[1]  # Second one
+# api_token = api_tokens[2]  # Third one
 
 # +
 from lib.survey_monkey.api_client import fetch_surveys
@@ -51,16 +56,18 @@ authorized_clients = get_service_account_authorized_clients()
 from lib.config import read_config
 
 config = read_config()
-# gs_combined_spreadsheet_id = config["GS_COMBINED_SPREADSHEET_ID"]
+gs_combined_spreadsheet_id = config["GS_COMBINED_SPREADSHEET_ID"]
 
 # Uncomment to use DEV spreadsheet during development
-gs_combined_spreadsheet_id = config["GS_DEV_COMBINED_SPREADSHEET_ID"]
+# gs_combined_spreadsheet_id = config["GS_DEV_COMBINED_SPREADSHEET_ID"]
 
 gs_combined_spreadsheet_id
 
 # +
 # %%time
 
+# The main entry point of the cloud function is refresh_surveys_and_combined_listings function.
+# This function will check and import all surveys from all Survey Monkey apps set in SURVEY_MONKEY_API_TOKEN
 from lib.import_mechanics.refresh_surveys_and_combined_listings import refresh_surveys_and_combined_listings
 
 refresh_surveys_and_combined_listings(authorized_clients, gs_combined_spreadsheet_id)
@@ -150,6 +157,3 @@ for test_case in choicify_question_test_cases_by_family['open_ended']:
     actual = choicify_question(question, rollup, submitted_answers)
     app_logger.debug(actual)
 # -
-
-
-
