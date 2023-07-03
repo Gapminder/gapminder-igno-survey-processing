@@ -12,6 +12,7 @@ from lib.import_mechanics.import_gs_question_and_answer_rows import (
     import_gs_question_and_answer_rows,
 )
 from lib.import_mechanics.prepare_import_of_gs_question_and_answer_rows import (
+    NoNewSurveys,
     prepare_import_of_gs_question_and_answer_rows,
 )
 from lib.import_mechanics.utils import get_non_existing_rows_df
@@ -85,14 +86,19 @@ def refresh_surveys_and_combined_listings_from_one_app(
     if len(survey_rows_to_add_df) > 0:
         surveys_worksheet_editor.append_data(survey_rows_to_add_df)
 
-    (
-        surveys_to_import_data_for,
-        survey_details_by_survey_id,
-        question_rollups_by_question_id,
-        submitted_answers_by_question_id,
-    ) = prepare_import_of_gs_question_and_answer_rows(
-        surveys_worksheet_editor, app_api_token
-    )
+    try:
+        (
+            surveys_to_import_data_for,
+            survey_details_by_survey_id,
+            question_rollups_by_question_id,
+            submitted_answers_by_question_id,
+        ) = prepare_import_of_gs_question_and_answer_rows(
+            surveys_worksheet_editor, app_api_token
+        )
+    except NoNewSurveys:
+        msg = f"No new surveys to import from this app: {app_api_token[:3]}..."
+        app_logger.info(msg)
+        return
 
     (
         gs_questions,

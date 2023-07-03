@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.14.4
+#       jupytext_version: 1.14.6
 #   kernelspec:
 #     display_name: gapminder-igno-survey-processing-gsheets-workflow-api
 #     language: python
@@ -27,9 +27,23 @@ app_logger.setLevel(logging.DEBUG)
 app_logger.debug("test")
 
 # +
+from lib.config import read_config
+
+config = read_config()
+# -
+
+# We can import data from multiple survey monkey apps. In this case we should use ";" to
+# separate API tokens.
+api_tokens = config['SURVEY_MONKEY_API_TOKEN'].split(';')
+# In the below cells, when we need api_token as function parameter, it means that we only use one API token.
+api_token = api_tokens[0]  # First one
+# api_token = api_tokens[1]  # Second one
+# api_token = api_tokens[2]  # Third one
+
+# +
 from lib.survey_monkey.api_client import fetch_surveys
 
-sm_surveys_df = fetch_surveys()
+sm_surveys_df = fetch_surveys(api_token)
 sm_surveys_df
 # -
 
@@ -52,6 +66,8 @@ gs_combined_spreadsheet_id
 # +
 # %%time
 
+# The main entry point of the cloud function is refresh_surveys_and_combined_listings function.
+# This function will check and import all surveys from all Survey Monkey apps set in SURVEY_MONKEY_API_TOKEN
 from lib.import_mechanics.refresh_surveys_and_combined_listings import refresh_surveys_and_combined_listings
 
 refresh_surveys_and_combined_listings(authorized_clients, gs_combined_spreadsheet_id)
@@ -66,7 +82,7 @@ AppSingleton().reset_log_buffer()
 # +
 from lib.survey_monkey.api_client import fetch_survey_details
 
-all_survey_details_by_survey_id = fetch_survey_details(sm_surveys_df['id'].to_list())
+all_survey_details_by_survey_id = fetch_survey_details(sm_surveys_df['id'].to_list(), api_token)
 # -
 
 all_survey_details_by_survey_id
@@ -95,7 +111,7 @@ print(json.dumps(all_survey_details))
 # +
 from lib.survey_monkey.api_client import fetch_question_rollups_by_question_id
 
-all_question_rollups_by_question_id = fetch_question_rollups_by_question_id(all_survey_details_by_survey_id)
+all_question_rollups_by_question_id = fetch_question_rollups_by_question_id(all_survey_details_by_survey_id, api_token)
 all_question_rollups_by_question_id
 
 # +
@@ -109,7 +125,7 @@ print(json.dumps(all_question_rollups))
 # +
 from lib.survey_monkey.api_client import fetch_submitted_answers_by_question_id
 
-all_submitted_answers_by_question_id = fetch_submitted_answers_by_question_id(all_survey_details_by_survey_id)
+all_submitted_answers_by_question_id = fetch_submitted_answers_by_question_id(all_survey_details_by_survey_id, api_token)
 all_submitted_answers_by_question_id
 # -
 
@@ -141,6 +157,3 @@ for test_case in choicify_question_test_cases_by_family['open_ended']:
     actual = choicify_question(question, rollup, submitted_answers)
     app_logger.debug(actual)
 # -
-
-
-
