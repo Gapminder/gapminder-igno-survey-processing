@@ -33,7 +33,7 @@ def read_gs_survey_results_data(
     imported_igno_questions_info = GsheetsWorksheetEditor(
         sh=gs_combined_spreadsheet,
         worksheet_name="imported_igno_questions_info",
-        header_row_number=0,
+        header_row_number=1,
         attributes_to_columns_map=attributes_to_columns_maps["gs_combined"][
             "imported_igno_questions"
         ],
