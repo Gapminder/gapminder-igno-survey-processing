@@ -64,6 +64,7 @@ For the GCP project that will be used for deployment:
 - Cloud Functions API
 - Cloud Build API
 - IAM Service Account Credentials API
+- Artifact Registry API
 
 2. Configure the OAuth consent screen: [https://console.cloud.google.com/apis/credentials/consent](). The current GCP Oauth assets (logo) was created using [this Figma project](https://www.figma.com/file/m7vuUFRdMkrTwnO1whFfi7/Google-Marketplace-assets?node-id=0%3A1&t=dgKGpR2Tdz7wsVAS-0).
 
