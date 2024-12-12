@@ -93,13 +93,6 @@ def determine_auto_marked_correctness(
             and x["step5_question_id"] == corresponding_gs_question.step5_question_id,
             axis=1,
         )
-    elif corresponding_gs_question.custom_igno_index_question_id.strip() != "":
-        matches = igno_questions_df.apply(
-            lambda x: x["custom_igno_index_question_id"]
-            and x["custom_igno_index_question_id"]
-            == corresponding_gs_question.custom_igno_index_question_id,
-            axis=1,
-        )
         matching_igno_questions_df = igno_questions_df[matches].fillna("")
 
         if len(matching_igno_questions_df) == 0:
@@ -134,6 +127,26 @@ def determine_auto_marked_correctness(
                 "step5_question_translated_question_very_wrong_answer"
             ]
         )
+    elif corresponding_gs_question.custom_igno_index_question_id.strip() != "":
+        matches = igno_questions_df.apply(
+            lambda x: x["custom_igno_index_question_id"]
+            and x["custom_igno_index_question_id"]
+            == corresponding_gs_question.custom_igno_index_question_id,
+            axis=1,
+        )
+        matching_custom_igno_questions_df = igno_questions_df[matches].fillna("")
+
+        if len(matching_custom_igno_questions_df) == 0:
+            raise ValueError(
+                f"(No matching imported custom_igno_index_question info "
+                f"entry found in {imported_igno_questions_info_sheet_name})"
+            )
+        factual_correct_answer = matching_custom_igno_questions_df.iloc[0][
+            "custom_igno_index_question_correct_answer"
+        ]
+        factual_very_wrong_answer = matching_custom_igno_questions_df.iloc[0][
+            "custom_igno_index_question_very_wrong_answer"
+        ]
     else:
         raise ValueError("(Question ID not mapped)")
     if factual_correct_answer is None or str(factual_correct_answer).strip() == "":
