@@ -75,6 +75,15 @@ def summarize_gs_question(
         step5_question_very_wrong_answer=template_gs_question[
             "step5_question_very_wrong_answer"
         ],
+        custom_igno_index_question_id="",
+        auto_mapped_custom_igno_index_question_id="",  # Mapped below
+        custom_igno_index_question=template_gs_question["custom_igno_index_question"],
+        custom_igno_index_question_correct_answer=template_gs_question[
+            "custom_igno_index_question_correct_answer"
+        ],
+        custom_igno_index_question_very_wrong_answer=template_gs_question[
+            "custom_igno_index_question_very_wrong_answer"
+        ],
         response_count=answered_count,
         the_answer_options=the_answer_options,
         answers_by_percent=answers_by_percent,
