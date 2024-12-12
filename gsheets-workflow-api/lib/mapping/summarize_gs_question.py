@@ -113,5 +113,9 @@ def summarize_gs_question(
         gs_question_row=gs_question_row,
         gs_survey_results_data=gs_survey_results_data,
     )
+    map_custom_igno_index_question_id(
+        gs_question_row=gs_question_row,
+        gs_survey_results_data=gs_survey_results_data,
+    )
 
     return gs_question_row

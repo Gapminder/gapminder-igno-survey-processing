@@ -93,6 +93,13 @@ def determine_auto_marked_correctness(
             and x["step5_question_id"] == corresponding_gs_question.step5_question_id,
             axis=1,
         )
+    elif corresponding_gs_question.custom_igno_index_question_id.strip() != "":
+        matches = igno_questions_df.apply(
+            lambda x: x["custom_igno_index_question_id"]
+            and x["custom_igno_index_question_id"]
+            == corresponding_gs_question.custom_igno_index_question_id,
+            axis=1,
+        )
         matching_igno_questions_df = igno_questions_df[matches].fillna("")
 
         if len(matching_igno_questions_df) == 0:
