@@ -3,6 +3,7 @@ from lib.mapping.map_question_ids import (
     map_foreign_country_igno_question_id,
     map_igno_index_question_id,
     map_step5_question_id,
+    map_custom_igno_index_question_id,
 )
 from lib.survey_monkey.survey import Question, Survey
 
