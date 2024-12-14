@@ -1,5 +1,6 @@
 from typing import Any, Dict, Union
 
+from lib.app_singleton import app_logger
 import gspread_dataframe
 import pandas as pd
 from gspread import Spreadsheet, Worksheet
@@ -47,6 +48,13 @@ class GsheetsWorksheetEditor:
             self.worksheet,
             header=self.header_row_number,
             evaluate_formulas=self.evaluate_formulas,
+        )
+        app_logger.info(
+            "Original DataFrame columns in {worksheet}: {columns}",
+            {
+                "worksheet": self.worksheet_name,
+                "columns": list(df.columns),
+            },
         )
         if self.remove_empty_rows:
             df = df.dropna(axis=0, how="all")
