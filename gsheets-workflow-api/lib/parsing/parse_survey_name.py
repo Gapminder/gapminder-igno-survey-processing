@@ -1,7 +1,7 @@
 from typing import Dict, Union
 
 from lib.parsing.extract_numerical_parts_of_answer_option import (
-    extract_numerical_parts_of_answer_option,
+    extract_numerical_parts_of_answer_option
 )
 
 BatchNumberParseResult = Union[str, None, bool]
@@ -53,8 +53,8 @@ def parse_survey_name(survey_name: str) -> Dict[str, BatchNumberParseResult]:
         country_views_survey_batch_number = None
         study_survey_batch_number = None
 
-    # Custom igno index uses the same batch number as regular igno index
-    custom_igno_index_world_views_survey_batch_number = world_views_survey_batch_number
+    # Just use None for Custom igno index
+    custom_igno_index_world_views_survey_batch_number = None
 
     return {
         "igno_index_world_views_survey_batch_number": world_views_survey_batch_number,
