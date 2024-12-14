@@ -3,7 +3,6 @@ import re
 import numpy as np
 import pandas as pd
 
-from lib.app_singleton import app_logger
 from lib.gsheets.utils import inv_dict
 
 
@@ -21,15 +20,7 @@ class GsheetsWorksheetData:
     ):
         self.header_row_number = header_row_number
         self.attributes_to_columns_map = attributes_to_columns_map
-        app_logger.info(
-            "DataFrame columns before rename: {columns}",
-            {"columns": list(df.columns)},
-        )
         renamed_df = df.rename(columns=inv_dict(attributes_to_columns_map))
-        app_logger.info(
-            "DataFrame columns after rename: {columns}",
-            {"columns": list(renamed_df.columns)},
-        )
         self.df = self.replace_current_row_numbers_in_formulas(renamed_df)
 
     def replace_current_row_numbers_in_formulas(self, df: pd.DataFrame) -> pd.DataFrame:

@@ -49,13 +49,6 @@ class GsheetsWorksheetEditor:
             header=self.header_row_number,
             evaluate_formulas=self.evaluate_formulas,
         )
-        app_logger.info(
-            "Original DataFrame columns in {worksheet}: {columns}",
-            {
-                "worksheet": self.worksheet_name,
-                "columns": list(df.columns),
-            },
-        )
         if self.remove_empty_rows:
             df = df.dropna(axis=0, how="all")
         if self.remove_empty_columns:
