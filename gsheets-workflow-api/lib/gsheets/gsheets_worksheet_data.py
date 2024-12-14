@@ -3,6 +3,7 @@ import re
 import numpy as np
 import pandas as pd
 
+from lib.app_singleton import app_logger
 from lib.gsheets.utils import inv_dict
 
 
