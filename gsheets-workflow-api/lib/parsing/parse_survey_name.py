@@ -13,6 +13,7 @@ def parse_survey_name(survey_name: str) -> Dict[str, BatchNumberParseResult]:
     )
     country_views_text_found = "Country Views " in survey_name
     study_survey_text_found = "Study Survey " in survey_name or "Study " in survey_name
+    custom_igno_text_found = "Other Survey " in survey_name
 
     numerical_parts_of_survey_name = extract_numerical_parts_of_answer_option(
         survey_name
@@ -28,6 +29,11 @@ def parse_survey_name(survey_name: str) -> Dict[str, BatchNumberParseResult]:
     study_survey_batch_number: BatchNumberParseResult = (
         str(int(numerical_parts_of_survey_name[0]))
         if study_survey_text_found
+        else False
+    )
+    custom_igno_index_world_views_survey_batch_number: BatchNumberParseResult = (
+        str(int(numerical_parts_of_survey_name[0]))
+        if custom_igno_text_found
         else False
     )
 
@@ -48,13 +54,12 @@ def parse_survey_name(survey_name: str) -> Dict[str, BatchNumberParseResult]:
         world_views_survey_batch_number is False
         and country_views_survey_batch_number is False
         and study_survey_batch_number is False
+        and custom_igno_index_world_views_survey_batch_number is False
     ):
         world_views_survey_batch_number = None
         country_views_survey_batch_number = None
         study_survey_batch_number = None
-
-    # Just use None for Custom igno index
-    custom_igno_index_world_views_survey_batch_number = None
+        custom_igno_index_world_views_survey_batch_number = None
 
     return {
         "igno_index_world_views_survey_batch_number": world_views_survey_batch_number,
