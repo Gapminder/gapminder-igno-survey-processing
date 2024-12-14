@@ -35,6 +35,17 @@ def map_question_id(
     )
 
     igno_questions_df = gs_survey_results_data.imported_igno_questions_info.data.df
+    
+    # Debug: Print DataFrame columns
+    app_logger.info(
+        "DataFrame columns: {columns}",
+        {"columns": list(igno_questions_df.columns)},
+    )
+    app_logger.info(
+        "Searching for column: {column}",
+        {"column": question_text_attribute},
+    )
+    
     matches = igno_questions_df.apply(
         lambda x: x[question_text_attribute]
         and key_normalizer_for_slightly_fuzzy_lookups(x[question_text_attribute])
