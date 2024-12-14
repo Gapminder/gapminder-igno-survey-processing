@@ -53,8 +53,12 @@ def parse_survey_name(survey_name: str) -> Dict[str, BatchNumberParseResult]:
         country_views_survey_batch_number = None
         study_survey_batch_number = None
 
+    # Custom igno index uses the same batch number as regular igno index
+    custom_igno_index_world_views_survey_batch_number = world_views_survey_batch_number
+
     return {
         "igno_index_world_views_survey_batch_number": world_views_survey_batch_number,
         "country_views_survey_batch_number": country_views_survey_batch_number,
         "study_survey_batch_number": study_survey_batch_number,
+        "custom_igno_index_world_views_survey_batch_number": custom_igno_index_world_views_survey_batch_number,
     }
