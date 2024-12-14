@@ -1,3 +1,4 @@
+from lib.app_singleton import app_logger
 from lib.gs_combined.schemas import GsQuestionRow, GsSurveyResultsData
 from lib.parsing.key_normalizer_for_slightly_fuzzy_lookups import (
     key_normalizer_for_slightly_fuzzy_lookups,
