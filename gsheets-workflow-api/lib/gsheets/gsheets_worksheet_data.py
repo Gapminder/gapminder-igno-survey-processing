@@ -20,9 +20,8 @@ class GsheetsWorksheetData:
     ):
         self.header_row_number = header_row_number
         self.attributes_to_columns_map = attributes_to_columns_map
-        self.df = self.replace_current_row_numbers_in_formulas(
-            df.rename(columns=inv_dict(attributes_to_columns_map))
-        )
+        renamed_df = df.rename(columns=inv_dict(attributes_to_columns_map))
+        self.df = self.replace_current_row_numbers_in_formulas(renamed_df)
 
     def replace_current_row_numbers_in_formulas(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()

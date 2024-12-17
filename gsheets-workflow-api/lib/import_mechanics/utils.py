@@ -18,14 +18,18 @@ def get_non_existing_rows_df(
     existing_df["_merge_id"] = (
         existing_df[unique_id_attribute].dropna().apply(stringify_id)
     )
-    merged_df = pd.merge(
-        new_df,
-        existing_df,
-        on=["_merge_id"],
-        how="outer",
-        indicator=True,
-        suffixes=("", "_existing"),
-    )
-    return merged_df.loc[merged_df["_merge"] == "left_only", new_df.columns].drop(
-        columns=["_merge_id"]
-    )
+    if not existing_df["_merge_id"].dropna().empty:
+        merged_df = pd.merge(
+            new_df,
+            existing_df,
+            on=["_merge_id"],
+            how="outer",
+            indicator=True,
+            suffixes=("", "_existing"),
+        )
+        res = merged_df.loc[merged_df["_merge"] == "left_only", new_df.columns].drop(
+            columns=["_merge_id"]
+        )
+    else:
+        res = new_df.drop(columns=["_merge_id"])
+    return res

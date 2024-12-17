@@ -29,6 +29,11 @@ class GsQuestionRow:
     step5_question: str
     step5_question_correct_answer: str
     step5_question_very_wrong_answer: str
+    custom_igno_index_question_id: str
+    auto_mapped_custom_igno_index_question_id: str
+    custom_igno_index_question: str
+    custom_igno_index_question_correct_answer: str
+    custom_igno_index_question_very_wrong_answer: str
     response_count: int
     the_answer_options: str
     answers_by_percent: str
@@ -111,6 +116,11 @@ attributes_to_columns_maps = {
             "step5_question": "Step 5 Question",
             "step5_question_correct_answer": "Correct Answer to Step 5 Question",
             "step5_question_very_wrong_answer": "Very Wrong Answer to Step 5 Question",
+            "custom_igno_index_question_id": "Custom Igno Index Question ID",
+            "auto_mapped_custom_igno_index_question_id": "Auto-mapped Custom Igno Index Question ID",
+            "custom_igno_index_question": "Custom Igno Index Question",
+            "custom_igno_index_question_correct_answer": "Correct Answer to Custom Igno Index Question",
+            "custom_igno_index_question_very_wrong_answer": "Very Wrong Answer to Custom Igno Index Question",
             "response_count": "Response count",
             "the_answer_options": "The answer options",
             "answers_by_percent": "Answers by percent",
@@ -143,18 +153,21 @@ attributes_to_columns_maps = {
             "weighted_by": "Weighted by",
         },
         "imported_igno_questions": {
+            # First group - Igno Index
             "igno_index_question_id": "ID\ncombo",
             "igno_index_world_views_survey_batch_number": "WV#",
             "igno_index_question": "Question ",
             "igno_index_question_correct_answer": "Correct Answer",
             "igno_index_question_answer_options": "Answer options",
             "igno_index_question_very_wrong_answer": "Very Wrong Answer - filled out only if it can't be derived numerically",
+            # Second group - Foreign Country
             "foreign_country_igno_question_id": "ID combo",
-            "foreign_country_country_views_survey_batch_number": "CV#",
+            "country_views_survey_batch_number": "CV#",  # Fixed attribute name to match usage
             "foreign_country_igno_question": "Question .1",
             "foreign_country_igno_index_question_correct_answer": "Correct Answer.1",
             "foreign_country_igno_question_answer_options": "Answer options.1",
             "foreign_country_igno_index_question_very_wrong_answer": "Very Wrong Answer - filled out only if it can't be derived numerically.1",
+            # Third group - Step 5
             "step5_question_id": "Step 5 Question ID",
             "step5_study_survey_batch_number": "S#",
             "step5_question_and_translation": "Study Question (EN) + Translation",
@@ -168,6 +181,13 @@ attributes_to_columns_maps = {
             "step5_question_translated_question_correct_answer": "Correct Answer (translation)",
             "step5_question_translated_question_answer_options": "Answer options (translation)",
             "step5_question_translated_question_very_wrong_answer": "Very Wrong Answer - filled out only if it can't be derived numerically (translation)",
+            # Fourth group - Custom Igno Index
+            "custom_igno_index_question_id": "ID\ncombo.1",
+            "custom_igno_index_world_views_survey_batch_number": "WV#.1",
+            "custom_igno_index_question": "Question .2",
+            "custom_igno_index_question_correct_answer": "Correct Answer.2",
+            "custom_igno_index_question_answer_options": "Answer options.2",
+            "custom_igno_index_question_very_wrong_answer": "Very Wrong Answer - filled out only if it can't be derived numerically.2",
         },
     }
 }

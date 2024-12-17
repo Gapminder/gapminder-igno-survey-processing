@@ -1,3 +1,4 @@
+from lib.app_singleton import app_logger
 from lib.gs_combined.schemas import GsQuestionRow, GsSurveyResultsData
 from lib.parsing.key_normalizer_for_slightly_fuzzy_lookups import (
     key_normalizer_for_slightly_fuzzy_lookups,
@@ -133,3 +134,29 @@ def map_step5_question_id(
             )
     except ValueError as e:
         gs_question_row.auto_mapped_step5_question_id = str(e)
+
+
+def map_custom_igno_index_question_id(
+    gs_question_row: GsQuestionRow,
+    gs_survey_results_data: GsSurveyResultsData,
+) -> None:
+    try:
+        auto_mapped_ids = map_question_id(
+            "custom_igno_index_world_views_survey_batch_number",
+            "custom_igno_index_question",
+            "custom_igno_index_question_id",
+            gs_question_row,
+            gs_survey_results_data,
+        )
+        gs_question_row.auto_mapped_custom_igno_index_question_id = "; ".join(
+            auto_mapped_ids
+        )
+        if (
+            len(auto_mapped_ids) == 1
+            and gs_question_row.custom_igno_index_question_id.strip() == ""
+        ):
+            gs_question_row.custom_igno_index_question_id = (
+                gs_question_row.auto_mapped_custom_igno_index_question_id
+            )
+    except ValueError as e:
+        gs_question_row.auto_mapped_custom_igno_index_question_id = str(e)

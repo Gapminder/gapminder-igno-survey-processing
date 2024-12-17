@@ -1,5 +1,6 @@
 from typing import Any, Dict, Union
 
+from lib.app_singleton import app_logger
 import gspread_dataframe
 import pandas as pd
 from gspread import Spreadsheet, Worksheet
